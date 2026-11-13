@@ -1,0 +1,22 @@
+{% extends 'base.html' %}{% import 'macros.html' as m with context %}
+{% block title %}{{ p.title }}{% endblock %}
+{% block content %}
+<section class="section section-tight">
+  <div class="container policy">
+    <div>
+      {{ m.crumbs([('Hỗ trợ & chính sách', url_for('contact')), (p.title, None)]) }}
+      <h1>{{ p.title }}</h1>
+      <p class="small muted">Cập nhật: {{ D.POLICY_UPDATED }} · Nội dung nháp, chờ doanh nghiệp duyệt trước khi xuất bản chính thức.</p>
+      <nav class="toc toc-inline" aria-label="Mục lục"><b>Mục lục</b><ol>{% for t, c in p.sections %}<li><a href="#s{{ loop.index }}">{{ t }}</a></li>{% endfor %}</ol></nav>
+      <div class="prose">
+        {% for t, c in p.sections %}<h2 id="s{{ loop.index }}">{{ t }}</h2><p>{{ c }}</p>{% endfor %}
+      </div>
+      <div class="note-card">Cần hỗ trợ? <a class="link" href="{{ url_for('track') }}">Gửi yêu cầu về đơn hàng</a> hoặc <a class="link" href="{{ url_for('contact') }}">liên hệ chúng tôi</a>.</div>
+    </div>
+    <aside class="policy-nav">
+      <b>Hỗ trợ đặt hàng</b>{% for k, v in D.POLICIES.items() if v.group=='support' %}<a class="{{ 'active' if k==slug }}" href="{{ url_for('policy', slug=k) }}">{{ v.title }}</a>{% endfor %}
+      <b>Chính sách</b>{% for k, v in D.POLICIES.items() if v.group=='policy' %}<a class="{{ 'active' if k==slug }}" href="{{ url_for('policy', slug=k) }}">{{ v.title }}</a>{% endfor %}
+    </aside>
+  </div>
+</section>
+{% endblock %}

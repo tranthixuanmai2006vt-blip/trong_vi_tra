@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+.idea/
+*.db
+uploads/
+_ban_cu_v1/
+.DS_Store

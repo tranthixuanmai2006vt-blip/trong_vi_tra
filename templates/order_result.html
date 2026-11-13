@@ -1,0 +1,57 @@
+{% extends 'base.html' %}{% import 'macros.html' as m with context %}
+{% block title %}Đơn hàng {{ o.code }}{% endblock %}
+{% block content %}
+{% set d = o.data %}
+<section class="section section-tight">
+  <div class="container narrow">
+    {% set st = o.payment %}
+    <div class="result-head status-{{ 'ok' if st=='paid' else ('wait' if st in ['cod_pending','bank_pending','verifying'] else 'err') }}" role="status">
+      {% if st == 'cod_pending' %}<h1>Đã nhận đơn – chờ thanh toán khi nhận</h1>
+      {% elif st == 'bank_pending' %}<h1>Đơn đã tạo – chờ thanh toán</h1>
+      {% elif st == 'verifying' %}<h1>Đang xác minh thanh toán</h1><p>Chúng tôi sẽ cập nhật khi đối soát xong. Vui lòng không chuyển khoản lại.</p>
+      {% elif st == 'paid' %}<h1>Thanh toán thành công</h1>
+      {% else %}<h1>{{ D.PAYMENT_STATUS.get(st, st) }}</h1>{% endif %}
+      <div class="code-box"><span>Mã đơn</span><b>{{ o.code }}</b><button class="btn btn-sm btn-secondary" data-copy="{{ o.code }}">{{ m.icon('copy') }} Sao chép</button></div>
+      <p class="small">Đặt lúc {{ o.created }} · Tổng <b>{{ o.total | vnd }}</b> · Xử lý đơn: <b>{{ D.ORDER_STEPS[o.status_idx] }}</b></p>
+    </div>
+
+    {% if st == 'bank_pending' %}
+    <div class="card-form bank">
+      <h2 class="h3">Hướng dẫn chuyển khoản</h2>
+      <table class="brew-table">
+        <tr><th>Ngân hàng</th><td>{{ D.BANK.bank }}</td></tr><tr><th>Số tài khoản</th><td>{{ D.BANK.account }}</td></tr>
+        <tr><th>Người thụ hưởng</th><td>{{ D.BANK.holder }}</td></tr>
+        <tr><th>Số tiền</th><td><b>{{ o.total | vnd }}</b> <button class="link-sm" data-copy="{{ o.total }}">Sao chép</button></td></tr>
+        <tr><th>Nội dung</th><td><b>{{ o.code }}</b> <button class="link-sm" data-copy="{{ o.code }}">Sao chép</button></td></tr>
+        <tr><th>Hiệu lực</th><td>{{ D.BANK.hours_valid }} giờ kể từ khi đặt</td></tr>
+      </table>
+      <p class="small muted">Mã QR chỉ hiển thị khi đã có thông tin tài khoản được doanh nghiệp xác nhận. Đơn được xác nhận sau khi đối soát.</p>
+      <form method="post" action="{{ url_for('order_paid_claim', code=o.code) }}"><button class="btn">Tôi đã chuyển khoản</button></form>
+    </div>
+    {% endif %}
+
+    <div class="card-form">
+      <h2 class="h3">Chi tiết đơn</h2>
+      <ul class="co-lines">
+        {% for l in d.lines %}
+        <li><div><b>{{ l.name }}</b> × {{ l.qty }}{% if l.kind=='giftbox' %} hộp{% endif %}
+          {% if l.kind == 'giftbox' %}<br><small class="muted">{% for i in l.detail['items'] %}{{ i.name }} ×{{ i.qty }}{{ ', ' if not loop.last }}{% endfor %} · {{ l.detail.box }} · {{ l.detail.paper }} · {{ l.detail.card }}</small>
+            {% if l.detail.wish and l.detail.wish.message %}<br><small>Lời chúc: “{{ l.detail.wish.message }}”</small>{% endif %}
+          {% else %}<br><small class="muted">{{ l.variant }}{% if l.card_name %} · {{ l.card_name }}{% endif %}</small>{% endif %}</div><span>{{ l.total | vnd }}</span></li>
+        {% endfor %}
+      </ul>
+      <div class="sum-row"><span>Tạm tính</span><b>{{ d.subtotal | vnd }}</b></div>
+      {% if d.discount %}<div class="sum-row"><span>Giảm giá</span><b>−{{ d.discount | vnd }}</b></div>{% endif %}
+      <div class="sum-row"><span>Giao hàng ({{ d.ship.label }})</span><b>{{ 'Miễn phí' if d.shipping == 0 else d.shipping | vnd }}</b></div>
+      <div class="sum-total"><span>Tổng cộng</span><b>{{ d.total | vnd }}</b></div>
+      <p class="small">Thanh toán: {{ D.PAYMENT_METHODS[d.payment].label }} · Người nhận: {{ d.recipient.name }} ({{ d.recipient.phone | mask_phone }}) · {{ d.address.district }}, {{ d.address.province }}</p>
+      <p class="small muted">Dự kiến chuẩn bị {{ d.prep_days }} ngày; nhận hàng khoảng {{ d.ship.eta }}.{% if d.buyer.buyer_email %} Xác nhận sẽ gửi tới {{ d.buyer.buyer_email | mask_email }} khi hệ thống email được tích hợp.{% endif %}</p>
+    </div>
+    <div class="cta-row center-row">
+      <a class="btn" href="{{ url_for('track', ma=o.code) }}">Tra cứu đơn</a>
+      <a class="btn btn-secondary" href="{{ url_for('catalog') }}">Tiếp tục mua</a>
+      <a class="btn btn-ghost" href="{{ url_for('contact', **{'chu-de':'dat-hang'}) }}">Cần hỗ trợ?</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

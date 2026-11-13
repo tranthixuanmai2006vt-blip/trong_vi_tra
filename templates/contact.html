@@ -1,0 +1,109 @@
+{% extends 'base.html' %}{% import 'macros.html' as m with context %}
+{% block title %}Liên hệ & FAQ{% endblock %}
+{% block content %}
+<section class="page-hero section-cream">
+  <div class="container">
+    {{ m.crumbs([('Liên hệ & FAQ', None)]) }}
+    <h1>{{ SITE.name }} có thể giúp gì cho bạn?</h1>
+    <p class="lead">Bạn cần chọn trà, tìm hiểu bánh hay hỗ trợ đơn hàng? Hãy chọn cách liên hệ phù hợp.</p>
+  </div>
+</section>
+
+<section class="section section-tight">
+  <div class="container contact-grid">
+    <div class="channels">
+      {% for label, val, href in [('Hotline', SITE.hotline, 'tel:' ~ SITE.hotline), ('Email', SITE.email, 'mailto:' ~ SITE.email), ('Zalo', SITE.zalo, SITE.zalo)] %}
+      <div class="channel"><b>{{ label }}</b>{% if val %}<a class="btn btn-sm" href="{{ href }}" {{ 'target=_blank rel=noopener' if label=='Zalo' }}>{{ {'Hotline':'Gọi','Email':'Gửi email','Zalo':'Nhắn Zalo'}[label] }}: {{ val }}</a>{% else %}<span class="muted">Đang cập nhật</span>{% endif %}</div>
+      {% endfor %}
+      <div class="channel"><b>Giờ hỗ trợ</b><span>{{ SITE.support_hours or 'Đang cập nhật' }}</span></div>
+      <div class="channel"><b>Đơn hàng</b><a class="link" href="{{ url_for('track') }}">Tra cứu đơn →</a></div>
+      <div class="channel"><b>Quà doanh nghiệp</b><a class="link" href="{{ url_for('custom_design') }}">Gửi yêu cầu thiết kế riêng →</a></div>
+    </div>
+    <div class="address-card">
+      <b>Địa chỉ</b>
+      <p>{{ SITE.address or 'Địa chỉ và điểm nhận hàng sẽ được công bố khi xác nhận.' }}</p>
+      {% if SITE.address %}<div class="cta-row"><button class="btn btn-sm btn-secondary" data-copy="{{ SITE.address }}">Sao chép</button>{% if SITE.maps_url %}<a class="btn btn-sm btn-secondary" href="{{ SITE.maps_url }}" target="_blank" rel="noopener">Mở Google Maps ↗</a>{% endif %}</div>{% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="section section-tint" id="loi-nhan">
+  <div class="container form-layout">
+    {% if done %}
+    <div class="success-panel success-big" role="status" tabindex="-1" id="donePanel">
+      <h2>{{ SITE.name }} đã nhận lời nhắn của bạn</h2>
+      <div class="code-box"><span>Mã yêu cầu</span><b>{{ done.code }}</b><button class="btn btn-sm btn-secondary" data-copy="{{ done.code }}">{{ m.icon('copy') }} Sao chép</button></div>
+      <p>Chủ đề: <b>{{ done.topic }}</b> · Gửi lúc {{ done.created }}</p>
+      <p>Bộ phận hỗ trợ sẽ phản hồi qua <b>{{ done.channel }}</b> ({{ done.contact | mask_email if '@' in (done.contact or '') else done.contact | mask_phone }}). Đây là xác nhận đã nhận câu hỏi, không phải xác nhận hủy/đổi/hoàn đơn.</p>
+      <div class="cta-row"><a class="btn" href="#faq">Xem FAQ</a><a class="btn btn-secondary" href="{{ url_for('catalog') }}">Tiếp tục mua</a><a class="btn btn-ghost" href="{{ url_for('contact') }}#loi-nhan">Gửi câu hỏi khác</a></div>
+    </div>
+    {% else %}
+    <form class="card-form" method="post" enctype="multipart/form-data" novalidate id="contactForm">
+      <h2>Để lại lời nhắn cho {{ SITE.name }}</h2>
+      {% if errors %}<div class="alert alert-error" role="alert">Vui lòng kiểm tra {{ errors|length }} mục được đánh dấu.</div>{% endif %}
+      <div class="grid-2">
+        {{ m.field('name', 'Họ tên', errors, f.name, required=True, attrs='autocomplete="name"') }}
+        <div class="field {{ 'has-error' if errors.topic }}"><label for="f-topic">Chủ đề <span class="req">*</span></label>
+          <select id="f-topic" name="topic" required><option value="">— Chọn —</option>{% for k, v in D.CONTACT_TOPICS.items() %}<option value="{{ k }}" {{ 'selected' if f.topic==k }}>{{ v }}</option>{% endfor %}</select>
+          {% if errors.topic %}<small class="err">⚠ {{ errors.topic }}</small>{% endif %}
+          <small class="hint" id="topicHint"></small></div>
+        <div class="field {{ 'has-error' if errors.channel }}"><label for="f-channel">Kênh phản hồi <span class="req">*</span></label>
+          <select id="f-channel" name="channel"><option value="phone" {{ 'selected' if f.channel=='phone' }}>Điện thoại</option><option value="zalo" {{ 'selected' if f.channel=='zalo' }}>Zalo</option><option value="email" {{ 'selected' if f.channel=='email' }}>Email</option></select></div>
+        {{ m.field('phone', 'Số điện thoại', errors, f.phone, 'tel', attrs='inputmode="tel"') }}
+        {{ m.field('email', 'Email', errors, f.email, 'email') }}
+        {{ m.field('order_code', 'Mã đơn (nếu có)', errors, f.order_code) }}
+      </div>
+      {{ m.field('content', 'Nội dung', errors, f.content, 'textarea', True) }}
+      <div class="field {{ 'has-error' if errors.files }}"><label for="f-files">Ảnh / tệp đính kèm</label><input id="f-files" type="file" name="files" multiple accept=".jpg,.jpeg,.png,.pdf"><small class="hint">Tùy chọn · JPG, PNG, PDF · tối đa 3 tệp × 10 MB</small>{% if errors.files %}<small class="err">⚠ {{ errors.files }}</small>{% endif %}</div>
+      <div class="field {{ 'has-error' if errors.agree }}">
+        <label class="check"><input type="checkbox" name="agree" value="1"> Tôi đồng ý cho {{ SITE.name }} dùng thông tin này để xử lý câu hỏi (<a class="link" href="{{ url_for('policy', slug='bao-mat') }}" target="_blank">Bảo mật</a>). <span class="req">*</span></label>
+        {% if errors.agree %}<small class="err">⚠ {{ errors.agree }}</small>{% endif %}
+      </div>
+      <button class="btn btn-lg">Gửi lời nhắn</button>
+    </form>
+    <aside class="side-help">
+      <h3>Tự hỗ trợ nhanh</h3>
+      <p><a class="link" href="{{ url_for('track') }}">Tra cứu đơn</a> – xem tiến độ và gửi yêu cầu gắn với đơn.</p>
+      <p><a class="link" href="{{ url_for('custom_design') }}">Thiết kế riêng</a> – quà doanh nghiệp, in logo.</p>
+      <p><a class="link" href="#faq">Câu hỏi thường gặp</a></p>
+    </aside>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="container narrow">
+    <h2>Câu hỏi thường gặp</h2>
+    <div class="faq-tools">
+      <input type="search" id="faqSearch" placeholder="Tìm câu hỏi (có dấu hoặc không dấu)…" aria-label="Tìm câu hỏi">
+      <div class="chips" id="faqChips"><button class="chip active" data-g="">Tất cả</button>{% for k, v in D.FAQ_GROUPS.items() %}<button class="chip" data-g="{{ k }}">{{ v }}</button>{% endfor %}</div>
+    </div>
+    <div id="faqList">
+      {% for g, q, a, link in D.FAQS %}
+      <details class="acc" data-g="{{ g }}"><summary>{{ q }}</summary><p>{{ a }} <a class="link" href="{{ link }}">Xem thêm →</a></p>
+        <p class="small"><a class="link-sm" href="?chu-de={{ {'chon-tra':'chon-tra','banh':'chon-tra','qua':'dat-hang','thiet-ke':'thiet-ke','dat-hang':'dat-hang','giao-nhan':'giao-hang','doi-tra':'doi-tra'}[g] }}#loi-nhan">Vẫn cần hỗ trợ?</a></p></details>
+      {% endfor %}
+    </div>
+    <div class="empty" id="faqEmpty" hidden><p>Không tìm thấy câu hỏi phù hợp. Thử từ khóa khác.</p><button class="btn btn-sm btn-secondary" id="faqClear">Xóa tìm kiếm</button> <a class="btn btn-sm" href="#loi-nhan">Gửi câu hỏi</a></div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/đ/g,'d').replace(/Đ/g,'D').toLowerCase();
+  let g = '';
+  const items = [...document.querySelectorAll('#faqList details')];
+  function run() { const q = norm(document.getElementById('faqSearch').value); let n = 0;
+    items.forEach(d => { const ok = (!g || d.dataset.g === g) && (!q || norm(d.textContent).includes(q)); d.hidden = !ok; if (ok) n++; });
+    document.getElementById('faqEmpty').hidden = n > 0; }
+  document.getElementById('faqSearch').oninput = run;
+  document.querySelectorAll('#faqChips .chip').forEach(c => c.onclick = () => { g = c.dataset.g; document.querySelectorAll('#faqChips .chip').forEach(x => x.classList.toggle('active', x === c)); run(); });
+  document.getElementById('faqClear').onclick = () => { document.getElementById('faqSearch').value = ''; g=''; run(); };
+  const t = document.getElementById('f-topic');
+  if (t) { const hint = () => { document.getElementById('topicHint').innerHTML = t.value === 'thiet-ke' ? 'Quà doanh nghiệp/in logo? <a class="link" href="/dich-vu/thiet-ke-rieng#gui-yeu-cau">Dùng form Thiết kế riêng</a> để được báo giá nhanh hơn.' : (['dat-hang','giao-hang','thanh-toan','doi-tra'].includes(t.value) ? 'Có mã đơn? <a class="link" href="/tra-cuu-don">Tra cứu đơn</a> để gửi yêu cầu gắn đúng đơn.' : ''); }; t.onchange = hint; hint(); }
+  {% if done %}document.getElementById('donePanel').scrollIntoView(); document.getElementById('donePanel').focus();{% endif %}
+  {% if errors %}document.getElementById('loi-nhan').scrollIntoView();{% endif %}
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends 'base.html' %}{% import 'macros.html' as m with context %}
+{% block title %}Một chút trà, thêm chút duyên{% endblock %}
+{% block content %}
+
+{# 01 – BANNER #}
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-text">
+      <p class="eyebrow">{{ SITE.eyebrow }}</p>
+      <h1>Một chút trà,<br>thêm chút duyên.</h1>
+      <p class="lead">Khám phá trà tuyển chọn, bánh mang hương trà và những hộp quà được chuẩn bị theo lời bạn muốn gửi.</p>
+      <p class="hero-sub">Thưởng trà • Chọn bánh • Trao quà</p>
+      <div class="cta-row">
+        <a href="{{ url_for('catalog') }}" class="btn btn-lg">Khám phá sản phẩm</a>
+        <a href="{{ url_for('giftbox_page') }}" class="btn btn-lg btn-secondary">Tạo hộp quà</a>
+      </div>
+      <nav class="hero-cats" aria-label="Danh mục nhanh">
+        <a href="{{ url_for('catalog', cat='tra') }}">Trà</a><a href="{{ url_for('catalog', cat='banh') }}">Bánh từ trà</a><a href="{{ url_for('catalog', cat='gift-set') }}">Gift set</a>
+      </nav>
+    </div>
+    <div class="hero-visual fade-in">
+      <div class="hero-scene">
+        <div class="scene-a">{{ m.art('giftbox', '#3B630D', 'hộp quà', note=False) }}</div>
+        <div class="scene-b">{{ m.art('pouch', '#B4762E', 'gói trà ô long', note=False) }}</div>
+        <div class="scene-c">{{ m.art('cookie', '#7C9A3F', 'bánh quy matcha', note=False) }}</div>
+        <span class="art-note">Ảnh minh họa – sẽ thay bằng ảnh thật trà, bánh & hộp quà</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# 02 – CHỌN DANH MỤC #}
+<section class="section">
+  <div class="container">
+    <div class="sec-head"><h2>Bạn đang tìm một chút duyên nào?</h2></div>
+    <div class="cat-grid">
+      {% for key, title, sub, kind, color, cta in [
+        ('tra','Trà','Tinh tuyển từng lá, trọn vị thanh','pouch','#7C8F3A','Xem trà'),
+        ('banh','Bánh từ trà','Vị trà trong từng chiếc bánh','cake','#C08A3E','Xem bánh'),
+        ('gift-set','Gift set','Trao tâm ý bằng một hộp quà','giftbox','#503021','Xem hộp quà')] %}
+      <a class="cat-card reveal" href="{{ url_for('catalog', cat=key) }}" aria-label="{{ cta }} – {{ title }}">
+        <div class="cat-img">{{ m.art(kind, color, title, '4/5', note=False) }}</div>
+        <div class="cat-body"><h3>{{ title }}</h3><p>{{ sub }}</p><span class="link">{{ cta }} →</span></div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# 03 – SẢN PHẨM GỢI Ý #}
+<section class="section section-tint">
+  <div class="container">
+    <div class="sec-head sec-head-row">
+      <h2>Món trà và chiếc bánh dành cho bạn</h2>
+      <a href="{{ url_for('catalog') }}" class="link">Xem tất cả →</a>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Lọc sản phẩm gợi ý">
+      {% for k, label in [('ban-chay','Bán chạy'),('tra','Trà'),('banh','Bánh'),('gift','Hộp quà')] %}
+      <button role="tab" class="tab {{ 'active' if loop.first }}" aria-selected="{{ 'true' if loop.first else 'false' }}" data-tab="{{ k }}">{{ label }}</button>
+      {% endfor %}
+    </div>
+    {% for k, prods in tabs.items() %}
+    <div class="pgrid tabpanel" data-panel="{{ k }}" {{ 'hidden' if not loop.first }} role="tabpanel">
+      {% for p in prods[:8] %}{{ m.product_card(p) }}{% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+{# 04 – DỊCH VỤ QUÀ TẶNG #}
+<section class="section">
+  <div class="container">
+    <div class="sec-head"><h2>Trao quà theo cách của riêng bạn</h2></div>
+    <div class="svc-grid">
+      <article class="svc-card reveal">
+        <div class="svc-img">{{ m.art('giftbox', '#8C9A4B', 'tự tạo hộp quà', '4/3') }}</div>
+        <div class="svc-body">
+          <p class="eyebrow">Mua theo giá hiển thị</p>
+          <h3>Tự tay tạo hộp quà</h3>
+          <ul class="ticks"><li>Chọn trà và bánh yêu thích</li><li>Chọn hộp, giấy gói, thiệp</li><li>Viết lời chúc – xem giá ngay</li></ul>
+          <a href="{{ url_for('giftbox_page') }}" class="btn">Bắt đầu tạo quà</a>
+        </div>
+      </article>
+      <article class="svc-card reveal">
+        <div class="svc-img">{{ m.art('card', '#503021', 'thiết kế theo yêu cầu', '4/3') }}</div>
+        <div class="svc-body">
+          <p class="eyebrow">Gửi yêu cầu – nhận báo giá</p>
+          <h3>Thiết kế theo yêu cầu</h3>
+          <ul class="ticks"><li>In tên, logo lên hộp và thiệp</li><li>Đặt theo dịp, số lượng lớn</li><li>Tư vấn và duyệt mẫu trước khi làm</li></ul>
+          <a href="{{ url_for('custom_design') }}" class="btn btn-secondary">Yêu cầu thiết kế riêng</a>
+        </div>
+      </article>
+    </div>
+    <p class="center muted">Chưa biết chọn gì? <a class="link" href="{{ url_for('catalog', cat='gift-set') }}">Xem hộp quà có sẵn</a></p>
+  </div>
+</section>
+
+{# 05 – CÂU CHUYỆN #}
+<section class="section section-cream">
+  <div class="container story-grid">
+    <div class="reveal">
+      <p class="eyebrow">Câu chuyện {{ SITE.name }}</p>
+      <h2>Từ đồi trà đến những kết nối dịu dàng</h2>
+      <p class="lead">{{ SITE.name }} bắt đầu từ tình yêu dành cho lá trà và những khoảng lặng bên tách trà. Chúng tôi mong mỗi món trà, chiếc bánh và hộp quà đều góp phần tạo nên một cuộc gặp gỡ đáng nhớ.</p>
+      <div class="cta-row">
+        <a href="{{ url_for('about') }}" class="btn">Đọc câu chuyện của chúng tôi</a>
+        <a href="{{ url_for('stories') }}" class="btn btn-secondary">Khám phá Chuyện trà</a>
+      </div>
+    </div>
+    <div class="story-art reveal">{{ m.art('leaf', '#3B630D', 'lá trà', '1/1') }}</div>
+  </div>
+</section>
+
+{# 06 – HÀNH TRÌNH NGUYÊN LIỆU #}
+<section class="section">
+  <div class="container">
+    <div class="sec-head"><h2>Trân trọng từng phần của lá trà</h2></div>
+    <ol class="journey">
+      <li class="reveal"><span class="j-no">1</span><h3>Nguồn trà tuyển chọn</h3><p>Trà Hằng Sơn Điền được chọn lọc từ vùng nguyên liệu, phân loại và đóng gói cẩn thận.</p><a class="link" href="{{ url_for('about') }}#nguon-tra">Xem hành trình →</a></li>
+      <li class="reveal"><span class="j-no">2</span><h3>Ứng dụng hương trà vào bánh</h3><p>Lá trà, bột matcha và nước cốt trà trở thành hương vị chính trong từng chiếc bánh.</p><a class="link" href="{{ url_for('catalog', cat='banh') }}">Xem bánh từ trà →</a></li>
+      <li class="reveal"><span class="j-no">3</span><h3>Tận dụng phụ phẩm phù hợp</h3><p>Phần phụ phẩm phù hợp được thử nghiệm làm giấy thủ công để trang trí hộp quà, thiệp.</p><a class="link" href="{{ url_for('about') }}#giay-tra">Khám phá giấy trà →</a></li>
+    </ol>
+    <p class="note center">* Quy trình và ứng dụng cụ thể đang được xác nhận.</p>
+  </div>
+</section>
+
+{# 07 – TEA DNA #}
+<section class="section section-dark">
+  <div class="container dna-teaser">
+    <div class="reveal">
+      <p class="eyebrow eyebrow-light">Tea DNA</p>
+      <h2>Bạn thuộc “hệ trà” nào?</h2>
+      <p>Một bài trắc nghiệm vui về hương vị, thói quen và khoảnh khắc thưởng trà. Nhận gợi ý trà, bánh và hộp quà hợp gu.</p>
+      <p class="tiny">Chỉ mang tính khám phá sở thích · Không cần email</p>
+      <div class="cta-row">
+        <a href="{{ url_for('tea_dna') }}" class="btn btn-light">Khám phá Tea DNA</a>
+        <a href="{{ url_for('catalog', cat='tra') }}" class="btn btn-ghost-light">Xem các loại trà</a>
+      </div>
+    </div>
+    <div class="dna-bars-demo reveal" aria-hidden="true">
+      {% for ax, w in [('Độ ngọt',40),('Độ chua',25),('Độ đắng',55),('Độ đậm trà',70),('Hương',30)] %}
+      <div><span>{{ ax }}</span><i style="--w: {{ w }}%"></i></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# 08 – BÀI VIẾT #}
+<section class="section">
+  <div class="container">
+    <div class="sec-head sec-head-row"><h2>Những câu chuyện bên tách trà</h2><a class="link" href="{{ url_for('stories') }}">Xem tất cả câu chuyện →</a></div>
+    <div class="blog-grid">
+      <a class="post post-big reveal" href="{{ url_for('article', slug=feat.slug) }}">
+        {{ m.art('leaf', feat.color, feat.title, '16/9') }}
+        <div class="post-body"><span class="tag">{{ D.ARTICLE_CATS[feat.cat] }}</span><time>{{ feat.date | vndate }}</time>
+          <h3>{{ feat.title }}</h3><p>{{ feat.summary }}</p><span class="link">Đọc bài →</span></div>
+      </a>
+      <div class="post-list">
+        {% for a in others %}
+        <a class="post post-row reveal" href="{{ url_for('article', slug=a.slug) }}">
+          <div class="post-thumb">{{ m.art('leaf', a.color, a.title, '4/3', note=False) }}</div>
+          <div><span class="tag">{{ D.ARTICLE_CATS[a.cat] }}</span> <time>{{ a.date | vndate }}</time><h3>{{ a.title }}</h3><p>{{ a.summary }}</p></div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{# 09 – ĐÁNH GIÁ: chưa có đánh giá hợp lệ → hiện lời mời thay vì bịa nhận xét #}
+<section class="section section-cream">
+  <div class="container cta-final reveal">
+    <h2>Duyên trà được kể bằng trải nghiệm thật</h2>
+    <p class="lead">Những đánh giá đầu tiên sẽ xuất hiện tại đây khi khách hàng đồng ý chia sẻ. Còn bây giờ, hãy là người viết nên câu chuyện ấy.</p>
+    <div class="cta-row center-row">
+      <a href="{{ url_for('catalog') }}" class="btn">Xem sản phẩm được yêu thích</a>
+      <a href="{{ url_for('giftbox_page') }}" class="btn btn-secondary">Chọn quà dành riêng cho bạn</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

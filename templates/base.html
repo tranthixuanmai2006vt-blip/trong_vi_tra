@@ -1,0 +1,112 @@
+{% import 'macros.html' as m with context %}<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ SITE.name }}{% endblock %} | {{ SITE.name }} × {{ SITE.partner }}</title>
+  <meta name="description" content="{% block desc %}Trà tuyển chọn Hằng Sơn Điền, bánh mang hương trà và hộp quà theo cách của bạn.{% endblock %}">
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block bodyclass %}{% endblock %}">
+<a class="skip" href="#main">Bỏ qua đến nội dung chính</a>
+{% if D.DEMO_MODE %}
+<div class="demo-bar" role="note">Bản demo · Giá, tồn kho và thông tin liên hệ là <b>dữ liệu mẫu</b>, chờ doanh nghiệp xác nhận.</div>
+{% endif %}
+
+<header class="header" id="header">
+  <div class="container header-inner">
+    <a href="{{ url_for('home') }}" class="brand" aria-label="{{ SITE.name }} – về trang chủ">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="{{ SITE.partner }} × Trà" onerror="this.replaceWith(Object.assign(document.createElement('b'),{textContent:'{{ SITE.name }}'}))">
+    </a>
+    <nav class="nav" id="nav" aria-label="Menu chính">
+      <button class="nav-close" id="navClose" aria-label="Đóng menu">✕</button>
+      <a href="{{ url_for('home') }}" class="{{ 'active' if endpoint=='home' }}">Trang chủ</a>
+      <a href="{{ url_for('about') }}" class="{{ 'active' if endpoint=='about' }}">Về Hằng Sơn Điền</a>
+      <div class="dd {{ 'active' if endpoint in ['catalog','product_detail'] }}">
+        <button class="dd-btn" aria-expanded="false">Sản phẩm <span aria-hidden="true">▾</span></button>
+        <div class="dd-menu">
+          <a href="{{ url_for('catalog') }}">Tất cả sản phẩm</a>
+          <a href="{{ url_for('catalog', cat='tra') }}">Trà</a>
+          <a href="{{ url_for('catalog', cat='banh') }}">Bánh từ trà</a>
+          <a href="{{ url_for('catalog', cat='gift-set') }}">Gift set</a>
+        </div>
+      </div>
+      <div class="dd {{ 'active' if endpoint in ['giftbox_page','custom_design'] }}">
+        <button class="dd-btn" aria-expanded="false">Dịch vụ <span aria-hidden="true">▾</span></button>
+        <div class="dd-menu">
+          <a href="{{ url_for('giftbox_page') }}">Tạo hộp quà</a>
+          <a href="{{ url_for('custom_design') }}">Thiết kế riêng</a>
+        </div>
+      </div>
+      <a href="{{ url_for('stories') }}" class="{{ 'active' if endpoint in ['stories','article'] }}">Chuyện trà</a>
+      <a href="{{ url_for('tea_dna') }}" class="{{ 'active' if endpoint in ['tea_dna','tea_dna_result'] }}">Tea DNA</a>
+      <a href="{{ url_for('track') }}" class="nav-mobile-only">Tra cứu đơn</a>
+      <a href="{{ url_for('contact') }}" class="nav-mobile-only">Liên hệ & FAQ</a>
+    </nav>
+    <div class="utils">
+      <button class="util" id="searchBtn" aria-label="Tìm kiếm" aria-expanded="false">{{ m.icon('search') }}</button>
+      <a class="util util-text" href="{{ url_for('track') }}" title="Tra cứu đơn">{{ m.icon('truck') }}<span>Tra cứu</span></a>
+      <a class="util cart-link" href="{{ url_for('cart_page') }}" aria-label="Giỏ hàng ({{ cart_count }} sản phẩm)">
+        {{ m.icon('cart') }}<span class="cart-badge" id="cartBadge" {{ 'hidden' if not cart_count }}>{{ cart_count }}</span>
+      </a>
+      <button class="burger" id="burger" aria-label="Mở menu" aria-controls="nav" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <form class="search-panel" id="searchPanel" action="{{ url_for('catalog') }}" role="search" hidden>
+    <div class="container search-inner">
+      <label for="q" class="sr-only">Tìm sản phẩm</label>
+      <input id="q" name="q" placeholder="Tìm trà, bánh, hộp quà… (vd: ô long, matcha)" autocomplete="off">
+      <button class="btn">Tìm</button>
+    </div>
+  </form>
+</header>
+<div class="nav-overlay" id="navOverlay" hidden></div>
+
+<main id="main">{% block content %}{% endblock %}</main>
+
+<footer class="footer">
+  <div class="container footer-grid">
+    <div class="f-brand">
+      <a href="{{ url_for('home') }}" class="f-logo"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="{{ SITE.name }}"></a>
+      <p><b>{{ SITE.name }}</b> – không gian giới thiệu trà tuyển chọn, bánh từ trà và hộp quà theo cách của bạn.</p>
+      <p class="f-small">Sản phẩm trà của {{ SITE.company }}.</p>
+      <p class="f-small">Địa chỉ: {{ SITE.address or 'Đang cập nhật' }}{% if SITE.tax_code %} · MST: {{ SITE.tax_code }}{% endif %}</p>
+    </div>
+    <div>
+      <h4>Liên hệ</h4>
+      <p>Hotline: {% if SITE.hotline %}<a href="tel:{{ SITE.hotline }}">{{ SITE.hotline }}</a>{% else %}Đang cập nhật{% endif %}</p>
+      <p>Email: {% if SITE.email %}<a href="mailto:{{ SITE.email }}">{{ SITE.email }}</a>{% else %}Đang cập nhật{% endif %}</p>
+      <p>Giờ hỗ trợ: {{ SITE.support_hours or 'Đang cập nhật' }}</p>
+      {% if SITE.zalo %}<p><a href="{{ SITE.zalo }}" target="_blank" rel="noopener">Zalo ↗</a></p>{% endif %}
+      {% if SITE.facebook %}<p><a href="{{ SITE.facebook }}" target="_blank" rel="noopener">Facebook ↗</a></p>{% endif %}
+      <a href="{{ url_for('contact') }}">Gửi lời nhắn →</a>
+    </div>
+    <div>
+      <h4>Hỗ trợ đặt hàng</h4>
+      <a href="{{ url_for('policy', slug='huong-dan-dat-hang') }}">Hướng dẫn đặt hàng</a>
+      <a href="{{ url_for('policy', slug='thanh-toan') }}">Phương thức thanh toán</a>
+      <a href="{{ url_for('track') }}">Tra cứu đơn</a>
+      <a href="{{ url_for('contact') }}">Liên hệ & FAQ</a>
+    </div>
+    <div>
+      <h4>Chính sách</h4>
+      <a href="{{ url_for('policy', slug='dieu-khoan') }}">Điều khoản sử dụng</a>
+      <a href="{{ url_for('policy', slug='bao-mat') }}">Bảo mật</a>
+      <a href="{{ url_for('policy', slug='doi-tra') }}">Đổi / hủy / hoàn</a>
+      <a href="{{ url_for('policy', slug='giao-hang') }}">Giao hàng</a>
+      <a href="{{ url_for('policy', slug='kiem-hang') }}">Kiểm hàng</a>
+      <a href="{{ url_for('policy', slug='qua-ca-nhan-hoa') }}">Quà cá nhân hóa</a>
+    </div>
+  </div>
+  <div class="container f-bottom">© {{ year }} {{ SITE.name }} × {{ SITE.partner }}. Bảo lưu mọi quyền.</div>
+</footer>
+
+<div class="toast-wrap" id="toasts" aria-live="polite"></div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

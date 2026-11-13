@@ -1,0 +1,47 @@
+{# Khối mua hàng dùng chung cho trà / bánh / gift set. Biến: p, extra_note (tùy chọn) #}
+{% set first_ok = (p.variants | selectattr('stock', 'gt', 0) | list | first) or p.variants[0] %}
+<form class="buybox" data-buybox>
+  <fieldset class="variants">
+    <legend>Quy cách</legend>
+    {% for v in p.variants %}
+    <label class="variant {{ 'is-out' if v.stock <= 0 }}">
+      <input type="radio" name="sku" value="{{ v.sku }}" data-price="{{ v.price }}" data-stock="{{ v.stock }}"
+             {{ 'checked' if v.sku == first_ok.sku }} {{ 'disabled' if v.stock <= 0 }}>
+      <span><b>{{ v.label }}</b><small>{{ v.price | vnd }}{% if v.stock <= 0 %} · Tạm hết{% elif v.stock < 5 %} · Còn {{ v.stock }}{% endif %}</small></span>
+    </label>
+    {% endfor %}
+  </fieldset>
+  <div class="price-row">
+    <span class="price price-lg" data-price-out>{{ first_ok.price | vnd }}</span>
+    <span class="stock-note" data-stock-out>{% if first_ok.stock > 0 %}Còn hàng{% else %}Tạm hết{% endif %}</span>
+  </div>
+  {% if p.type == 'gift' %}
+        <fieldset class="gift-opts">
+          <legend>Thêm một lời riêng <small>(tùy chọn)</small></legend>
+          <div class="card-pick">
+            {% for c in D.CARDS %}
+            <label class="variant variant-sm {{ 'is-out' if c.stock<=0 }}"><input type="radio" name="card" value="{{ c.id }}" data-price="{{ c.price }}" data-max="{{ c.max_chars }}" {{ 'checked' if loop.first }} {{ 'disabled' if c.stock<=0 }}>
+              <span><b>{{ c.name }}</b><small>{{ '+' ~ (c.price|vnd) if c.price else 'Miễn phí' }}{% if c.max_chars %} · tối đa {{ c.max_chars }} ký tự{% endif %}</small></span></label>
+            {% endfor %}
+          </div>
+          <div class="field" data-wish hidden>
+            <label for="giftMsg">Lời chúc in trên thiệp</label>
+            <textarea id="giftMsg" name="message" rows="3" placeholder="Ví dụ: Gửi bạn một chút trà, thêm chút duyên…"></textarea>
+            <small class="hint"><span data-count>0</span>/<span data-max>0</span> ký tự</small>
+            <div class="card-preview" aria-label="Xem trước thiệp (minh họa)"><span class="cp-label">Xem trước (minh họa, không phải bản in)</span><p data-preview></p></div>
+          </div>
+        </fieldset>
+        {% endif %}
+  <div class="qty-row">
+    <label for="qty-{{ p.id }}">Số lượng</label>
+    <div class="stepper"><button type="button" data-step="-1" aria-label="Giảm">−</button>
+      <input id="qty-{{ p.id }}" type="number" name="qty" value="1" min="1" max="{{ first_ok.stock }}" inputmode="numeric">
+      <button type="button" data-step="1" aria-label="Tăng">+</button></div>
+  </div>
+  <p class="form-msg" data-msg role="status"></p>
+  <div class="buy-actions">
+    <button type="submit" class="btn btn-lg" data-action="add" {{ 'disabled' if first_ok.stock <= 0 }}>Thêm vào giỏ</button>
+    <button type="submit" class="btn btn-lg btn-secondary" data-action="buy" {{ 'disabled' if first_ok.stock <= 0 }}>Mua ngay</button>
+  </div>
+  {% if first_ok.stock <= 0 %}<p class="err">Sản phẩm đang tạm hết. <a class="link" href="{{ url_for('contact', **{'chu-de':'chon-tra'}) }}">Hỏi ngày có hàng lại</a></p>{% endif %}
+</form>

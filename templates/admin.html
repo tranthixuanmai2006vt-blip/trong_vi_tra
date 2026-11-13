@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Quản trị (demo){% endblock %}
+{% block content %}
+<section class="section section-tight">
+  <div class="container">
+    <h1>Quản trị – bản demo</h1>
+    <p class="muted">Trang nội bộ để xem dữ liệu và thử cập nhật trạng thái đơn. Chưa có đăng nhập – không dùng khi đưa website lên mạng.</p>
+
+    <h2 id="don">Đơn hàng ({{ orders|length }})</h2>
+    <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>Mã</th><th>Thời gian</th><th>Người đặt</th><th>Tổng</th><th>Thanh toán</th><th>Xử lý</th><th>Thao tác</th></tr></thead>
+      <tbody>{% for o in orders %}
+      <tr><td><a class="link" href="{{ url_for('track', ma=o.code) }}">{{ o.code }}</a></td><td>{{ o.created }}</td>
+        <td>{{ o.data.buyer.buyer_name }}<br><small>{{ o.phone }}</small></td><td>{{ o.total | vnd }}</td>
+        <td>{{ D.PAYMENT_STATUS.get(o.payment) }}</td><td>{{ D.ORDER_STEPS[o.status_idx] }}</td>
+        <td><form method="post" action="{{ url_for('admin_order', code=o.code) }}" class="admin-act">
+          <button class="btn btn-sm" name="act" value="next" {{ 'disabled' if o.status_idx >= 5 }}>Bước tiếp →</button>
+          <button class="btn btn-sm btn-secondary" name="act" value="paid">Đã thanh toán</button>
+          <button class="btn btn-sm btn-ghost" name="act" value="failed">Thất bại</button></form></td></tr>
+      {% else %}<tr><td colspan="7" class="muted">Chưa có đơn.</td></tr>{% endfor %}</tbody></table></div>
+
+    <h2>Yêu cầu thiết kế riêng ({{ designs|length }})</h2>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>Mã</th><th>Thời gian</th><th>Liên hệ</th><th>Nhu cầu</th><th>SL</th><th>Ngày cần</th><th>Mô tả</th><th>Tệp</th></tr></thead><tbody>
+      {% for r in designs %}<tr><td>{{ r.code }}</td><td>{{ r.created }}</td><td>{{ r.data.name }}<br><small>{{ r.data.phone }} {{ r.data.email }}</small></td><td>{{ r.data.need }}</td><td>{{ r.data.quantity }}</td><td>{{ r.data.deadline }}</td><td>{{ r.data.description }}</td><td>{{ r.data.files|join(', ') }}</td></tr>
+      {% else %}<tr><td colspan="8" class="muted">Chưa có yêu cầu.</td></tr>{% endfor %}</tbody></table></div>
+
+    <h2>Lời nhắn liên hệ ({{ msgs|length }})</h2>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>Mã</th><th>Thời gian</th><th>Tên</th><th>Chủ đề</th><th>Kênh</th><th>Nội dung</th></tr></thead><tbody>
+      {% for r in msgs %}<tr><td>{{ r.code }}</td><td>{{ r.created }}</td><td>{{ r.data.name }}</td><td>{{ D.CONTACT_TOPICS.get(r.data.topic) }}</td><td>{{ r.data.channel }}: {{ r.data.phone or r.data.email }}</td><td>{{ r.data.content }}</td></tr>
+      {% else %}<tr><td colspan="6" class="muted">Chưa có lời nhắn.</td></tr>{% endfor %}</tbody></table></div>
+
+    <h2>Yêu cầu hỗ trợ đơn ({{ tickets|length }})</h2>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>Mã</th><th>Đơn</th><th>Thời gian</th><th>Loại</th><th>Mô tả</th><th>Trạng thái</th></tr></thead><tbody>
+      {% for r in tickets %}<tr><td>{{ r.code }}</td><td>{{ r.order_code }}</td><td>{{ r.created }}</td><td>{{ r.data.kind }}</td><td>{{ r.data.desc }}</td><td>{{ r.status }}</td></tr>
+      {% else %}<tr><td colspan="6" class="muted">Chưa có yêu cầu.</td></tr>{% endfor %}</tbody></table></div>
+
+    <h2>Email nhận tin ({{ subs|length }})</h2>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>Email</th><th>Thời gian</th><th>Nguồn</th></tr></thead><tbody>
+      {% for s in subs %}<tr><td>{{ s.email }}</td><td>{{ s.created }}</td><td>{{ s.source }}</td></tr>{% else %}<tr><td colspan="3" class="muted">Chưa có.</td></tr>{% endfor %}</tbody></table></div>
+  </div>
+</section>
+{% endblock %}

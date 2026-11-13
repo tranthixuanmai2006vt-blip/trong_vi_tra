@@ -1,0 +1,66 @@
+{% extends 'base.html' %}{% import 'macros.html' as m with context %}
+{% block title %}{{ p.name }}{% endblock %}
+{% block content %}
+<section class="section section-tight">
+  <div class="container">
+    {{ m.crumbs([('Sản phẩm', url_for('catalog')), ('Gift set', url_for('catalog', cat='gift-set')), (p.name, None)]) }}
+    <div class="pdp">
+      <div class="pdp-gallery">{{ m.art(p.art, p.color, p.name) }}</div>
+      <div class="pdp-info">
+        <p class="eyebrow">Gift set · {% for o in p.occasions %}{{ D.OCCASIONS[o] }}{{ ', ' if not loop.last }}{% endfor %}</p>
+        <h1>{{ p.name }}</h1>
+        <p class="lead">{{ p.desc }}</p>
+        <ul class="meta-list">
+          <li><span>Gợi ý người nhận</span>{{ p.recipient }}</li>
+          <li><span>Số món</span>{{ contents|length }} món · <a class="link-sm" href="#thanh-phan">Xem thành phần</a></li>
+          <li><span>Chuẩn bị</span>{{ prep }} ngày làm việc (làm theo đơn)</li>
+        </ul>
+        {% include '_buybox.html' %}
+        <p class="muted small">Có thể thêm thiệp/lời chúc theo lựa chọn hiện có. <a class="link-sm" href="{{ url_for('custom_design', **{'tham-chieu': p.name}) }}">Cần thiết kế khác?</a></p>
+        <div class="pdp-links"><a class="link-sm" href="{{ url_for('giftbox_page') }}">{{ m.icon('gift') }} Tạo hộp theo ý bạn</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-tint" id="thanh-phan">
+  <div class="container">
+    <h2>Bên trong hộp có gì?</h2>
+    <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Món</th><th>Loại</th><th>Quy cách</th><th>SL</th><th>Dị ứng</th><th>Bảo quản</th></tr></thead>
+      <tbody>
+      {% for item, v, qty in contents %}
+      <tr><td><a class="link" href="{{ product_url(item) }}">{{ item.name }}</a><br><small class="muted">{{ v.sku }}</small></td>
+        <td>{{ D.TYPE_LABEL[item.type] }}</td><td>{{ v.label }}</td><td>{{ qty }}</td>
+        <td>{{ item.allergens | join(', ') if item.allergens else '—' }}</td><td><small>{{ item.storage }}</small></td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <p><b>Hộp & bao bì:</b> {{ p.box }}. <b>Kèm theo:</b> {{ p.includes | join(', ') }}.</p>
+    <p class="muted small">Nếu cần thay thế một món do hết hàng, chúng tôi sẽ liên hệ xin ý kiến của bạn trước khi giao.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container two-col">
+    <div>
+      <h2>Đặt quà đúng dịp</h2>
+      <p>Thời gian chuẩn bị: <b>{{ prep }} ngày làm việc</b>, tách riêng với thời gian vận chuyển.</p>
+      {% if cake_hsd %}<p>Hộp có bánh – hạn dùng theo thành phần ngắn nhất: {% for c in cake_hsd %}<b>{{ c[0].name }}</b>: {{ c[0].hsd }}{{ '; ' if not loop.last }}{% endfor %}</p>{% endif %}
+      <p>Bạn có thể gửi quà đến người khác: nhập thông tin người nhận ở bước thanh toán, và chọn ẩn giá trên phiếu giao.</p>
+      <div class="cta-row"><a class="btn btn-secondary btn-sm" href="{{ url_for('policy', slug='giao-hang') }}">Chính sách giao hàng</a><a class="btn btn-secondary btn-sm" href="{{ url_for('custom_design', **{'tham-chieu': p.name}) }}">Liên hệ đơn số lượng lớn</a></div>
+    </div>
+    <div class="note-card"><b>Lưu ý</b><ul><li>Ngày nhận mong muốn là yêu cầu, sẽ được xác nhận ở bước thanh toán.</li><li>Bánh tươi chỉ giao trong khu vực hỗ trợ.</li><li>Giấy thủ công có thể khác nhẹ về sắc độ.</li></ul></div>
+  </div>
+</section>
+
+<section class="section section-cream">
+  <div class="container">
+    <div class="sec-head"><h2>Còn nhiều cách để trao duyên</h2></div>
+    <div class="pgrid pgrid-3">{% for s in similar %}{{ m.product_card(s) }}{% endfor %}</div>
+    <div class="cta-row center-row"><a class="btn" href="{{ url_for('giftbox_page') }}">Tự tạo hộp quà</a><a class="btn btn-secondary" href="{{ url_for('custom_design', **{'tham-chieu': p.name}) }}">Báo giá theo yêu cầu</a></div>
+  </div>
+</section>
+{% endblock %}

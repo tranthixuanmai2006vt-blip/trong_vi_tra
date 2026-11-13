@@ -1,0 +1,94 @@
+{% extends 'base.html' %}{% import 'macros.html' as m with context %}
+{% block title %}{{ p.name }}{% endblock %}
+{% block content %}
+<section class="section section-tight">
+  <div class="container">
+    {{ m.crumbs([('Sản phẩm', url_for('catalog')), ('Bánh', url_for('catalog', cat='banh')), (p.name, None)]) }}
+    <div class="pdp">
+      <div class="pdp-gallery">{{ m.art(p.art, p.color, p.name) }}</div>
+      <div class="pdp-info">
+        <p class="eyebrow">Bánh từ trà · {{ p.line }}</p>
+        <h1>{{ p.name }}</h1>
+        <p class="lead">{{ p.desc }}</p>
+        <div class="allergy-box" role="note">
+          <b>Chất gây dị ứng:</b> {{ p.allergens | join(', ') }}.{% if p.shared_line %} {{ p.shared_line }}{% endif %}
+          <a class="link-sm" href="#thanh-phan">Xem thành phần</a>
+        </div>
+        <ul class="meta-list">
+          <li><span>Trạng thái</span>{{ 'Làm theo đơn – cần đặt trước' if p.made_to_order else 'Làm sẵn theo mẻ' }}</li>
+          <li><span>Thời gian chuẩn bị</span>{{ p.prep_days }} ngày làm việc</li>
+          <li><span>Giao sớm nhất</span><span id="earliest"></span></li>
+        </ul>
+        {% include '_buybox.html' %}
+        <div class="pdp-links">
+          <a class="link-sm" href="{{ url_for('giftbox_page', sku=p.variants[0].sku) }}">{{ m.icon('gift') }} Tạo hộp quà với bánh này</a>
+          <button class="link-sm" data-copy="{{ request.url }}">{{ m.icon('share') }} Chia sẻ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-tint">
+  <div class="container">
+    <h2>Chuyện vị bánh</h2>
+    <div class="trio">
+      <div><span class="eyebrow">Vị trà</span><p>{% if tea_used %}<a class="link" href="{{ product_url(tea_used) }}">{{ tea_used.name }}</a>{% else %}—{% endif %}</p></div>
+      <div><span class="eyebrow">Kết cấu</span><p>{{ p.texture }}</p></div>
+      <div><span class="eyebrow">Độ ngọt</span><p>{{ p.sweetness }}</p></div>
+    </div>
+    <p class="muted">Khoảnh khắc gợi ý: {{ p.moment }}</p>
+    <div class="cta-row">{% if tea_used %}<a class="btn btn-secondary btn-sm" href="{{ product_url(tea_used) }}">Xem loại trà sử dụng</a>{% endif %}<a class="btn btn-secondary btn-sm" href="{{ url_for('catalog', cat='banh') }}">Khám phá thêm bánh</a></div>
+  </div>
+</section>
+
+<section class="section" id="thanh-phan">
+  <div class="container two-col">
+    <div>
+      <h2>Thành phần & lưu ý</h2>
+      <p>{{ p.ingredients }}</p>
+      <p><b>Chất gây dị ứng:</b> {% for a in p.allergens %}<span class="pill-warn">{{ a }}</span> {% endfor %}</p>
+      {% if p.shared_line %}<p class="muted">{{ p.shared_line }}</p>{% endif %}
+      <p class="muted small">Giá trị dinh dưỡng sẽ hiển thị khi có kết quả kiểm nghiệm.</p>
+      <a class="link-sm" href="{{ url_for('contact', **{'chu-de':'chon-tra'}) }}">Hỏi về dị ứng →</a>
+    </div>
+    <div>
+      <h2>Giữ bánh ngon đúng cách</h2>
+      <table class="brew-table">
+        <tr><th>Bảo quản</th><td>{{ p.storage }}</td></tr>
+        <tr><th>Hạn sử dụng</th><td>{{ p.hsd }}</td></tr>
+        <tr><th>Loại</th><td>{{ 'Làm theo đơn' if p.made_to_order else 'Làm sẵn' }}</td></tr>
+        <tr><th>Vận chuyển</th><td>{{ 'Cần giữ lạnh – chỉ giao khu vực ' ~ D.CAKE_ZONE|join(', ') if p.made_to_order else 'Giao thường, tránh nắng nóng' }}</td></tr>
+      </table>
+      <p class="muted small">Ngày giao cụ thể được tính lại ở bước thanh toán theo địa chỉ và các món khác trong giỏ.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section section-cream">
+  <div class="container">
+    <div class="sec-head"><h2>Thử bánh với một tách trà</h2></div>
+    <div class="pair-grid">
+      {% for t in pairs %}
+      <article class="pair">
+        <a href="{{ product_url(t) }}" class="pair-img">{{ m.art(t.art, t.color, t.name, note=False) }}</a>
+        <div>
+          <h3><a href="{{ product_url(t) }}">{{ t.name }}</a></h3>
+          <p class="muted">{{ p.pair_reason.get(t.id, t.taste_note) }}</p>
+          {% set v1 = (p.variants | selectattr('stock','gt',0) | list | first) %}{% set v2 = (t.variants | selectattr('stock','gt',0) | list | first) %}
+          {% if v1 and v2 %}<button class="btn btn-sm" data-add-multi='[{"sku":"{{ v1.sku }}","qty":1},{"sku":"{{ v2.sku }}","qty":1}]'>Thêm cả hai · {{ (v1.price+v2.price) | vnd }}</button>
+          {% else %}<a class="btn btn-sm btn-secondary" href="{{ product_url(t) }}">Xem trà phù hợp</a>{% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% if sets %}<p class="center">Có trong hộp quà: {% for s in sets %}<a class="link" href="{{ product_url(s) }}">{{ s.name }}</a>{{ ', ' if not loop.last }}{% endfor %} · <a class="link" href="{{ url_for('giftbox_page', sku=p.variants[0].sku) }}">Đặt bánh vào hộp quà</a></p>{% endif %}
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){ const d = new Date(); let n = {{ p.prep_days }} + 1; while (n > 0) { d.setDate(d.getDate()+1); if (d.getDay()!==0) n--; }
+  document.getElementById('earliest').textContent = d.toLocaleDateString('vi-VN') + ' (ước tính, chưa gồm vận chuyển)'; })();
+</script>
+{% endblock %}
