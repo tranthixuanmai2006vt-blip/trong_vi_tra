@@ -10,7 +10,7 @@ Viết bằng Python (Flask), dựng theo file *[THDAKD] BRIEF WEB* và *[THDAKD
 ## Chạy trong PyCharm (macOS)
 ```bash
 cd ~/Downloads/trong_vi_tra
-python3 -m venv .venv            # chỉ cần lần đầu
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python app.py
