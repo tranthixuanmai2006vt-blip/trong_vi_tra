@@ -82,12 +82,15 @@
     if (!list.length) { $('bxItems').innerHTML = `<div class="empty"><p>Không tìm thấy món phù hợp.</p><button class="btn btn-sm btn-secondary" id="clrF">Xóa bộ lọc</button></div>`;
       $('clrF').onclick = () => { $('bxSearch').value = ''; $('bxStock').checked = false; renderItems(); }; return; }
     $('bxItems').innerHTML = list.map(p => {
-      const opts = p.variants.map(v => `<option value="${v.sku}" ${v.stock <= 0 ? 'disabled' : ''}>${esc(v.label)}${v.stock <= 0 ? ' (tạm hết)' : ''}</option>`).join('');
       const chosen = p.variants.filter(v => st.items[v.sku] > 0);
       const allOut = p.variants.every(v => v.stock <= 0);
+      const addable = p.variants.filter(v => !st.items[v.sku]);
+      const opts = addable.map(v => `<option value="${v.sku}" ${v.stock <= 0 ? 'disabled' : ''}>${esc(v.label)}${v.stock <= 0 ? ' (tạm hết)' : ''}</option>`).join('');
       const teaPacks = p.type === 'tra'
         ? `<div class="bx-tea-packs">${p.variants.filter(v => !st.items[v.sku]).map(v => `<div class="bx-tea-pack"><span class="bx-pack-tag">${esc(v.label.replace(/^Gói\s*/i, ''))}</span><button class="btn btn-sm" data-addtea="${v.sku}" ${v.stock <= 0 ? 'disabled' : ''}>Thêm vào hộp</button></div>`).join('')}</div>`
-        : `<div class="bx-add"><select data-var="${p.id}" aria-label="Quy cách ${esc(p.name)}">${opts}</select><button class="btn btn-sm" data-addbox="${p.id}">Thêm vào hộp</button></div>`;
+        : p.variants.length === 1
+          ? (chosen.length ? '' : `<div class="bx-tea-pack"><span class="bx-pack-tag">${esc(p.variants[0].label)}</span><button class="btn btn-sm" data-addbox="${p.id}" data-sku="${p.variants[0].sku}">Thêm vào hộp</button></div>`)
+          : (addable.length ? `<div class="bx-add"><select data-var="${p.id}" aria-label="Chọn vị và quy cách ${esc(p.name)}">${opts}</select><button class="btn btn-sm" data-addbox="${p.id}">Thêm vào hộp</button></div>` : '');
       return `<article class="bx-card ${chosen.length ? 'selected' : ''} ${allOut ? 'is-out' : ''}">
         <div class="bx-art ${p.image_url ? 'has-photo' : ''}" style="--c:${p.color}">${p.image_url ? `<img src="${esc(p.image_url)}" alt="${esc(p.name)}" loading="lazy">` : ''}</div>
         <div class="bx-body"><h4>${esc(p.name)}</h4><p class="small muted">${esc(p.taste_note)}</p>
@@ -98,7 +101,8 @@
     }).join('');
     $('bxItems').querySelectorAll('[data-addtea]').forEach(b => b.onclick = () => changeQty(b.dataset.addtea, 1));
     $('bxItems').querySelectorAll('[data-addbox]').forEach(b => b.onclick = () => {
-      const sku = $('bxItems').querySelector(`[data-var="${b.dataset.addbox}"]`).value; changeQty(sku, 1);
+      const select = $('bxItems').querySelector(`[data-var="${b.dataset.addbox}"]`);
+      changeQty(select ? select.value : b.dataset.sku, 1);
     });
     $('bxItems').querySelectorAll('[data-inc]').forEach(b => b.onclick = () => changeQty(b.dataset.inc, 1));
     $('bxItems').querySelectorAll('[data-dec]').forEach(b => b.onclick = () => changeQty(b.dataset.dec, -1));
@@ -113,10 +117,10 @@
     update();
   }
 
-  function optCard({ id, name, sel, disabled, reason, body, priceTxt, group, type = 'radio', swatch }) {
+  function optCard({ id, name, sel, disabled, reason, body, priceTxt, group, type = 'radio', swatch, image }) {
     return `<label class="opt ${sel ? 'selected' : ''} ${disabled ? 'is-out' : ''}">
       <input type="${type}" name="${group}" value="${id}" ${sel ? 'checked' : ''} ${disabled ? 'disabled' : ''}>
-      ${swatch ? `<span class="swatch" style="background:${swatch}"></span>` : ''}
+      ${image ? `<span class="opt-photo"><img src="${esc(image)}" alt="" loading="lazy"></span>` : swatch ? `<span class="swatch" style="background:${swatch}"></span>` : ''}
       <span class="opt-body"><b>${esc(name)}</b>${body}<span class="opt-price">${priceTxt}</span>${reason ? `<small class="err">${esc(reason)}</small>` : ''}</span>
       ${sel ? '<span class="tick" aria-hidden="true">✓</span>' : ''}</label>`;
   }
@@ -126,8 +130,9 @@
     $('bxBoxes').innerHTML = BX.boxes.map(b => {
       const fits = s <= b.capacity, out = b.stock <= 0;
       return optCard({ id: b.id, group: 'box', name: b.name, sel: st.box === b.id, disabled: !fits || out,
+        image: b.image_url,
         reason: out ? 'Tạm hết' : !fits ? `Không đủ chỗ (${s}/${b.capacity} ô)` : '',
-        body: `<small>Ngoài ${b.outer} · Lòng hộp ${b.inner}</small><small>${esc(b.material)} · ${esc(b.color)} · Sức chứa ${b.capacity} ô</small>${fits && !out ? '<small class="ok">✓ Phù hợp với lựa chọn của bạn</small>' : ''}${b.prep_days ? `<small>+${b.prep_days} ngày chuẩn bị</small>` : ''}`,
+        body: `<small>Sức chứa ${b.capacity} món · ${b.outer}</small>${fits && !out ? '<small class="ok">Vừa với lựa chọn hiện tại</small>' : ''}${b.prep_days ? `<small>+${b.prep_days} ngày chuẩn bị</small>` : ''}`,
         priceTxt: vnd(b.price) });
     }).join('');
     $('bxBoxes').querySelectorAll('input').forEach(i => i.onchange = () => {
@@ -273,7 +278,7 @@
 
   function openDetail(pid, opener) {
     const p = BX.products.find(x => x.id === pid);
-    $('ddBody').innerHTML = `<h3 id="ddTitle">${esc(p.name)}</h3><p>${esc(p.desc)}</p>
+    $('ddBody').innerHTML = `<h3 id="ddTitle">${esc(p.name)}</h3><p>${esc(p.taste_note || '')}</p>
       <ul class="meta-list">${p.variants.map(v => `<li><span>${esc(v.label)}</span>${v.stock > 0 ? 'Còn hàng' : 'Tạm hết'}</li>`).join('')}</ul>
       ${p.allergens.length ? `<p><b>Dị ứng:</b> ${esc(p.allergens.join(', '))}</p>` : ''}
       <p><b>Bảo quản:</b> ${esc(p.storage)}</p><p><b>Hạn dùng:</b> ${esc(p.hsd)}</p>

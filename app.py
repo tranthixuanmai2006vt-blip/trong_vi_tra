@@ -692,7 +692,8 @@ def giftbox_page():
                         "brand": p.get("brand"), "url": product_url(p), "allergens": p.get("allergens", []),
                         "prep_days": p.get("prep_days", 0), "hsd": p.get("hsd", ""), "storage": p.get("storage", ""),
                         "desc": p.get("desc", ""), "image_url": product_photo_url(p), "variants": p["variants"]} for p in pool],
-          "boxes": D.BOXES, "papers": D.PAPERS, "cards": D.CARDS, "accessories": D.ACCESSORIES,
+          "boxes": [{**b, "image_url": url_for("static", filename=f"img/{b['image']}")} for b in D.BOXES],
+          "papers": D.PAPERS, "cards": D.CARDS, "accessories": D.ACCESSORIES,
           "wishes": D.WISH_SAMPLES, "packing_days": D.GIFTBOX_PACKING_DAYS}
     pre = request.args.get("sku")
     if pre and pre not in BY_SKU:

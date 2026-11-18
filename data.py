@@ -667,11 +667,11 @@ ADDONS = [
 # TẠO HỘP QUÀ – hộp, giấy gói, thiệp, phụ kiện
 # -----------------------------------------------------------------
 BOXES = [
-    {"id": "BX-S", "name": "Hộp Duyên nhỏ", "outer": "18 × 14 × 7 cm", "inner": "17 × 13 × 6 cm",
+    {"id": "BX-S", "name": "Gift set Khơi Hương", "image": "products/khoi-huong.png", "outer": "18 × 14 × 7 cm", "inner": "17 × 13 × 6 cm",
      "material": "Giấy kraft cứng", "color": "Nâu kraft", "capacity": 3, "price": 35_000, "stock": 40, "prep_days": 0},
-    {"id": "BX-M", "name": "Hộp Duyên vừa", "outer": "25 × 20 × 8 cm", "inner": "24 × 19 × 7 cm",
+    {"id": "BX-M", "name": "Gift set Trọn Vị", "image": "products/tron-vi.png", "outer": "25 × 20 × 8 cm", "inner": "24 × 19 × 7 cm",
      "material": "Giấy cứng bọc giấy mỹ thuật", "color": "Kem", "capacity": 6, "price": 55_000, "stock": 25, "prep_days": 0},
-    {"id": "BX-L", "name": "Hộp Duyên lớn nắp gỗ", "outer": "32 × 24 × 10 cm", "inner": "31 × 23 × 9 cm",
+    {"id": "BX-L", "name": "Gift set Giao Hòa", "image": "products/giao-hoa.png", "outer": "32 × 24 × 10 cm", "inner": "31 × 23 × 9 cm",
      "material": "Thân giấy cứng, nắp gỗ thông", "color": "Nâu gỗ", "capacity": 10, "price": 120_000, "stock": 6, "prep_days": 1},
 ]
 PAPERS = [

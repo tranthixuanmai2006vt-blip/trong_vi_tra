@@ -6,7 +6,7 @@
     <div>
       {{ m.crumbs([('Dịch vụ', None), ('Tạo hộp quà', None)]) }}
       <p class="eyebrow">Dịch vụ · Tạo hộp quà</p>
-      <h1>Gói một chút hương trà, gửi trọn lời thương.</h1>
+      <h1>Gói ghém sắc hương, gửi trọn lời thương.</h1>
       <p class="lead">Chọn trà, bánh, hộp và thiệp theo cách bạn thích.</p>
       <div class="giftbox-hero-actions"><a href="#builder" class="btn btn-lg" id="startBtn">Bắt đầu chọn quà <span aria-hidden="true">↓</span></a><a class="link" href="{{ url_for('custom_design') }}" id="toCustom">Cần thiết kế riêng? →</a></div>
       <p class="muted small">Giá hộp quà sẽ được tổng kết ở bước cuối.</p>
@@ -47,7 +47,7 @@
         <div class="step" data-step="2" hidden>
           <h2 tabindex="-1">Chọn chiếc hộp cho món quà</h2>
           <p class="muted" id="slotInfo"></p>
-          <div class="opt-grid" id="bxBoxes"></div>
+          <div class="opt-grid box-opt-grid" id="bxBoxes"></div>
         </div>
 
         {# BƯỚC 3 #}
