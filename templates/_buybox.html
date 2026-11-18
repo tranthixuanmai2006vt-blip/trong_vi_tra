@@ -1,25 +1,15 @@
 {# Khối mua hàng dùng chung cho trà / bánh / gift set. Biến: p, extra_note (tùy chọn) #}
 {% set first_ok = (p.variants | selectattr('stock', 'gt', 0) | list | first) or p.variants[0] %}
 <form class="buybox" data-buybox>
-  {% macro variant_radio(v) -%}
+  <fieldset class="variants">
+    <legend>Quy cách</legend>
+    {% for v in p.variants %}
     <label class="variant {{ 'is-out' if v.stock <= 0 }}">
       <input type="radio" name="sku" value="{{ v.sku }}" data-price="{{ v.price }}" data-stock="{{ v.stock }}"
-             {% if v.image_stem %}data-image="{{ photo_url_for_stem(v.image_stem) or '' }}"{% endif %}
              {{ 'checked' if v.sku == first_ok.sku }} {{ 'disabled' if v.stock <= 0 }}>
-      <span><b>{{ v.size or v.label }}</b><small>{{ v.price | vnd }}{% if v.stock <= 0 %} · Tạm hết{% elif v.stock < 5 %} · Còn {{ v.stock }}{% endif %}</small></span>
+      <span><b>{{ v.label }}</b><small>{{ v.price | vnd }}{% if v.stock <= 0 %} · Tạm hết{% elif v.stock < 5 %} · Còn {{ v.stock }}{% endif %}</small></span>
     </label>
-  {%- endmacro %}
-  <fieldset class="variants">
-    {% if p.flavors %}
-    <legend>Chọn vị và quy cách</legend>
-    {% for fl in p.flavors %}
-    <div class="flavor-group"><p class="flavor-name">{{ fl }}</p>
-      <div class="flavor-row">{% for v in p.variants if v.flavor == fl %}{{ variant_radio(v) }}{% endfor %}</div></div>
     {% endfor %}
-    {% else %}
-    <legend>Quy cách</legend>
-    {% for v in p.variants %}{{ variant_radio(v) }}{% endfor %}
-    {% endif %}
   </fieldset>
   <div class="price-row">
     <span class="price price-lg" data-price-out>{{ first_ok.price | vnd }}</span>

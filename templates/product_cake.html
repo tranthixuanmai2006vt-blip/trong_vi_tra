@@ -33,7 +33,7 @@
   <div class="container">
     <h2>Chuyện vị bánh</h2>
     <div class="trio">
-      <div><span class="eyebrow">Vị trà</span><p>{% if tea_used %}<a class="link" href="{{ product_url(tea_used) }}">{{ tea_used.name }}</a>{% else %}{{ p.tea_note or 'Đang cập nhật' }}{% endif %}</p></div>
+      <div><span class="eyebrow">Vị trà</span><p>{% if tea_used %}<a class="link" href="{{ product_url(tea_used) }}">{{ tea_used.name }}</a>{% else %}—{% endif %}</p></div>
       <div><span class="eyebrow">Kết cấu</span><p>{{ p.texture }}</p></div>
       <div><span class="eyebrow">Độ ngọt</span><p>{{ p.sweetness }}</p></div>
     </div>
@@ -87,13 +87,6 @@
 </section>
 {% endblock %}
 {% block scripts %}
-<script>
-/* Chọn vị khác -> đổi ảnh bánh tương ứng */
-document.querySelectorAll('[name=sku][data-image]').forEach(r => r.addEventListener('change', () => {
-  const img = document.querySelector('.pdp-gallery img'); if (img && r.dataset.image) img.src = r.dataset.image;
-}));
-</script>
-
 <script>
 (function(){ const d = new Date(); let n = {{ p.prep_days }} + 1; while (n > 0) { d.setDate(d.getDate()+1); if (d.getDay()!==0) n--; }
   document.getElementById('earliest').textContent = d.toLocaleDateString('vi-VN') + ' (ước tính, chưa gồm vận chuyển)'; })();

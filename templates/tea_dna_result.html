@@ -1,0 +1,85 @@
+{% extends 'base.html' %}{% import 'macros.html' as m with context %}
+{% block title %}Kết quả Tea DNA{% endblock %}
+{% block bodyclass %}page-dna{% endblock %}
+{% block content %}
+<section class="section section-tight">
+  <div class="container">
+    {{ m.crumbs([('Tea DNA', url_for('tea_dna')), ('Kết quả', None)]) }}
+    <div id="noProfile" class="empty" hidden>
+      <p class="empty-ic">🧬</p><h2>Bạn chưa có hồ sơ Tea DNA trên thiết bị này</h2>
+      <p class="muted">Trả lời vài câu hỏi để nhận hồ sơ khẩu vị và gợi ý trà, bánh phù hợp.</p>
+      <div class="cta-row center-row"><a class="btn" href="{{ url_for('tea_dna') }}">Khám phá Tea DNA</a><a class="btn btn-secondary" href="{{ url_for('catalog') }}">Xem sản phẩm</a></div>
+    </div>
+
+    <div id="result" hidden>
+      <p class="eyebrow">YOUR TEA DNA / HỒ SƠ GU TRÀ</p>
+      <div class="dna-top">
+        <div>
+          <div class="dna-card" id="dnaCard">
+            <p class="dc-eyebrow">MY TEA DNA</p>
+            <h1 id="gName"></h1>
+            <p class="dc-tag" id="gTagline"></p>
+            <p class="dc-desc" id="gDesc"></p>
+            <p id="gSecond" class="dc-second"></p>
+            <div class="dc-chips" id="gChips"></div>
+            <div class="dc-conf"><span>Độ hoàn thiện hồ sơ</span><i><b id="gConfBar"></b></i><span id="gConf"></span></div>
+            <p class="dc-foot">{{ SITE.name }} × {{ SITE.partner }} · Explore Tea. Create Your Way.</p>
+          </div>
+          <div class="dna-actions">
+            <button class="btn btn-sm btn-secondary" id="shareBtn">{{ m.icon('share') }} Chia sẻ kết quả</button>
+            <button class="btn btn-sm btn-secondary" id="redoBtn">↻ Làm lại bài test</button>
+            <button class="btn btn-sm btn-ghost" id="delBtn">Xóa hồ sơ</button>
+          </div>
+          <p class="small muted" id="gUpdated"></p>
+        </div>
+
+        <div class="axes-box">
+          <h2 class="h3">Điểm từng trục</h2>
+          <div id="axes"></div>
+          <p class="small muted">0–39: nghiêng về trái · 40–60: cân bằng · 61–100: nghiêng về phải. Trục Hương là quy ước Hoa → Trái cây, không phải chất lượng cao/thấp.</p>
+          <div class="ctx" id="ctx"></div>
+          <details class="acc" id="manualBox"><summary>Chỉnh hồ sơ thủ công</summary>
+            <div id="manual"></div>
+            <p class="err" id="manErr" hidden></p>
+            <div class="cta-row"><button class="btn btn-sm" id="manSave">Lưu điều chỉnh</button><button class="btn btn-sm btn-secondary" id="manCancel">Hủy</button><button class="btn btn-sm btn-ghost" id="manReset" hidden>Khôi phục kết quả bài test</button></div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-cream" id="recSec" hidden>
+  <div class="container">
+    <p class="eyebrow">Gợi ý dành cho bạn</p>
+    <h2 id="recTitle"></h2>
+    <p class="muted">Xếp hạng theo độ gần giữa hồ sơ của bạn và hồ sơ vị công thức, đã loại trừ thành phần bạn muốn tránh. % là độ gần gu theo quy tắc, không phải điểm chất lượng.</p>
+    <div class="recipe-grid" id="recipes"></div>
+  </div>
+</section>
+
+<section class="section" id="prodSec" hidden>
+  <div class="container">
+    <h2 id="prodTitle"></h2>
+    <p class="muted small" id="prodNote"></p>
+    <div class="pgrid" id="prods"></div>
+    <div class="cta-row" id="prodAll"></div>
+  </div>
+</section>
+
+<section class="section section-tint" id="groupsSec" hidden>
+  <div class="container">
+    <p class="eyebrow">Bộ sưu tập Tea DNA</p>
+    <h2>13 hồ sơ khẩu vị</h2>
+    <div class="group-grid" id="groups"></div>
+    <div class="group-detail" id="groupDetail" hidden></div>
+  </div>
+</section>
+
+<div class="drawer" id="recipeDrawer" hidden role="dialog" aria-modal="true" aria-labelledby="rdTitle"><div class="drawer-panel"><button class="nav-close" id="rdClose" aria-label="Đóng">✕</button><div id="rdBody"></div></div></div>
+<div class="drawer" id="dlg" hidden role="dialog" aria-modal="true" aria-labelledby="dlgTitle"><div class="drawer-panel dialog"><div id="dlgBody"></div></div></div>
+{% endblock %}
+{% block scripts %}
+<script>window.DNA = {{ dna | tojson }}; window.DNA_PAGE = 'result';</script>
+<script src="{{ url_for('static', filename='js/teadna.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends 'base.html' %}{% import 'macros.html' as m with context %}
+{% block title %}Thanh toán{% endblock %}
+{% block content %}
+<section class="section section-tight">
+  <div class="container">
+  {% if empty %}
+    <div class="empty empty-lg"><h1>Giỏ hàng chưa có sản phẩm</h1><a class="btn btn-lg" href="{{ url_for('catalog') }}">Khám phá sản phẩm</a></div>
+  {% else %}
+    <a class="link" href="{{ url_for('cart_page') }}">← Quay lại giỏ hàng</a>
+    <h1>Hoàn tất đơn hàng</h1>
+    {% if errors %}<div class="alert alert-error" role="alert"><b>Vui lòng kiểm tra lại:</b><ul>{% for k, e in errors.items() %}<li><a href="#f-{{ k }}">{{ e }}</a></li>{% endfor %}</ul></div>{% endif %}
+    <form method="post" class="checkout" id="checkoutForm" novalidate>
+      <input type="hidden" name="token" value="{{ token }}">
+      <div class="co-main">
+        {# 02 NGƯỜI ĐẶT / NHẬN #}
+        <fieldset class="card-form">
+          <legend class="h3">Người đặt hàng</legend>
+          <p class="small muted">Mua không cần tài khoản. <span class="req">*</span> là thông tin bắt buộc.</p>
+          <div class="grid-2">
+            {{ m.field('buyer_name', 'Họ tên', errors, f.buyer_name, required=True, attrs='autocomplete="name"') }}
+            {{ m.field('buyer_phone', 'Số điện thoại', errors, f.buyer_phone, 'tel', True, attrs='autocomplete="tel" inputmode="tel"') }}
+            {{ m.field('buyer_email', 'Email (nhận xác nhận đơn)', errors, f.buyer_email, 'email', attrs='autocomplete="email"') }}
+          </div>
+          <label class="check"><input type="checkbox" name="same_recipient" value="1" id="sameRcv" {{ 'checked' if f.same_recipient }}> Người nhận là tôi</label>
+          <div class="grid-2" id="rcvBox" {{ 'hidden' if f.same_recipient }}>
+            {{ m.field('rcv_name', 'Tên người nhận', errors, f.rcv_name, required=True) }}
+            {{ m.field('rcv_phone', 'Số điện thoại người nhận', errors, f.rcv_phone, 'tel', True, attrs='inputmode="tel"') }}
+            <label class="check span-2"><input type="checkbox" name="hide_price" value="1" {{ 'checked' if f.hide_price }}> Ẩn giá trên phiếu giao (khi gửi quà)</label>
+          </div>
+          <label class="check"><input type="checkbox" name="invoice" value="1" id="invChk" {{ 'checked' if f.invoice }}> Xuất hóa đơn</label>
+          <div class="grid-2" id="invBox" {{ 'hidden' if not f.invoice }}>
+            {{ m.field('tax_code', 'Mã số thuế', errors, f.tax_code, required=True) }}
+            {{ m.field('company', 'Tên công ty / cá nhân', errors, f.company) }}
+            {{ m.field('company_addr', 'Địa chỉ xuất hóa đơn', errors, f.company_addr) }}
+            {{ m.field('invoice_email', 'Email nhận hóa đơn', errors, f.invoice_email, 'email') }}
+          </div>
+        </fieldset>
+
+        {# 03 ĐỊA CHỈ & GIAO HÀNG #}
+        <fieldset class="card-form">
+          <legend class="h3">Bạn muốn nhận hàng ở đâu?</legend>
+          <div class="grid-2">
+            <div class="field {{ 'has-error' if errors.province }}"><label for="f-province">Tỉnh / thành phố <span class="req">*</span></label>
+              <select id="f-province" name="province" required><option value="">— Chọn —</option>{% for p in D.PROVINCES %}<option {{ 'selected' if f.province==p }}>{{ p }}</option>{% endfor %}</select>
+              {% if errors.province %}<small class="err">⚠ {{ errors.province }}</small>{% endif %}</div>
+            {{ m.field('district', 'Quận/huyện, phường/xã', errors, f.district, required=True) }}
+            <div class="span-2">{{ m.field('street', 'Số nhà, tên đường', errors, f.street, required=True, attrs='autocomplete="street-address"') }}</div>
+            <div class="span-2">{{ m.field('addr_note', 'Mô tả thêm (tòa nhà, mốc…)', errors, f.addr_note) }}</div>
+          </div>
+          <h3 class="h4">Phương thức giao</h3>
+          <div id="shipOpts" class="radio-cards {{ 'has-error' if errors.ship }}">
+            {% if not v.ship_options %}<p class="muted" id="shipHint">Chọn tỉnh/thành để xem phương thức và phí giao.</p>{% endif %}
+            {% for o in v.ship_options %}
+            <label class="rcard {{ 'is-out' if not o.ok }}"><input type="radio" name="ship" value="{{ o.id }}" {{ 'checked' if f.ship==o.id and o.ok }} {{ 'disabled' if not o.ok }}>
+              <span><b>{{ o.label }}</b> · {{ 'Miễn phí' if o.fee==0 else o.fee|vnd }}<small>{{ o.desc }} · Dự kiến nhận {{ o.eta }}</small>{% if o.reason %}<small class="err">{{ o.reason }}</small>{% endif %}</span></label>
+            {% endfor %}
+          </div>
+          {% if errors.ship %}<small class="err" id="f-ship">⚠ {{ errors.ship }}</small>{% endif %}
+          <p class="small muted">Thời gian chuẩn bị đơn: <b>{{ v.prep_days }} ngày</b> (tính riêng với vận chuyển). {% if v.has_cake %}Đơn có bánh tươi – chỉ giao trong khu vực được hỗ trợ, cần giữ lạnh.{% endif %}</p>
+          <div class="grid-2">
+            {{ m.field('wish_date', 'Ngày mong muốn nhận (yêu cầu, chưa phải cam kết)', errors, f.wish_date, 'date') }}
+            {{ m.field('delivery_note', 'Ghi chú giao hàng', errors, f.delivery_note) }}
+          </div>
+        </fieldset>
+
+        {# 04 THANH TOÁN #}
+        <fieldset class="card-form">
+          <legend class="h3">Chọn cách thanh toán</legend>
+          <div class="radio-cards {{ 'has-error' if errors.payment }}" id="payOpts">
+            {% for k, pm in D.PAYMENT_METHODS.items() %}
+            <label class="rcard"><input type="radio" name="payment" value="{{ k }}" data-btn="{{ pm.button }}" {{ 'checked' if f.payment==k }}>
+              <span><b>{{ pm.label }}</b><small>{{ pm.desc }}</small>{% if k=='cod' %}<small class="err" id="codWarn" {{ 'hidden' if v.total <= D.COD_LIMIT }}>Đơn vượt {{ D.COD_LIMIT|vnd }} – vui lòng chọn chuyển khoản.</small>{% endif %}</span></label>
+            {% endfor %}
+          </div>
+          {% if errors.payment %}<small class="err" id="f-payment">⚠ {{ errors.payment }}</small>{% endif %}
+          <p class="small muted">Thanh toán thẻ/ví điện tử chưa được hỗ trợ ở phiên bản này.</p>
+        </fieldset>
+
+        {# 05 KIỂM TRA CUỐI #}
+        <fieldset class="card-form">
+          <legend class="h3">Kiểm tra trước khi đặt</legend>
+          <div class="field {{ 'has-error' if errors.agree }}">
+            <label class="check"><input type="checkbox" name="agree" value="1" id="f-agree"> Tôi đồng ý với <a class="link" target="_blank" href="{{ url_for('policy', slug='dieu-khoan') }}">Điều khoản</a>, <a class="link" target="_blank" href="{{ url_for('policy', slug='bao-mat') }}">Bảo mật</a>, <a class="link" target="_blank" href="{{ url_for('policy', slug='doi-tra') }}">Đổi/hủy</a> và <a class="link" target="_blank" href="{{ url_for('policy', slug='qua-ca-nhan-hoa') }}">Quy định quà cá nhân hóa</a>. <span class="req">*</span></label>
+            {% if errors.agree %}<small class="err">⚠ {{ errors.agree }}</small>{% endif %}
+          </div>
+          <label class="check"><input type="checkbox" name="marketing" value="1"> Nhận tin sản phẩm mới qua email (không bắt buộc)</label>
+          {% if errors._cart %}<p class="err">{{ errors._cart }} <a class="link" href="{{ url_for('cart_page') }}">Sửa giỏ hàng</a></p>{% endif %}
+          <button class="btn btn-lg btn-block" id="placeBtn" data-loading="Đang tạo đơn…">{{ D.PAYMENT_METHODS[f.payment].button if f.payment in D.PAYMENT_METHODS else 'Đặt hàng' }} · <span id="btnTotal">{{ v.total | vnd }}</span></button>
+        </fieldset>
+      </div>
+
+      {# 01 TÓM TẮT #}
+      <aside class="summary sticky">
+        <div class="sec-head-row"><h2 class="h3">Đơn hàng</h2><a class="link-sm" href="{{ url_for('cart_page') }}">Sửa giỏ hàng</a></div>
+        <ul class="co-lines">
+          {% for l in v.lines %}
+          <li>
+            {% if l.kind == 'giftbox' %}
+              <div><b>Hộp quà tự tạo</b> × {{ l.qty }} hộp<br><small class="muted">{% for i in l.quote['items'] %}{{ i.name }} ×{{ i.qty }}{{ ', ' if not loop.last }}{% endfor %} · {{ l.quote.box.name }} · {{ l.quote.paper.name }} · {{ l.quote.card.name }}</small>
+              {% if l.quote.wish and l.quote.wish.message %}<br><small>Lời chúc: “{{ l.quote.wish.message }}”</small>{% endif %}</div>
+            {% else %}
+              <div><b>{{ l.name }}</b> × {{ l.qty }}<br><small class="muted">{{ l.variant }}{% if l.product.made_to_order %} · Làm theo đơn{% endif %}</small></div>
+            {% endif %}
+            <span>{{ l.total | vnd }}</span>
+            {% if l.errors %}<small class="err">{{ l.errors[0] }}</small>{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        <div class="sum-row"><span>Tạm tính</span><b>{{ v.subtotal | vnd }}</b></div>
+        {% if v.discount %}<div class="sum-row"><span>Giảm giá ({{ v.coupon }})</span><b>−{{ v.discount | vnd }}</b></div>{% endif %}
+        <div class="sum-row"><span>Phí giao hàng</span><b id="sShip">{{ ('Miễn phí' if v.ship == 0 else v.ship | vnd) if v.ship is not none else 'Tính sau khi nhập địa chỉ' }}</b></div>
+        <div class="sum-total"><span>Tổng cộng</span><b id="sTotal">{{ v.total | vnd }}</b></div>
+      </aside>
+    </form>
+  {% endif %}
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+{% if not empty %}
+<script>
+(function(){
+  const $ = id => document.getElementById(id), vnd = n => (Math.round(n)||0).toLocaleString('vi-VN') + 'đ';
+  $('sameRcv').onchange = () => $('rcvBox').hidden = $('sameRcv').checked;
+  $('invChk').onchange = () => $('invBox').hidden = !$('invChk').checked;
+  const form = $('checkoutForm');
+  async function quote() {
+    const prov = $('f-province').value, ship = (form.querySelector('[name=ship]:checked')||{}).value || 'standard';
+    if (!prov) return;
+    const r = await fetch('/api/checkout/quote', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({province: prov, ship})});
+    if (!r.ok) { $('shipOpts').innerHTML = '<p class="err">Chưa tính được phí giao. <button type="button" class="link-sm" id="retry">Thử lại</button></p>'; $('retry').onclick = quote; return; }
+    const d = await r.json();
+    let anyOk = false;
+    $('shipOpts').innerHTML = d.ship_options.map(o => { if (o.ok) anyOk = true; return `<label class="rcard ${o.ok?'':'is-out'}"><input type="radio" name="ship" value="${o.id}" ${o.id===ship && o.ok?'checked':''} ${o.ok?'':'disabled'}>
+      <span><b>${o.label}</b> · ${o.fee===0?'Miễn phí':vnd(o.fee)}<small>${o.desc} · Dự kiến nhận ${o.eta}</small>${o.reason?`<small class="err">${o.reason}</small>`:''}</span></label>`; }).join('')
+      + (anyOk ? '' : '<p class="err">Chưa có phương thức giao khả dụng cho địa chỉ này. Vui lòng sửa địa chỉ, giỏ hàng hoặc <a class="link" href="/lien-he">liên hệ</a>.</p>');
+    if (!form.querySelector('[name=ship]:checked')) { const f = form.querySelector('[name=ship]:not([disabled])'); if (f) { f.checked = true; return quote(); } }
+    $('sShip').textContent = d.ship === null ? 'Chọn phương thức giao' : (d.ship === 0 ? 'Miễn phí' : vnd(d.ship));
+    $('sTotal').textContent = vnd(d.total); $('btnTotal').textContent = vnd(d.total);
+    $('codWarn').hidden = d.cod_ok;
+    const cod = form.querySelector('[name=payment][value=cod]'); cod.disabled = !d.cod_ok; if (!d.cod_ok && cod.checked) cod.checked = false;
+  }
+  $('f-province').onchange = quote;
+  form.addEventListener('change', e => { if (e.target.name === 'ship') quote();
+    if (e.target.name === 'payment') $('placeBtn').firstChild.textContent = e.target.dataset.btn + ' · '; });
+  if ($('f-province').value) quote();
+  form.onsubmit = () => { const b = $('placeBtn'); b.disabled = true; b.textContent = b.dataset.loading; };
+})();
+</script>
+{% endif %}
+{% endblock %}

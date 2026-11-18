@@ -1,0 +1,77 @@
+{% extends 'base.html' %}{% import 'macros.html' as m with context %}
+{% block title %}Tra cứu đơn{% endblock %}
+{% block content %}
+<section class="section section-tight">
+  <div class="container">
+  {% if not o %}
+    <div class="track-form">
+      {{ m.crumbs([('Tra cứu đơn', None)]) }}
+      <h1>Đơn hàng của bạn đang ở đâu?</h1>
+      <p class="muted">Bạn tìm thấy mã trong trang xác nhận hoặc thông báo đặt hàng.</p>
+      <form method="post" class="card-form" novalidate>
+        {% if err %}<div class="alert alert-error" role="alert">{{ err }}</div>{% endif %}
+        <div class="field"><label for="code">Mã đơn <span class="req">*</span></label><input id="code" name="code" value="{{ f.code or code }}" placeholder="VD: TVT-261114-AB12C" autocapitalize="characters" required></div>
+        <div class="field"><label for="contact">Số điện thoại hoặc email đã dùng khi đặt <span class="req">*</span></label><input id="contact" name="contact" value="{{ f.contact }}" required inputmode="email"></div>
+        <button class="btn btn-lg btn-block">Tra cứu đơn</button>
+        <p class="small muted">Không nhớ mã? <a class="link" href="{{ url_for('contact', **{'chu-de':'dat-hang'}) }}">Liên hệ hỗ trợ</a>. Mã yêu cầu thiết kế riêng (YC-…) khác mã đơn hàng – vui lòng liên hệ kèm mã đó.</p>
+      </form>
+    </div>
+  {% else %}
+    {% set d = o.data %}
+    {{ m.crumbs([('Tra cứu đơn', url_for('track')), (o.code, None)]) }}
+    <div class="sec-head-row"><h1>Đơn {{ o.code }} <button class="btn btn-sm btn-secondary" data-copy="{{ o.code }}">{{ m.icon('copy') }} Sao chép mã</button></h1>
+      <a class="link" href="{{ url_for('track', ma=o.code) }}">↻ Làm mới</a></div>
+    <p class="small muted">Đặt lúc {{ o.created }} · Cập nhật gần nhất: {{ o.history[-1].time }}</p>
+    <div class="status-pills">
+      <span class="pill pill-{{ 'ok' if o.payment=='paid' else 'wait' }}">Thanh toán: {{ D.PAYMENT_STATUS.get(o.payment, o.payment) }}</span>
+      <span class="pill pill-info">Xử lý: {{ D.ORDER_STEPS[o.status_idx] }}</span>
+    </div>
+    <div class="track-grid">
+      <div class="card-form">
+        <h2 class="h3">Tiến độ chuẩn bị & giao nhận</h2>
+        <ol class="tline">
+          {% for s in D.ORDER_STEPS %}
+          {% set h = o.history | selectattr('step','equalto',loop.index0) | list | first %}
+          <li class="{{ 'done' if loop.index0 <= o.status_idx }} {{ 'next' if loop.index0 == o.status_idx + 1 }}"><b>{{ s }}</b>{% if h %}<small>{{ h.time }}</small>{% elif loop.index0 == o.status_idx + 1 %}<small>Bước tiếp theo</small>{% endif %}</li>
+          {% endfor %}
+        </ol>
+        <p class="small muted">Dự kiến chuẩn bị: {{ d.prep_days }} ngày · Dự kiến nhận: {{ d.ship.eta }}. {% if o.status_idx < 3 %}Chưa bàn giao vận chuyển.{% endif %}</p>
+      </div>
+      <div class="card-form">
+        <h2 class="h3">Tổng quan đơn</h2>
+        <ul class="co-lines">
+          {% for l in d.lines %}<li><div><b>{{ l.name }}</b> × {{ l.qty }}{% if l.kind=='giftbox' %}<br><small class="muted">{% for i in l.detail['items'] %}{{ i.name }} ×{{ i.qty }}{{ ', ' if not loop.last }}{% endfor %}</small>{% if l.detail.wish and l.detail.wish.message %}<br><small>Lời chúc: “{{ l.detail.wish.message }}”</small>{% endif %}{% else %}<br><small class="muted">{{ l.variant }}</small>{% endif %}</div><span>{{ l.total | vnd }}</span></li>{% endfor %}
+        </ul>
+        <div class="sum-row"><span>Giao hàng</span><b>{{ 'Miễn phí' if d.shipping == 0 else d.shipping | vnd }}</b></div>
+        {% if d.discount %}<div class="sum-row"><span>Giảm giá</span><b>−{{ d.discount | vnd }}</b></div>{% endif %}
+        <div class="sum-total"><span>Tổng</span><b>{{ d.total | vnd }}</b></div>
+        <p class="small">Đã trả: {{ (d.total if o.payment=='paid' else 0) | vnd }} · Còn lại: {{ (0 if o.payment=='paid' else d.total) | vnd }} · {{ D.PAYMENT_METHODS[d.payment].label }}</p>
+        <p class="small">Người nhận: {{ d.recipient.name }} · {{ d.recipient.phone | mask_phone }} · {{ d.address.district }}, {{ d.address.province }}</p>
+        {% if o.payment == 'bank_pending' and o.code in session.get('my_orders', []) %}<a class="btn btn-sm" href="{{ url_for('order_result', code=o.code) }}">Thanh toán đơn này</a>{% elif o.payment == 'bank_pending' %}<a class="btn btn-sm" href="{{ url_for('order_result', code=o.code) }}">Xem hướng dẫn thanh toán</a>{% endif %}
+      </div>
+    </div>
+
+    <div class="card-form" id="ho-tro">
+      <h2 class="h3">Yêu cầu chỉnh sửa, hủy và hỗ trợ</h2>
+      {% if ticket_done %}<div class="alert alert-ok" role="status">Đã nhận yêu cầu <b>{{ ticket_done }}</b> – trạng thái <b>Chờ tiếp nhận</b>. Gửi yêu cầu chưa đồng nghĩa đơn đã được sửa/hủy.</div>{% endif %}
+      {% if request.args.get('loi') %}<div class="alert alert-error">Vui lòng chọn loại vấn đề và mô tả.</div>{% endif %}
+      {% if tickets %}<ul class="mini-list">{% for t in tickets %}<li>{{ t.code }} · {{ t.data.kind }} · {{ t.created }} · <b>{{ t.status }}</b></li>{% endfor %}</ul>{% endif %}
+      <form method="post" action="{{ url_for('track_support', code=o.code) }}" enctype="multipart/form-data" class="grid-2">
+        <div class="field"><label for="kind">Loại vấn đề <span class="req">*</span></label>
+          <select id="kind" name="kind" required>
+            <option value="">— Chọn —</option>
+            {% if o.status_idx < 2 %}<option>Yêu cầu đổi thông tin</option><option>Yêu cầu hủy</option>{% endif %}
+            {% if o.status_idx >= 3 %}<option>Báo giao sai / hỏng</option>{% endif %}
+            <option>Liên hệ về thanh toán</option><option>Khác</option>
+          </select>
+          {% if o.status_idx >= 2 %}<small class="hint">Đơn đã bắt đầu chuẩn bị nên không thể tự sửa/hủy – yêu cầu sẽ được CSKH xem xét.</small>{% endif %}</div>
+        <div class="field"><label for="ch">Kênh phản hồi</label><select id="ch" name="channel"><option value="phone">Điện thoại đã đặt</option><option value="email">Email đã đặt</option></select></div>
+        <div class="field span-2"><label for="desc">Mô tả <span class="req">*</span></label><textarea id="desc" name="desc" rows="3" required></textarea></div>
+        <div class="field span-2"><label for="tf">Ảnh (tùy chọn, khi hàng hỏng/sai)</label><input id="tf" type="file" name="files" multiple accept=".jpg,.jpeg,.png,.pdf"><small class="hint">Tối đa 3 tệp JPG/PNG/PDF. Ảnh chỉ nhân sự có quyền xem.</small></div>
+        <div class="span-2"><button class="btn">Gửi yêu cầu hỗ trợ</button></div>
+      </form>
+    </div>
+  {% endif %}
+  </div>
+</section>
+{% endblock %}

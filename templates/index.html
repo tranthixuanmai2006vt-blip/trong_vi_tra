@@ -1,0 +1,165 @@
+{% extends 'base.html' %}{% import 'macros.html' as m with context %}
+{% block title %}Vị trà đong đầy, vị nhà sum vầy{% endblock %}
+{% block desc %}Trồng Vị Nhà – trà Hằng Sơn Điền, bánh thơm vị trà và hộp quà mang lời nhắn riêng.{% endblock %}
+{% block content %}
+
+{# 01 – COVER NGANG (chữ & nút là thành phần web thật, không ghép vào ảnh) #}
+<section class="cover {{ 'has-photo' if has_img('cover-desktop.jpg') }}">
+  <div class="cover-media">
+    {% if has_img('cover-desktop.jpg') %}
+    <picture>
+      {% if has_img('cover-mobile.jpg') %}<source media="(max-width: 767px)" srcset="{{ url_for('static', filename='img/cover-mobile.jpg') }}">{% endif %}
+      <img src="{{ url_for('static', filename='img/cover-desktop.jpg') }}" alt="Gói trà, đĩa bánh và hộp quà mở của Trồng Vị Nhà trên bàn gỗ sáng" fetchpriority="high">
+    </picture>
+    {% else %}
+    <div class="hero-scene">
+      <div class="scene-a">{{ m.art('giftbox', '#3B630D', 'hộp quà', note=False) }}</div>
+      <div class="scene-b">{{ m.art('pouch', '#B4762E', 'gói trà ô long', note=False) }}</div>
+      <div class="scene-c">{{ m.art('cookie', '#7C9A3F', 'bánh quy matcha', note=False) }}</div>
+    </div>
+    <span class="art-note cover-note">Ảnh minh họa – sẽ thay bằng ảnh full set trà · bánh · hộp quà</span>
+    {% endif %}
+  </div>
+  <div class="container cover-inner">
+    <div class="cover-text">
+      <p class="eyebrow">{{ SITE.eyebrow }}</p>
+      <h1>Vị trà đong đầy,<br>vị nhà sum vầy.</h1>
+      <p class="lead">Từ trà Hằng Sơn Điền đến bánh thơm vị trà và hộp quà mang lời nhắn riêng, Trồng Vị Nhà gom những điều thân quen vào từng lần thưởng thức và trao tặng.</p>
+      <div class="cta-row">
+        <a href="{{ url_for('catalog') }}" class="btn btn-lg">Khám phá sản phẩm</a>
+        <a href="{{ url_for('giftbox_page') }}" class="btn btn-lg btn-secondary">Tạo hộp quà</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# 02 – BA LỐI VÀO #}
+<section class="section">
+  <div class="container">
+    <div class="sec-head"><h2>Hôm nay, bạn muốn tìm vị nhà nào?</h2></div>
+    <div class="cat-grid">
+      {% for key, tag, title, sub, kind, color, file in [
+        ('tra','Trà','Vị trà thân quen','Một ấm trà, một khoảng thảnh thơi','pouch','#7C8F3A','cat-tra.jpg'),
+        ('banh','Bánh từ trà','Vị bánh ấm lòng','Thêm chút ngọt cho buổi ngồi cùng nhau','cake','#C08A3E','cat-banh.jpg'),
+        ('gift-set','Hộp quà','Gói vị nhà trao nhau','Chọn một món quà, gửi một lời thương','giftbox','#503021','cat-hopqua.jpg')] %}
+      <a class="cat-card reveal" href="{{ url_for('catalog', cat=key) }}" aria-label="{{ tag }} – {{ title }}">
+        <div class="cat-img">{{ m.pic(file, title, '4/5', kind, color) }}<span class="cat-tag">{{ tag }}</span></div>
+        <div class="cat-body"><h3>{{ title }}</h3><p>{{ sub }}</p><span class="link">Xem {{ tag | lower }} →</span></div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# 03 – HAI DỊCH VỤ (cân xứng 1:1) #}
+<section class="section section-tint">
+  <div class="container">
+    <div class="sec-head"><h2>Trao quà theo cách của riêng bạn</h2></div>
+    <div class="svc-grid">
+      <article class="svc-card reveal">
+        <div class="svc-img">{{ m.pic('svc-tu-tao.jpg', 'Hộp quà có sẵn cùng các món và phụ kiện', '4/3', 'giftbox', '#8C9A4B') }}</div>
+        <div class="svc-body">
+          <p class="eyebrow">Chọn mẫu có sẵn, xem giá ngay</p>
+          <h3>Tự tạo hộp quà</h3>
+          <ul class="ticks"><li>Chọn trà và bánh yêu thích</li><li>Chọn hộp, giấy gói, thiệp</li><li>Viết lời chúc, xem giá ngay</li></ul>
+          <a href="{{ url_for('giftbox_page') }}" class="btn">Bắt đầu tạo quà</a>
+        </div>
+      </article>
+      <article class="svc-card reveal">
+        <div class="svc-img">{{ m.pic('svc-theo-yeu-cau.jpg', 'Mẫu hộp, thiệp và tag thiết kế riêng', '4/3', 'card', '#503021') }}</div>
+        <div class="svc-body">
+          <p class="eyebrow">Gửi nhu cầu, nhận tư vấn và báo giá</p>
+          <h3>Thiết kế hộp quà theo yêu cầu</h3>
+          <ul class="ticks"><li>In tên, logo lên hộp và thiệp</li><li>Đặt theo dịp, số lượng lớn</li><li>Duyệt mẫu trước khi làm</li></ul>
+          <a href="{{ url_for('custom_design') }}" class="btn btn-secondary">Yêu cầu thiết kế riêng</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+{# 04 – CÂU CHUYỆN NGUỒN TRÀ #}
+<section class="section section-cream">
+  <div class="container story-grid story-55">
+    <div class="story-photo reveal">
+      {% if has_img('doi-tra-bao-loc.jpg') %}
+        {{ m.pic('doi-tra-bao-loc.jpg', 'Đồi trà Bảo Lộc buổi sớm', '4/3', cap='Ảnh minh họa cảnh quan đồi trà Bảo Lộc') }}
+      {% else %}{{ m.hills('4/3') }}{% endif %}
+    </div>
+    <div class="reveal">
+      <p class="eyebrow">Câu chuyện {{ SITE.name }}</p>
+      <h2>Từ đồi trà, vun vị nhà</h2>
+      <p class="lead">Câu chuyện bắt đầu từ những lá trà được chăm chút, rồi tiếp nối trong tách trà, chiếc bánh và món quà dành cho người thương.</p>
+      <div class="cta-row"><a href="{{ url_for('about') }}" class="btn">Về chúng tôi</a></div>
+    </div>
+  </div>
+</section>
+
+{# 05 – CÂU CHUYỆN GIẤY TRÀ / UPCYCLING #}
+<section class="section">
+  <div class="container story-grid story-rev">
+    <div class="reveal">
+      <p class="eyebrow">Giấy trà thủ công</p>
+      <h2>Lá trà được tiếp tục câu chuyện</h2>
+      <p class="lead">Phần phụ phẩm trà phù hợp đang được thử nghiệm làm giấy thủ công để trang trí hộp quà và thiệp, vừa gọn gàng vừa mang dấu ấn riêng.</p>
+      <p class="note">* Quy trình và ứng dụng cụ thể đang được xác nhận.</p>
+      <div class="cta-row"><a class="btn btn-secondary" href="{{ url_for('about') }}#giay-tra">Khám phá giấy trà</a></div>
+    </div>
+    <div class="reveal">{{ m.pic('giay-tra.jpg', 'Giấy trà thủ công', '4/3', 'card', '#8C9A4B') }}</div>
+  </div>
+</section>
+
+{# 06 – TEA DNA #}
+<section class="section section-dark">
+  <div class="container dna-teaser">
+    <div class="reveal">
+      <p class="eyebrow eyebrow-light">Tea DNA</p>
+      <h2>Gu trà của bạn mang vị gì?</h2>
+      <p>Một vài câu hỏi để tìm hương vị bạn thích, rồi chọn trà và bánh cho những buổi ở nhà.</p>
+      <p class="tiny dna-meta">12 câu hỏi · khoảng 3 phút · không cần tài khoản</p>
+      <div class="cta-row"><a href="{{ url_for('tea_dna') }}" class="btn btn-light btn-lg">Khám phá gu trà</a></div>
+    </div>
+    {% set g = D.DNA_GROUPS[0] %}
+    <aside class="dna-card reveal reveal-card" aria-label="Hồ sơ gu trà minh họa">
+      <span class="dna-card-badge">Hồ sơ minh họa</span>
+      <div class="dna-card-top">
+        <svg viewBox="0 0 120 110" class="dna-cup" aria-hidden="true">
+          <path d="M44 14c-6 8 6 12 0 22M60 10c-6 8 6 12 0 22M76 14c-6 8 6 12 0 22" stroke="#EDD4AB" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/>
+          <path d="M26 46h68v18c0 18-14 30-34 30S26 82 26 64Z" fill="{{ g.color }}"/>
+          <path d="M94 52h8a10 10 0 0 1 0 20h-9" stroke="{{ g.color }}" stroke-width="5" fill="none"/>
+          <ellipse cx="60" cy="46" rx="34" ry="6" fill="#FAF7F0" opacity=".35"/>
+          <ellipse cx="60" cy="102" rx="40" ry="5" fill="#000" opacity=".18"/>
+        </svg>
+        <div><p class="tiny muted-light">Nhóm gu trà</p><h3>{{ g.name }}</h3><p class="tiny">{{ g.tagline }}</p></div>
+      </div>
+      <div class="dna-bars-demo">
+        {% for ax, w in [('Độ ngọt',75),('Độ chua',45),('Độ đắng',20),('Độ đậm trà',35),('Hương',70)] %}
+        <div><span>{{ ax }}</span><i style="--w: {{ w }}%"></i></div>
+        {% endfor %}
+      </div>
+    </aside>
+  </div>
+</section>
+
+{# 07 – CHUYỆN TRÀ #}
+<section class="section">
+  <div class="container">
+    <div class="sec-head sec-head-row"><h2>Những câu chuyện bên tách trà</h2><a class="link" href="{{ url_for('stories') }}">Xem tất cả câu chuyện →</a></div>
+    <div class="blog-grid">
+      <a class="post post-big reveal" href="{{ url_for('article', slug=feat.slug) }}">
+        {{ m.art('leaf', feat.color, feat.title, '16/9') }}
+        <div class="post-body"><span class="tag">{{ D.ARTICLE_CATS[feat.cat] }}</span><time>{{ feat.date | vndate }}</time>
+          <h3>{{ feat.title }}</h3><p>{{ feat.summary }}</p><span class="link">Đọc bài →</span></div>
+      </a>
+      <div class="post-list">
+        {% for a in others %}
+        <a class="post post-row reveal" href="{{ url_for('article', slug=a.slug) }}">
+          <div class="post-thumb">{{ m.art('leaf', a.color, a.title, '4/3', note=False) }}</div>
+          <div><span class="tag">{{ D.ARTICLE_CATS[a.cat] }}</span> <time>{{ a.date | vndate }}</time><h3>{{ a.title }}</h3><p>{{ a.summary }}</p></div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

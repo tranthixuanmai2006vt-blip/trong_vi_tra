@@ -1,0 +1,152 @@
+{% extends 'base.html' %}{% import 'macros.html' as m with context %}
+{% block title %}Thiết kế hộp quà theo yêu cầu{% endblock %}
+{% block content %}
+<section class="page-hero section-cream">
+  <div class="container hero-grid hero-grid-sm">
+    <div>
+      {{ m.crumbs([('Dịch vụ', None), ('Thiết kế riêng', None)]) }}
+      <h1>Món quà mang dấu ấn của riêng bạn</h1>
+      <p class="lead">In tên, logo; chọn món theo ngân sách; thiết kế bao bì và thiệp cho doanh nghiệp, sự kiện hay dịp đặc biệt. Bạn gửi yêu cầu – chúng tôi tư vấn và báo giá trước khi bắt đầu.</p>
+      <div class="cta-row"><a href="#gui-yeu-cau" class="btn btn-lg">Gửi yêu cầu thiết kế</a><a href="{{ url_for('giftbox_page') }}" class="btn btn-lg btn-secondary">Chỉ cần vài hộp? Tự tạo hộp quà</a></div>
+      <p class="small muted">Đây là luồng tư vấn, không đặt mua ngay. Bạn chỉ thanh toán khi đã có báo giá và phạm vi được chấp thuận.</p>
+    </div>
+    <div>{{ m.art('giftbox', '#503021', 'hộp quà in logo', '4/3') }}</div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="sec-head"><h2>Bạn có thể cá nhân hóa những gì?</h2></div>
+    <div class="scope-grid">
+      {% for s in D.CUSTOM_SCOPES %}
+      <article class="scope reveal"><span class="v-ic">{{ m.icon({'logo':'pen','leaf':'leaf','paper':'gift','card':'pen'}[s.icon]) }}</span><h3>{{ s.title }}</h3><p>{{ s.desc }}</p></article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section section-tint">
+  <div class="container">
+    <div class="sec-head"><h2>Bộ sưu tập ý tưởng</h2><p class="muted">Mẫu tham khảo để bạn hình dung – không phải sản phẩm bấm mua ngay.</p></div>
+    <div class="tabs" role="tablist" id="ideaTabs">
+      <button class="tab active" data-f="" role="tab">Tất cả</button>
+      {% for k, v in D.CUSTOM_IDEA_TAGS.items() %}<button class="tab" data-f="{{ k }}" role="tab">{{ v }}</button>{% endfor %}
+    </div>
+    <div class="idea-grid">
+      {% for i in D.CUSTOM_IDEAS %}
+      <article class="idea" data-tag="{{ i.tag }}">
+        {{ m.art('giftbox', i.color, i.title, '4/3') }}
+        <div class="idea-body"><span class="tag">{{ D.CUSTOM_IDEA_TAGS[i.tag] }}</span><h3>{{ i.title }}</h3><p>{{ i.desc }}</p>
+          <button class="link-sm" data-ref="{{ i.title }}">Dùng làm cảm hứng →</button></div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container two-col">
+    <div>
+      <h2>Quy trình từ ý tưởng đến món quà</h2>
+      <ol class="vsteps">{% for t, d in D.CUSTOM_STEPS %}<li><b>{{ t }}</b><p>{{ d }}</p></li>{% endfor %}</ol>
+    </div>
+    <div>
+      <h2>Chi phí, thời gian và điều kiện</h2>
+      <div class="terms-grid">{% for t, d in D.CUSTOM_TERMS %}<div class="term"><b>{{ t }}</b><p>{{ d }}</p></div>{% endfor %}</div>
+      <p class="small"><a class="link" href="{{ url_for('policy', slug='qua-ca-nhan-hoa') }}">Xem Quy định quà cá nhân hóa →</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="section section-cream" id="gui-yeu-cau">
+  <div class="container form-layout">
+    {% if done %}
+    <div class="success-panel success-big" role="status" tabindex="-1" id="donePanel">
+      <p class="eyebrow">Đã gửi yêu cầu</p>
+      <h2>Cảm ơn {{ done.name }}! Chúng tôi đã nhận yêu cầu của bạn.</h2>
+      <div class="code-box"><span>Mã yêu cầu</span><b id="reqCode">{{ done.code }}</b><button class="btn btn-sm btn-secondary" data-copy="{{ done.code }}">{{ m.icon('copy') }} Sao chép</button></div>
+      <p>Gửi lúc {{ done.created }}. Bộ phận tư vấn sẽ liên hệ qua <b>{{ {'phone':'điện thoại','email':'email','zalo':'Zalo'}[done.channel] or done.channel }}</b> ({{ done.contact | mask_phone if done.channel != 'email' else done.contact | mask_email }}).</p>
+      <ol class="vsteps vsteps-sm"><li><b>Tư vấn & báo giá</b></li><li><b>Chốt phạm vi & đặt cọc</b></li><li><b>Thiết kế & duyệt mẫu</b></li><li><b>Sản xuất & giao</b></li></ol>
+      <p class="small muted">Lưu ý: mã yêu cầu (YC-…) khác mã đơn hàng. Chưa có khoản thanh toán nào được tạo.</p>
+      <div class="cta-row"><a class="btn" href="{{ url_for('custom_design') }}#gui-yeu-cau">Gửi yêu cầu khác</a><a class="btn btn-secondary" href="{{ url_for('catalog') }}">Xem sản phẩm</a></div>
+    </div>
+    {% else %}
+    <form class="card-form" method="post" enctype="multipart/form-data" novalidate id="designForm">
+      <h2>Biểu mẫu gửi yêu cầu thiết kế</h2>
+      <p class="small muted"><span class="req">*</span> là thông tin bắt buộc.</p>
+      {% if errors %}<div class="alert alert-error" role="alert">Vui lòng kiểm tra {{ errors|length }} mục được đánh dấu bên dưới.</div>{% endif %}
+      <fieldset class="fgroup"><legend>1. Thông tin liên hệ</legend>
+        <div class="grid-2">
+          {{ m.field('name', 'Họ tên', errors, form.name, required=True, attrs='autocomplete="name"') }}
+          {{ m.field('company', 'Công ty / tổ chức', errors, form.company) }}
+          {{ m.field('phone', 'Số điện thoại', errors, form.phone, 'tel', True, attrs='autocomplete="tel" inputmode="tel"') }}
+          {{ m.field('email', 'Email', errors, form.email, 'email', attrs='autocomplete="email"') }}
+        </div>
+        <div class="field"><span class="label">Kênh phản hồi mong muốn</span>
+          <div class="radio-row">{% for k, v in [('phone','Điện thoại'),('zalo','Zalo'),('email','Email')] %}<label class="check"><input type="radio" name="channel" value="{{ k }}" {{ 'checked' if (form.channel or 'phone')==k }}> {{ v }}</label>{% endfor %}</div></div>
+      </fieldset>
+      <fieldset class="fgroup"><legend>2. Nhu cầu</legend>
+        <div class="grid-2">
+          <div class="field {{ 'has-error' if errors.need }}"><label for="f-need">Loại nhu cầu <span class="req">*</span></label>
+            <select id="f-need" name="need" required><option value="">— Chọn —</option>
+              {% for v in ['Quà doanh nghiệp / tri ân','Quà Tết','Quà sự kiện, hội thảo','Quà cưới','Quà cá nhân (in tên)','Khác'] %}<option {{ 'selected' if form.need==v }}>{{ v }}</option>{% endfor %}</select>
+            {% if errors.need %}<small class="err">⚠ {{ errors.need }}</small>{% endif %}</div>
+          {{ m.field('quantity', 'Số lượng dự kiến (hộp)', errors, form.quantity, 'number', True, attrs='min="1" inputmode="numeric"') }}
+          <div class="field"><label for="f-budget">Ngân sách / hộp</label>
+            <select id="f-budget" name="budget"><option value="">— Chưa xác định —</option>
+              {% for v in ['Dưới 300.000đ','300.000 – 500.000đ','500.000 – 1.000.000đ','Trên 1.000.000đ'] %}<option {{ 'selected' if form.budget==v }}>{{ v }}</option>{% endfor %}</select></div>
+          {{ m.field('deadline', 'Ngày cần nhận quà', errors, form.deadline, 'date', True) }}
+        </div>
+        <div class="field"><span class="label">Muốn tùy chỉnh</span>
+          <div class="radio-row">{% for v in ['In logo / tên','Chọn món riêng','Bao bì / giấy trà','Thiệp & lời nhắn'] %}<label class="check"><input type="checkbox" name="scope_{{ loop.index }}" value="{{ v }}" {{ 'checked' if form['scope_' ~ loop.index] }}> {{ v }}</label>{% endfor %}</div></div>
+      </fieldset>
+      <fieldset class="fgroup"><legend>3. Mô tả & tệp tham khảo</legend>
+        {{ m.field('reference', 'Mẫu cảm hứng / sản phẩm tham chiếu', errors, form.reference or ref or '', hint='Ví dụ: Quà Tết doanh nghiệp, Hộp Quà Tri Ân…') }}
+        {{ m.field('description', 'Mô tả mong muốn', errors, form.description, 'textarea', True, hint='Món, màu sắc, thông điệp, cách giao (một địa chỉ hay theo danh sách)…') }}
+        <div class="field {{ 'has-error' if errors.files }}"><label for="f-files">Tệp đính kèm (logo, mẫu tham khảo)</label>
+          <input id="f-files" type="file" name="files" multiple accept=".jpg,.jpeg,.png,.pdf">
+          <small class="hint">Tùy chọn · JPG, PNG, PDF · tối đa 3 tệp × 10 MB</small>
+          {% if errors.files %}<small class="err">⚠ {{ errors.files }}</small>{% endif %}</div>
+      </fieldset>
+      <div class="field {{ 'has-error' if errors.agree }}">
+        <label class="check"><input type="checkbox" name="agree" value="1" {{ 'checked' if form.agree }}> Tôi đã đọc và đồng ý cho {{ SITE.name }} dùng thông tin này để tư vấn, báo giá (<a class="link" href="{{ url_for('policy', slug='bao-mat') }}" target="_blank">Chính sách bảo mật</a>). <span class="req">*</span></label>
+        {% if errors.agree %}<small class="err">⚠ {{ errors.agree }}</small>{% endif %}
+        <label class="check"><input type="checkbox" name="marketing" value="1"> Nhận tin về sản phẩm, ưu đãi qua email (không bắt buộc)</label>
+      </div>
+      <button class="btn btn-lg" data-loading="Đang gửi…">Gửi yêu cầu thiết kế</button>
+    </form>
+    <aside class="side-help">
+      <h3>Sau khi gửi</h3>
+      <p>Bạn nhận <b>mã yêu cầu</b> ngay trên trang. Bộ phận tư vấn liên hệ qua kênh bạn chọn để làm rõ nhu cầu và gửi báo giá.</p>
+      <p>Báo giá, góp ý và duyệt mẫu trao đổi qua kênh hỗ trợ đã thống nhất.</p>
+      <p>Có câu hỏi trước? <a class="link" href="{{ url_for('contact', **{'chu-de':'thiet-ke'}) }}">Liên hệ</a></p>
+    </aside>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <h2>Câu hỏi thường gặp</h2>
+    {% for q, a in D.CUSTOM_FAQ %}<details class="acc"><summary>{{ q }}</summary><p>{{ a }}</p></details>{% endfor %}
+    <div class="cta-row"><a href="#gui-yeu-cau" class="btn">Gửi yêu cầu</a></div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+document.querySelectorAll('#ideaTabs .tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('#ideaTabs .tab').forEach(x => x.classList.toggle('active', x === t));
+  document.querySelectorAll('.idea').forEach(i => i.hidden = t.dataset.f && i.dataset.tag !== t.dataset.f);
+});
+document.querySelectorAll('[data-ref]').forEach(b => b.onclick = () => {
+  const f = document.getElementById('f-reference'); if (!f) return;
+  f.value = b.dataset.ref; document.getElementById('gui-yeu-cau').scrollIntoView({behavior:'smooth'}); f.focus();
+});
+const ff = document.getElementById('f-files');
+if (ff) ff.onchange = () => { const bad = [...ff.files].filter(f => f.size > 10*1024*1024 || !/\.(jpe?g|png|pdf)$/i.test(f.name));
+  if (ff.files.length > 3 || bad.length) { toast(ff.files.length > 3 ? 'Tối đa 3 tệp.' : 'Tệp "' + bad[0].name + '" không hợp lệ (JPG/PNG/PDF, ≤10 MB).', 'error'); ff.value = ''; } };
+{% if done %}document.getElementById('gui-yeu-cau').scrollIntoView(); document.getElementById('donePanel').focus();{% endif %}
+{% if errors %}document.getElementById('gui-yeu-cau').scrollIntoView(); (document.querySelector('.has-error input, .has-error select, .has-error textarea')||{}).focus?.();{% endif %}
+</script>
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends 'base.html' %}{% import 'macros.html' as m with context %}
+{% block title %}Giỏ hàng{% endblock %}
+{% block content %}
+<section class="section section-tight">
+  <div class="container">
+    {{ m.crumbs([('Giỏ hàng', None)]) }}
+    {% if not v.lines %}
+    <div class="empty empty-lg">
+      <p class="empty-ic">{{ m.icon('cart') }}</p>
+      <h1>Giỏ hàng đang trống</h1>
+      <p class="muted">Chọn một món trà, chiếc bánh hay tự tạo hộp quà cho người thương nhé.</p>
+      <div class="cta-row center-row"><a href="{{ url_for('catalog') }}" class="btn btn-lg">Tiếp tục mua sắm</a><a href="{{ url_for('giftbox_page') }}" class="btn btn-lg btn-secondary">Tạo hộp quà</a></div>
+    </div>
+    {% else %}
+    <div class="sec-head-row"><h1>Giỏ hàng (<span id="cartCount">{{ v.count }}</span> sản phẩm)</h1><a class="link" href="{{ url_for('catalog') }}">← Quay lại mua sắm</a></div>
+
+    <div class="freeship" id="freeship">
+      {% if v.freeship_left > 0 %}Mua thêm <b>{{ v.freeship_left | vnd }}</b> để được miễn phí giao tiêu chuẩn.{% else %}🎉 Đơn của bạn được miễn phí giao tiêu chuẩn.{% endif %}
+      <i style="--w: {{ [100, (100 - v.freeship_left * 100 / D.FREESHIP_THRESHOLD)] | min }}%"></i>
+    </div>
+
+    <div class="cart-layout">
+      <div>
+        <div class="cart-table" id="cartTable">
+          <div class="ct-head"><span>Sản phẩm</span><span>Đơn giá</span><span>Số lượng</span><span>Tổng</span><span></span></div>
+          {% for l in v.lines %}
+          <div class="ct-row {{ 'has-err' if l.errors }}" data-key="{{ l.key }}">
+            <div class="ct-prod">
+              {% if l.kind == 'giftbox' %}
+                <a href="{{ l.url }}" class="ct-img">{{ m.art('giftbox', '#8C9A4B', 'hộp quà tự tạo', note=False) }}</a>
+                <div><a class="ct-name" href="{{ l.url }}">Hộp quà tự tạo</a>
+                  <details class="ct-detail"><summary>{{ l.quote['items']|length }} món · {{ l.quote.box.name }}</summary>
+                    <ul>{% for i in l.quote['items'] %}<li>{{ i.name }} – {{ i.variant }} × {{ i.qty }}</li>{% endfor %}
+                      <li>Giấy: {{ l.quote.paper.name }}</li><li>Thiệp: {{ l.quote.card.name }}</li>
+                      {% for a in l.quote.accessories %}<li>{{ a.name }} × {{ a.qty }}</li>{% endfor %}
+                      {% if l.quote.wish and l.quote.wish.message %}<li>Lời chúc: “{{ l.quote.wish.message }}”</li>{% endif %}</ul>
+                    <p class="small muted">Số hộp cùng cấu hình: {{ l.qty }} · Chuẩn bị {{ l.quote.prep_days }} ngày</p>
+                  </details></div>
+              {% else %}
+                <a href="{{ l.url }}" class="ct-img">{{ m.product_image(l.product) }}</a>
+                <div><a class="ct-name" href="{{ l.url }}">{{ l.name }}</a>
+                  {% if l.variants|length > 1 %}
+                  <select class="ct-variant" data-variant aria-label="Đổi phân loại">{% for vv in l.variants %}<option value="{{ vv.sku }}" {{ 'selected' if vv.sku==l.sku }} {{ 'disabled' if vv.stock<=0 }}>{{ vv.label }}{{ ' (tạm hết)' if vv.stock<=0 }}</option>{% endfor %}</select>
+                  {% else %}<p class="small muted">{{ l.variant }}</p>{% endif %}
+                  {% if l.opts %}<p class="small muted">+ {{ D.CARDS | selectattr('id','equalto',l.opts.card) | map(attribute='name') | first }}{% if l.opts.message %}: “{{ l.opts.message }}”{% endif %}</p>{% endif %}
+                </div>
+              {% endif %}
+              <p class="err small ct-err" {{ 'hidden' if not l.errors }}>{{ l.errors[0] if l.errors }}</p>
+            </div>
+            <span class="ct-unit" data-label="Đơn giá">{{ l.unit_price | vnd }}</span>
+            <div class="stepper stepper-sm" data-label="Số lượng"><button data-q="-1" aria-label="Giảm" {{ 'disabled' if l.retired }}>−</button><input type="number" value="{{ l.qty }}" min="1" aria-label="Số lượng {{ l.name }}" {{ 'disabled' if l.retired }}><button data-q="1" aria-label="Tăng" {{ 'disabled' if l.retired }}>+</button></div>
+            <b class="ct-total" data-label="Tổng">{{ l.total | vnd }}</b>
+            <button class="ct-del" data-del aria-label="Xóa {{ l.name }}">✕</button>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="card-form cart-opts">
+          <div class="field"><label for="note">Ghi chú đơn hàng</label>
+            <textarea id="note" rows="3" placeholder="Ví dụ: nhờ gói kỹ, giao giờ hành chính…">{{ cart.note }}</textarea><small class="hint">Lời chúc trên thiệp nhập ở phần hộp quà, không cần ghi ở đây.</small></div>
+          <label class="check"><input type="checkbox" id="vatChk" {{ 'checked' if cart.vat }}> Yêu cầu xuất hóa đơn VAT</label>
+          <div class="grid-2" id="vatBox" {{ 'hidden' if not cart.vat }}>
+            <div class="field"><label for="vatTax">Mã số thuế <span class="req">*</span></label><input id="vatTax" value="{{ cart.vat.tax_code if cart.vat }}"><small class="err" id="vatErr" hidden>⚠ Vui lòng nhập mã số thuế.</small></div>
+            <div class="field"><label for="vatCo">Tên công ty</label><input id="vatCo" value="{{ cart.vat.company if cart.vat }}"></div>
+            <div class="field span-2"><label for="vatAddr">Địa chỉ công ty</label><input id="vatAddr" value="{{ cart.vat.company_addr if cart.vat }}"></div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="summary sticky">
+        <h2 class="h3">Tóm tắt đơn hàng</h2>
+        <form class="coupon" id="couponForm"><label for="coupon" class="sr-only">Mã giảm giá</label>
+          <input id="coupon" placeholder="Mã giảm giá" value="{{ v.coupon or '' }}"><button class="btn btn-sm btn-secondary">Áp dụng</button></form>
+        <small id="couponMsg" class="{{ 'err' if v.coupon_msg }}">{{ v.coupon_msg or (D.COUPONS[v.coupon].label if v.coupon) or '' }}</small>
+        <div class="sum-row"><span>Tạm tính</span><b id="sSub">{{ v.subtotal | vnd }}</b></div>
+        <div class="sum-row"><span>Giảm giá</span><b id="sDisc">−{{ v.discount | vnd }}</b></div>
+        <div class="sum-row"><span>Phí giao hàng</span><span class="muted">Tính sau khi nhập địa chỉ</span></div>
+        <div class="sum-total"><span>Tổng cộng</span><b id="sTotal">{{ v.total | vnd }}</b></div>
+        <p class="err small" id="cartIssue" {{ 'hidden' if not v.issues }}>{{ v.issues[0] if v.issues }}</p>
+        <a href="{{ url_for('checkout') }}" class="btn btn-lg btn-block" id="toCheckout">TIẾN HÀNH THANH TOÁN</a>
+        <ul class="trust"><li>{{ m.icon('shield') }} Thanh toán an toàn</li><li>{{ m.icon('return') }} Hỗ trợ đổi trả theo chính sách</li><li>{{ m.icon('truck') }} Theo dõi đơn bằng mã</li></ul>
+      </aside>
+    </div>
+
+    {% if addons %}
+    <section class="addons" id="addons">
+      <h2 class="h3">Đừng quên mua kèm</h2>
+      <div class="addon-grid">
+        {% for a in addons %}
+        <div class="addon" data-sku="{{ a.variants[0].sku }}">
+          <div class="addon-img">{{ m.art(a.art, a.color, a.name, note=False) }}</div>
+          <div><b>{{ a.name }}</b><span class="price">{{ a.variants[0].price | vnd }}</span></div>
+          <button class="btn btn-sm btn-secondary" data-quick="{{ a.variants[0].sku }}">Thêm nhanh</button>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const vnd = n => (Math.round(n)||0).toLocaleString('vi-VN') + 'đ';
+  if (!$('cartTable')) return;
+  function apply(c) {
+    if (!c) return;
+    setCartBadge(c.count); $('cartCount').textContent = c.count;
+    $('sSub').textContent = vnd(c.subtotal); $('sDisc').textContent = '−' + vnd(c.discount); $('sTotal').textContent = vnd(c.total);
+    const fs = $('freeship'); fs.firstChild && (fs.innerHTML = (c.freeship_left > 0 ? `Mua thêm <b>${vnd(c.freeship_left)}</b> để được miễn phí giao tiêu chuẩn.` : '🎉 Đơn của bạn được miễn phí giao tiêu chuẩn.') + `<i style="--w:${Math.min(100, 100 - c.freeship_left*100/{{ D.FREESHIP_THRESHOLD }})}%"></i>`);
+    const issues = [];
+    c.lines.forEach(l => { const row = document.querySelector(`.ct-row[data-key="${l.key}"]`); if (!row) return;
+      row.querySelector('.ct-total').textContent = vnd(l.total); row.querySelector('.ct-unit').textContent = vnd(l.unit);
+      row.querySelector('input[type=number]').value = l.qty;
+      const e = row.querySelector('.ct-err'); e.hidden = !l.errors.length; e.textContent = l.errors[0] || ''; row.classList.toggle('has-err', !!l.errors.length);
+      if (l.errors.length) issues.push(l.errors[0]); });
+    $('cartIssue').hidden = !issues.length; $('cartIssue').textContent = issues[0] || '';
+    $('couponMsg').textContent = c.coupon_msg || $('couponMsg').textContent; $('couponMsg').className = c.coupon_msg ? 'err' : '';
+    if (!c.count) location.reload();
+  }
+  async function post(url, body) { const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)}); return [r.ok, await r.json()]; }
+  document.querySelectorAll('.ct-row').forEach(row => {
+    const key = row.dataset.key, inp = row.querySelector('input[type=number]');
+    const setQ = async q => { const [ok, d] = await post('/api/cart/update', {key, qty: q}); if (!ok) toast(d.msg, 'error'); apply(d.cart); };
+    row.querySelectorAll('[data-q]').forEach(b => b.onclick = () => setQ(+inp.value + +b.dataset.q));
+    inp.onchange = () => setQ(Math.max(0, +inp.value));
+    row.querySelector('[data-del]').onclick = async () => { const [, d] = await post('/api/cart/remove', {key}); row.remove(); toast('Đã xóa khỏi giỏ.'); apply(d.cart); };
+    const vs = row.querySelector('[data-variant]'); if (vs) vs.onchange = async () => { const [, d] = await post('/api/cart/update', {key, sku: vs.value}); apply(d.cart); };
+  });
+  $('couponForm').onsubmit = async e => { e.preventDefault(); const [ok, d] = await post('/api/cart/coupon', {code: $('coupon').value});
+    $('couponMsg').textContent = d.msg; $('couponMsg').className = ok ? 'ok' : 'err'; if (ok) apply(d.cart); };
+  let t; $('note').oninput = () => { try { localStorage.setItem('tvt_note', $('note').value); } catch(e){} clearTimeout(t); t = setTimeout(() => post('/api/cart/meta', {note: $('note').value}), 500); };
+  try { const n = localStorage.getItem('tvt_note'); if (n && !$('note').value) $('note').value = n; } catch(e){}
+  $('vatChk').onchange = () => { $('vatBox').hidden = !$('vatChk').checked; if (!$('vatChk').checked) post('/api/cart/meta', {vat: null}); };
+  const saveVat = () => post('/api/cart/meta', {vat: $('vatChk').checked ? {tax_code: $('vatTax').value, company: $('vatCo').value, company_addr: $('vatAddr').value} : null});
+  ['vatTax','vatCo','vatAddr'].forEach(id => $(id).onchange = saveVat);
+  $('toCheckout').onclick = async e => {
+    if ($('vatChk').checked && !$('vatTax').value.trim()) { e.preventDefault(); $('vatErr').hidden = false; $('vatTax').focus(); return; }
+    e.preventDefault(); await saveVat(); await post('/api/cart/meta', {note: $('note').value}); location.href = e.target.href;
+  };
+  document.querySelectorAll('[data-quick]').forEach(b => b.onclick = async () => {
+    const [ok, d] = await post('/api/cart/add', {sku: b.dataset.quick, qty: 1});
+    if (ok) { toast(d.msg); location.reload(); } else toast(d.msg, 'error');
+  });
+})();
+</script>
+{% endblock %}

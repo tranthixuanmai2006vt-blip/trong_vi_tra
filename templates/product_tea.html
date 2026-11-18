@@ -1,0 +1,101 @@
+{% extends 'base.html' %}{% import 'macros.html' as m with context %}
+{% block title %}{{ p.name }}{% endblock %}
+{% block content %}
+<section class="section section-tight">
+  <div class="container">
+    {{ m.crumbs([('Sản phẩm', url_for('catalog')), ('Trà', url_for('catalog', cat='tra')), (p.name, None)]) }}
+    <div class="pdp">
+      <div class="pdp-gallery">{{ m.product_image(p) }}</div>
+      <div class="pdp-info">
+        <p class="eyebrow">{{ p.brand }} · {{ p.line }}</p>
+        <h1>{{ p.name }}</h1>
+        <p class="lead">{{ p.desc }}</p>
+        <ul class="meta-list">
+          <li><span>Nguồn gốc</span>{{ p.region }}</li>
+          <li><span>SKU</span><span data-sku-out>{{ p.variants[0].sku }}</span></li>
+          <li><span>Thời gian chuẩn bị</span>{{ 'Sẵn hàng, giao ngay' if p.prep_days == 0 else p.prep_days ~ ' ngày' }}</li>
+        </ul>
+        {% include '_buybox.html' %}
+        <div class="pdp-links">
+          <a class="link-sm" href="{{ url_for('contact', **{'chu-de':'chon-tra'}) }}">Tư vấn về trà</a>
+          <button class="link-sm" data-copy="{{ request.url }}">{{ m.icon('share') }} Chia sẻ (sao chép link)</button>
+          <a class="link-sm" href="{{ url_for('giftbox_page', sku=p.variants[0].sku) }}">{{ m.icon('gift') }} Tạo quà từ món này</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-tint">
+  <div class="container two-col">
+    <div>
+      <h2>Chân dung hương vị</h2>
+      <dl class="profile">
+        {% for k, val in p.profile.items() %}
+        <div><dt>{{ k }}{% if k == 'Hậu vị' %} <span class="tip" tabindex="0" data-tip="Cảm giác còn đọng lại sau khi nuốt ngụm trà.">?</span>{% elif k == 'Độ chát' %} <span class="tip" tabindex="0" data-tip="Cảm giác se nhẹ trên lưỡi – khác với vị đắng.">?</span>{% endif %}</dt><dd>{{ val }}</dd></div>
+        {% endfor %}
+        <div><dt>Vùng nguyên liệu</dt><dd>{{ p.region }}</dd></div>
+      </dl>
+      <div class="cta-row">
+        <a class="link" href="{{ url_for('catalog', cat='tra', nhom=p.group) }}">Khám phá dòng {{ D.TEA_GROUPS[p.group] }} →</a>
+        <a class="link" href="{{ url_for('about') }}#nguon-tra">Xem vùng nguyên liệu →</a>
+      </div>
+    </div>
+    <div>
+      <h2>Pha một ấm trà ngon</h2>
+      {% if p.brew %}
+      <table class="brew-table">
+        <tr><th>Lượng trà</th><td>{{ p.brew.g }} g</td></tr>
+        <tr><th>Nước</th><td>{{ p.brew.ml }} ml</td></tr>
+        <tr><th>Nhiệt độ</th><td>{{ p.brew.temp }}°C</td></tr>
+        <tr><th>Thời gian (nước đầu)</th><td>{{ p.brew.time_s }} giây</td></tr>
+        <tr><th>Số lần pha</th><td>{{ p.brew.steeps }} lần</td></tr>
+      </table>
+      <div class="cta-row">
+        <button class="btn btn-sm btn-secondary" data-copy="{{ p.name }}: {{ p.brew.g }}g trà / {{ p.brew.ml }}ml nước {{ p.brew.temp }}°C, hãm {{ p.brew.time_s }} giây, pha {{ p.brew.steeps }} lần.">{{ m.icon('copy') }} Sao chép công thức</button>
+        <button class="btn btn-sm btn-secondary" id="brewTimer" data-sec="{{ p.brew.time_s }}">⏱ Hẹn giờ {{ p.brew.time_s }} giây</button>
+      </div>
+      {% else %}<p class="muted">Hướng dẫn pha cho sản phẩm này đang cập nhật. Xem hướng dẫn trên bao bì hoặc liên hệ để được tư vấn.</p>{% endif %}
+      <p class="muted small">Bảo quản: {{ p.storage }} Hạn dùng: {{ p.hsd }}</p>
+      <a class="link-sm" href="{{ url_for('article', slug='huong-dan-chon-tra') }}">Xem hướng dẫn chi tiết →</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <h2>Thông tin sản phẩm</h2>
+    <details class="acc" open><summary>Thành phần</summary><p>{{ p.ingredients }}</p></details>
+    <details class="acc"><summary>Khối lượng & đóng gói</summary><p>{{ p.variants | map(attribute='label') | join(', ') }}. Xem hình thức đóng gói thực tế trên bao bì.</p></details>
+    <details class="acc"><summary>NSX / HSD</summary><p>{{ p.hsd }}</p></details>
+    <details class="acc"><summary>Bảo quản</summary><p>{{ p.storage }}</p></details>
+    <details class="acc"><summary>Đơn vị chịu trách nhiệm</summary><p>{{ SITE.company }}. Địa chỉ: {{ SITE.address or 'đang cập nhật' }}.</p></details>
+    <details class="acc"><summary>Đổi trả / Giao hàng</summary><p>Xem <a class="link" href="{{ url_for('policy', slug='doi-tra') }}">Chính sách đổi trả</a> và <a class="link" href="{{ url_for('policy', slug='giao-hang') }}">Chính sách giao hàng</a>. <a class="link" href="{{ url_for('contact') }}">Hỏi về sản phẩm</a>.</p></details>
+  </div>
+</section>
+
+{% if pairs %}
+<section class="section section-cream">
+  <div class="container">
+    <div class="sec-head"><h2>Thử cùng chiếc bánh này</h2></div>
+    <div class="pair-grid">
+      {% for c in pairs if c.type == 'banh' %}
+      <article class="pair">
+        <a href="{{ product_url(c) }}" class="pair-img">{{ m.product_image(c) }}</a>
+        <div>
+          <h3><a href="{{ product_url(c) }}">{{ c.name }}</a></h3>
+          <p class="muted">{{ c.pair_reason.get(p.id, c.taste_note) }}</p>
+          <p class="price">{{ min_price(c) | vnd }}</p>
+          {% set v1 = (p.variants | selectattr('stock','gt',0) | list | first) %}{% set v2 = (c.variants | selectattr('stock','gt',0) | list | first) %}
+          {% if v1 and v2 %}
+          <button class="btn btn-sm" data-add-multi='[{"sku":"{{ v1.sku }}","qty":1},{"sku":"{{ v2.sku }}","qty":1}]'>Thêm cặp trà & bánh · {{ (v1.price + v2.price) | vnd }}</button>
+          {% else %}<span class="badge badge-out">Bánh tạm hết</span>{% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    <p class="center muted">Chưa chắc gu? <a class="link" href="{{ url_for('tea_dna') }}">Khám phá Tea DNA</a> · Chưa có đánh giá cho sản phẩm này.</p>
+  </div>
+</section>
+{% endif %}
+{% endblock %}
