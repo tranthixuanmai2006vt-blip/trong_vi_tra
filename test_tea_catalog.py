@@ -158,7 +158,7 @@ class TeaCatalogTests(unittest.TestCase):
         self.assertIn('dd-product-link', html)
         for cat, heading, description in [
             ('tra', 'Vị trà thân quen', 'Trồng nên hương trà, lưu giữ vị nhà'),
-            ('banh', 'Vị bánh ấm lòng', 'Ủ hương trà trong bánh, vun chút ngọt cho nhà'),
+            ('banh', 'Vị bánh ấm lòng', 'Ủ hương trà cho bánh, vun chút ngọt cho nhà'),
             ('gift-set', 'Gói vị nhà trao nhau', 'Gói hương trà, gom vị bánh, gửi chút tình nhà')]:
             body = self.client.get('/san-pham/' + cat).get_data(as_text=True)
             self.assertIn('<h1>' + heading + '</h1>', body)
