@@ -35,6 +35,27 @@ COUPONS = {                           # mã giảm giá mẫu (không quảng b�
     "TRONGVITRA10": {"type": "percent", "value": 10, "min": 300_000, "label": "Giảm 10% đơn từ 300.000đ"},
     "CHAODUYEN": {"type": "fixed", "value": 30_000, "min": 200_000, "label": "Giảm 30.000đ đơn từ 200.000đ"},
 }
+# Thành viên: tích điểm, hạng, đổi điểm (số liệu mẫu – nhóm chỉnh lại khi chốt chính sách)
+LOYALTY = {
+    "earn_per": 10_000,        # 1 điểm cho mỗi 10.000đ tiền hàng (sau giảm giá, không tính phí giao)
+    "voucher_days": 60,        # hạn dùng voucher đổi điểm / quà lên hạng
+    "welcome": {"value": 20_000, "min": 200_000, "days": 30},
+    "tiers": [   # xét theo tổng chi tiêu của các đơn đã giao
+        {"id": "mam", "name": "Mầm Trà", "min": 0, "mult": 1.0, "color": "#8C9A4B", "ink": "#2F3B2A",
+         "perks": ["1 điểm cho mỗi 10.000đ", "Voucher chào mừng 20.000đ"]},
+        {"id": "la-non", "name": "Lá Non", "min": 1_000_000, "mult": 1.2, "color": "#5E8C3A", "ink": "#FAF7F0",
+         "gift": 30_000, "gift_min": 200_000, "perks": ["Điểm ×1,2", "Quà lên hạng: voucher 30.000đ"]},
+        {"id": "bup-vang", "name": "Búp Vàng", "min": 3_000_000, "mult": 1.5, "color": "#C08A3E", "ink": "#FFFFFF",
+         "gift": 60_000, "gift_min": 300_000, "perks": ["Điểm ×1,5", "Quà lên hạng: voucher 60.000đ"]},
+        {"id": "co-thu", "name": "Trà Cổ Thụ", "min": 8_000_000, "mult": 2.0, "color": "#503021", "ink": "#EDD4AB",
+         "gift": 120_000, "gift_min": 400_000, "perks": ["Điểm ×2", "Quà lên hạng: voucher 120.000đ"]},
+    ],
+    "rewards": [
+        {"id": "r10", "points": 100, "value": 10_000, "min": 150_000},
+        {"id": "r35", "points": 300, "value": 35_000, "min": 300_000},
+        {"id": "r60", "points": 500, "value": 60_000, "min": 400_000},
+    ],
+}
 BANK = {"bank": "[Ngân hàng – chờ xác nhận]", "account": "[Số tài khoản – chờ xác nhận]",
         "holder": "[Tên người thụ hưởng – chờ xác nhận]", "hours_valid": 24}
 

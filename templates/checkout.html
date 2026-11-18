@@ -12,6 +12,17 @@
     <form method="post" class="checkout" id="checkoutForm" novalidate>
       <input type="hidden" name="token" value="{{ token }}">
       <div class="co-main">
+        {% if current_user %}{% set t = tier_of(current_user.spent) %}
+        <div class="member-on"><span class="acc-dot" style="--c:{{ t.color }}">{{ current_user.name.split()[-1][:1] | upper }}</span>
+          <span>Đang mua với tài khoản <b>{{ current_user.name }}</b> · hạng {{ t.name }}. Đơn này dự kiến <b>+{{ earn }} điểm</b> (cộng khi đơn được giao).</span>
+          {% if my_vouchers %}<div class="vchips" aria-label="Voucher của bạn">{% for vc in my_vouchers %}<button type="button" class="vchip {{ 'on' if v.coupon == vc.code }}" data-voucher="{{ vc.code }}" title="Đơn từ {{ vc.min | vnd }}">−{{ vc.value | vnd }} · {{ vc.code }}</button>{% endfor %}</div>{% endif %}
+        </div>
+        {% else %}
+        <div class="member-cta"><span class="mc-ic" aria-hidden="true">🍃</span>
+          <div><b>Đăng nhập để tích +{{ earn }} điểm cho đơn này</b><small>Thành viên mới nhận ngay voucher {{ LOYALTY.welcome.value | vnd }}. Không muốn? Cứ điền thông tin bên dưới để mua không cần tài khoản.</small></div>
+          <div class="cta-row"><a class="btn btn-sm btn-light" href="{{ url_for('acc.login', next=url_for('checkout')) }}">Đăng nhập</a><a class="btn btn-sm btn-secondary" href="{{ url_for('acc.register', next=url_for('checkout')) }}">Đăng ký</a></div>
+        </div>
+        {% endif %}
         {# 02 NGƯỜI ĐẶT / NHẬN #}
         <fieldset class="card-form">
           <legend class="h3">Người đặt hàng</legend>
@@ -116,12 +127,18 @@
   </div>
 </section>
 {% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/account.css') }}">{% endblock %}
 {% block scripts %}
 {% if not empty %}
 <script>
 (function(){
   const $ = id => document.getElementById(id), vnd = n => (Math.round(n)||0).toLocaleString('vi-VN') + 'đ';
   $('sameRcv').onchange = () => $('rcvBox').hidden = $('sameRcv').checked;
+  document.querySelectorAll('[data-voucher]').forEach(b => b.onclick = async () => {
+    const code = b.classList.contains('on') ? '' : b.dataset.voucher;
+    const r = await fetch('/api/cart/coupon', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) });
+    const d = await r.json(); if (!r.ok) { toast(d.msg, 'error'); return; } location.reload();
+  });
   $('invChk').onchange = () => $('invBox').hidden = !$('invChk').checked;
   const form = $('checkoutForm');
   async function quote() {

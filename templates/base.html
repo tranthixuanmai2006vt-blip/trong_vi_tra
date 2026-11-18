@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script>if (!('CSSViewTransitionRule' in window)) document.documentElement.classList.add('no-vt');</script>
   {% block head %}{% endblock %}
 </head>
 <body class="{% block bodyclass %}{% endblock %}">
@@ -49,10 +50,18 @@
       <a href="{{ url_for('tea_dna') }}" class="{{ 'active' if endpoint in ['tea_dna','tea_dna_result'] }}">Tea DNA</a>
       <a href="{{ url_for('track') }}" class="nav-mobile-only">Tra cứu đơn</a>
       <a href="{{ url_for('contact') }}" class="nav-mobile-only">Liên hệ & FAQ</a>
+      {% if current_user %}<a href="{{ url_for('acc.account') }}" class="nav-mobile-only">Tài khoản của tôi</a>
+      {% else %}<a href="{{ url_for('acc.login') }}" class="nav-mobile-only">Đăng nhập / Đăng ký</a>{% endif %}
+      <span class="nav-ink" id="navInk" aria-hidden="true"></span>
     </nav>
     <div class="utils">
       <button class="util" id="searchBtn" aria-label="Tìm kiếm" aria-expanded="false">{{ m.icon('search') }}</button>
       <a class="util util-text" href="{{ url_for('track') }}" title="Tra cứu đơn">{{ m.icon('truck') }}<span>Tra cứu</span></a>
+      {% if current_user %}
+      <a class="util util-acc" href="{{ url_for('acc.account') }}" title="Tài khoản của tôi"><span class="acc-dot" style="--c:{{ tier_of(current_user.spent).color }}">{{ current_user.name.split()[-1][:1] | upper }}</span><span class="util-acc-name">{{ current_user.name.split()[-1] }}</span></a>
+      {% else %}
+      <a class="util util-text util-login" href="{{ url_for('acc.login', next=request.full_path if endpoint not in ['acc.login', 'acc.register'] else None) }}" title="Đăng nhập / Đăng ký">{{ m.icon('user') }}<span>Đăng nhập</span></a>
+      {% endif %}
       <a class="util cart-link" href="{{ url_for('cart_page') }}" aria-label="Giỏ hàng ({{ cart_count }} sản phẩm)">
         {{ m.icon('cart') }}<span class="cart-badge" id="cartBadge" {{ 'hidden' if not cart_count }}>{{ cart_count }}</span>
       </a>
@@ -114,6 +123,10 @@
 {% endif %}
 <div class="toast-wrap" id="toasts" aria-live="polite"></div>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/nav.js') }}"></script>
+{% with msgs = get_flashed_messages(with_categories=true) %}{% if msgs %}
+<script>{% for cat, msg in msgs %}toast({{ msg | tojson }}, {{ ('error' if cat == 'error' else 'ok') | tojson }});{% endfor %}</script>
+{% endif %}{% endwith %}
 {% block scripts %}{% endblock %}
 </body>
 </html>

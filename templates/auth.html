@@ -1,0 +1,82 @@
+{% extends 'base.html' %}{% import 'macros.html' as m with context %}
+{% block title %}{{ 'Đăng nhập' if mode == 'login' else 'Tạo tài khoản' }}{% endblock %}
+{% block bodyclass %}page-auth{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/account.css') }}">{% endblock %}
+{% block content %}
+<section class="auth">
+  <div class="container auth-grid">
+    <aside class="auth-side" aria-label="Quyền lợi thành viên">
+      <p class="eyebrow">Thành viên {{ SITE.name }}</p>
+      <h1>Mỗi chén trà,<br>thêm một <em>điểm thương</em></h1>
+      <ul class="auth-perks">
+        <li style="--k:0"><span>🎁</span><div><b>Voucher chào mừng {{ (LOYALTY.welcome.value) | vnd }}</b><small>Cho đơn từ {{ LOYALTY.welcome.min | vnd }}, ngay khi tạo tài khoản</small></div></li>
+        <li style="--k:1"><span>🍃</span><div><b>Tích điểm mỗi đơn</b><small>1 điểm cho mỗi {{ LOYALTY.earn_per | vnd }}, đổi lấy voucher giảm giá</small></div></li>
+        <li style="--k:2"><span>🌱</span><div><b>4 hạng thành viên</b><small>{% for t in LOYALTY.tiers %}{{ t.name }}{{ ' → ' if not loop.last }}{% endfor %}</small></div></li>
+        <li style="--k:3"><span>📦</span><div><b>Lưu lịch sử mua hàng</b><small>Xem lại đơn, mua lại nhanh, điền sẵn địa chỉ</small></div></li>
+      </ul>
+      <div class="auth-cards" aria-hidden="true">{% for t in LOYALTY.tiers %}<i style="--c:{{ t.color }};--ink:{{ t.ink }};--k:{{ loop.index0 }}"><b>{{ t.name }}</b></i>{% endfor %}</div>
+    </aside>
+
+    <div class="auth-card" data-mode="{{ mode }}">
+      <div class="auth-switch" role="tablist">
+        <a href="{{ url_for('acc.login', next=nxt or None) }}" role="tab" data-to="login" aria-selected="{{ 'true' if mode == 'login' else 'false' }}">Đăng nhập</a>
+        <a href="{{ url_for('acc.register', next=nxt or None) }}" role="tab" data-to="register" aria-selected="{{ 'true' if mode == 'register' else 'false' }}">Đăng ký</a>
+        <i aria-hidden="true"></i>
+      </div>
+
+      <div class="auth-panes">
+        <form method="post" action="{{ url_for('acc.login') }}" class="auth-pane" data-pane="login" novalidate {{ 'hidden' if mode != 'login' }}>
+          <input type="hidden" name="next" value="{{ nxt }}">
+          <h2 class="h3">Chào bạn quay lại</h2>
+          {% if mode == 'login' and errors._ %}<p class="alert alert-error" role="alert">{{ errors._ }}</p>{% endif %}
+          <div class="field"><label for="l-email">Email <span class="req" aria-hidden="true">*</span></label>
+            <input id="l-email" type="email" name="email" value="{{ f.email if mode == 'login' }}" required autocomplete="email"></div>
+          <div class="field pw-field"><label for="l-password">Mật khẩu <span class="req" aria-hidden="true">*</span></label>
+            <span class="pw-wrap"><input id="l-password" type="password" name="password" required autocomplete="current-password"><button type="button" class="pw-eye" aria-label="Hiện mật khẩu">👁</button></span></div>
+          <button class="btn btn-lg btn-dark btn-block">Đăng nhập</button>
+        </form>
+
+        <form method="post" action="{{ url_for('acc.register') }}" class="auth-pane" data-pane="register" novalidate {{ 'hidden' if mode != 'register' }}>
+          <input type="hidden" name="next" value="{{ nxt }}">
+          <h2 class="h3">Tạo tài khoản thành viên</h2>
+          {% set e = errors if mode == 'register' else {} %}
+          {{ m.field('name', 'Họ tên', e, f.name if mode == 'register', required=True, attrs='autocomplete="name"') }}
+          <div class="grid-2">
+            {{ m.field('email', 'Email', e, f.email if mode == 'register', 'email', True, attrs='autocomplete="email"') }}
+            {{ m.field('phone', 'Số điện thoại', e, f.phone if mode == 'register', 'tel', hint='Không bắt buộc', attrs='autocomplete="tel" inputmode="tel"') }}
+          </div>
+          <div class="grid-2">
+            {{ m.field('password', 'Mật khẩu', e, '', 'password', True, hint='Ít nhất 8 ký tự', attrs='autocomplete="new-password" minlength="8"') }}
+            {{ m.field('password2', 'Nhập lại mật khẩu', e, '', 'password', True, attrs='autocomplete="new-password"') }}
+          </div>
+          <label class="check {{ 'has-error' if e.agree }}"><input type="checkbox" name="agree" value="1" {{ 'checked' if f.agree }}> Tôi đồng ý với <a href="{{ url_for('policy', slug='dieu-khoan') }}" target="_blank">Điều khoản</a> và <a href="{{ url_for('policy', slug='bao-mat') }}" target="_blank">Chính sách bảo mật</a></label>
+          {% if e.agree %}<small class="err">⚠ {{ e.agree }}</small>{% endif %}
+          <button class="btn btn-lg btn-dark btn-block">Tạo tài khoản & nhận voucher</button>
+        </form>
+      </div>
+
+      <div class="auth-guest">
+        <span>hoặc</span>
+        <a href="{{ nxt if nxt and nxt.startswith('/') and not nxt.startswith('//') else url_for('catalog') }}" class="btn btn-secondary btn-block">Tiếp tục mua không cần đăng nhập</a>
+        <small class="muted">Bạn vẫn đặt hàng và tra cứu đơn bình thường; chỉ không tích điểm cho đơn đó.</small>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  const card = document.querySelector('.auth-card');
+  card.querySelectorAll('[data-to]').forEach(a => a.addEventListener('click', e => {
+    e.preventDefault(); const to = a.dataset.to; if (card.dataset.mode === to) return;
+    card.dataset.mode = to;
+    card.querySelectorAll('[data-to]').forEach(x => x.setAttribute('aria-selected', x.dataset.to === to));
+    card.querySelectorAll('[data-pane]').forEach(p => { p.hidden = p.dataset.pane !== to; if (!p.hidden) { p.classList.remove('enter'); void p.offsetWidth; p.classList.add('enter'); } });
+    history.replaceState(null, '', a.href); document.title = (to === 'login' ? 'Đăng nhập' : 'Tạo tài khoản') + document.title.slice(document.title.indexOf(' |'));
+    const f = card.querySelector(`[data-pane="${to}"] input:not([type=hidden])`); if (f) f.focus({ preventScroll: true });
+  }));
+  card.querySelectorAll('.pw-eye').forEach(b => b.onclick = () => { const i = b.previousElementSibling; i.type = i.type === 'password' ? 'text' : 'password'; b.setAttribute('aria-label', i.type === 'password' ? 'Hiện mật khẩu' : 'Ẩn mật khẩu'); });
+})();
+</script>
+{% endblock %}

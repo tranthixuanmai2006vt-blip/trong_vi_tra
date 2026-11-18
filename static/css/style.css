@@ -957,3 +957,36 @@ h1, h2, h3 { text-transform: none; }
   body:has(.mobile-bar) .msg-bubble { bottom: 84px; } }
 body:has(.dna-reveal:not([hidden])) .msg-bubble, body:has(.drawer:not([hidden])) .msg-bubble { display: none; }
 @media print { .msg-bubble { display: none; } }
+
+/* ---------- Gạch chân menu trượt + chuyển trang mượt ---------- */
+.nav { position: relative; }
+.nav-ink { position: absolute; left: 0; bottom: 2px; height: 2.5px; width: 0; border-radius: 2px; background: var(--action); opacity: 0; pointer-events: none;
+  transition: transform .45s cubic-bezier(.22, 1, .36, 1), width .45s cubic-bezier(.22, 1, .36, 1), opacity .25s; }
+.nav-ink.no-anim { transition: none; }
+@media (min-width: 1024px) { .nav > a.active, .dd.active > .dd-btn, .nav > a, .dd-btn { border-bottom-color: transparent; } }
+@media (max-width: 1023px) { .nav-ink { display: none; } }
+
+@view-transition { navigation: auto; }
+.header { view-transition-name: site-header; }
+::view-transition-old(site-header) { display: none; }
+::view-transition-new(site-header) { animation: none; }
+::view-transition-old(root) { animation: vtOut .2s ease-in both; }
+::view-transition-new(root) { animation: vtIn .5s cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes vtOut { to { opacity: 0; transform: translateY(-6px); } }
+@keyframes vtIn { from { opacity: 0; transform: translateY(14px); } }
+.no-vt main { animation: vtIn .5s cubic-bezier(.22, 1, .36, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+  .no-vt main { animation: none; } .nav-ink { transition: none; }
+}
+
+/* ---------- Nút tài khoản trên header ---------- */
+.util-acc { gap: 8px; padding: 0 10px 0 4px; }
+.acc-dot { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--c, var(--accent)); color: #fff; font: 600 14px var(--sans); box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px var(--c, var(--accent)); }
+.util-acc-name { max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 1100px) { .util-acc-name { display: none; } }
+@media (max-width: 1023px) { .util-login span { display: none; } }
+@media (min-width: 1024px) { .dd.active .dd-product-heading { border-bottom-color: transparent; } }
+
+.nav > a, .dd-btn, .dd-product-link, .util { white-space: nowrap; }
+@media (max-width: 1320px) { .util-text span { display: none; } }

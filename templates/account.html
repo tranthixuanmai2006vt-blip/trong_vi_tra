@@ -1,0 +1,156 @@
+{% extends 'base.html' %}{% import 'macros.html' as m with context %}
+{% block title %}Tài khoản{% endblock %}
+{% block bodyclass %}page-account{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/account.css') }}">{% endblock %}
+
+
+{% block content %}
+{% set TABS = [('overview', 'acc.account', 'Tổng quan', '🌿'), ('orders', 'acc.account_orders', 'Đơn hàng', '📦'), ('rewards', 'acc.account_rewards', 'Điểm & ưu đãi', '🎁'), ('settings', 'acc.account_settings', 'Cài đặt', '⚙️')] %}
+{% macro order_row(o) -%}
+<a class="ord" href="{{ url_for('order_result', code=o.code) }}">
+  <div class="ord-main"><b>{{ o.code }}</b><span class="muted small">{{ o.created }} · {{ o.data.lines | length }} món</span></div>
+  <div class="ord-steps" aria-label="Trạng thái: {{ steps[o.status_idx] }}">{% for s in steps %}<i class="{{ 'on' if loop.index0 <= o.status_idx }}"></i>{% endfor %}</div>
+  <span class="ord-status {{ 'done' if o.status_idx == steps|length - 1 }}">{{ steps[o.status_idx] }}</span>
+  <b class="ord-total">{{ o.total | vnd }}</b>
+  <span class="ord-pts {{ o.pts_status }}">{{ '+' ~ o.pts }} điểm{{ ' · chờ cộng' if o.pts_status == 'pending' }}</span>
+</a>
+{%- endmacro %}
+<section class="acct">
+  <div class="container">
+    {{ m.crumbs([('Tài khoản', None)]) }}
+    <div class="acc-head">
+      <div class="acc-avatar" style="--c:{{ tier.color }};--ink:{{ tier.ink }}">{{ u.name.split()[-1][:1] | upper }}</div>
+      <div><p class="muted small">Xin chào,</p><h1>{{ u.name }}</h1></div>
+      <form method="post" action="{{ url_for('acc.logout') }}" class="acc-out"><button class="btn btn-sm btn-ghost">Đăng xuất</button></form>
+    </div>
+
+    <div class="acc-layout">
+      <nav class="acc-tabs" aria-label="Mục tài khoản">
+        {% for key, ep, label, ic in TABS %}<a href="{{ url_for(ep) }}" class="{{ 'on' if tab == key }}" {{ 'aria-current=page' if tab == key }}><span aria-hidden="true">{{ ic }}</span>{{ label }}</a>{% endfor %}
+        <i class="acc-tabs-ink" aria-hidden="true"></i>
+      </nav>
+
+      <div class="acc-body">
+      {% if tab == 'overview' %}
+        <div class="acc-top">
+          <article class="mcard" style="--c:{{ tier.color }};--ink:{{ tier.ink }}">
+            <div class="mcard-shine" aria-hidden="true"></div>
+            <p class="mcard-brand">{{ SITE.name }} · Thành viên</p>
+            <p class="mcard-tier">{{ tier.name }}</p>
+            <div class="mcard-pts"><b data-count="{{ u.points }}">{{ u.points }}</b><span>điểm khả dụng</span></div>
+            {% if pending %}<p class="mcard-pending">+{{ pending }} điểm chờ cộng khi đơn được giao</p>{% endif %}
+            <div class="mcard-foot"><span>{{ u.name }}</span><span>Từ {{ u.created[:10] }}</span></div>
+          </article>
+          <div class="acc-progress">
+            {% if ntier %}
+            <p>Đã chi tiêu <b>{{ u.spent | vnd }}</b>. Còn <b>{{ (ntier.min - u.spent) | vnd }}</b> để lên hạng <b>{{ ntier.name }}</b>.</p>
+            {% else %}<p>Bạn đang ở hạng cao nhất. Cảm ơn bạn đã đồng hành cùng {{ SITE.name }}!</p>{% endif %}
+            <div class="bar"><i style="--w:{{ prog }}%"></i></div>
+            <ol class="ladder">{% for t in LOYALTY.tiers %}<li class="{{ 'on' if u.spent >= t.min }} {{ 'cur' if t.id == tier.id }}" style="--c:{{ t.color }}"><i></i><b>{{ t.name }}</b><small>{{ 'Mặc định' if not t.min else 'từ ' ~ (t.min | vnd) }}</small></li>{% endfor %}</ol>
+            <p class="small muted">Hạng xét theo tổng tiền hàng của các đơn đã giao. Điểm được cộng khi đơn chuyển sang “Đã giao”.</p>
+          </div>
+        </div>
+        <div class="acc-stats">
+          <a href="{{ url_for('acc.account_orders') }}"><b>{{ orders | length }}</b><span>đơn hàng</span></a>
+          <a href="{{ url_for('acc.account_rewards') }}"><b>{{ vouchers | length }}</b><span>voucher dùng được</span></a>
+          <a href="{{ url_for('acc.account_rewards') }}"><b>×{{ ('%.1f' % tier.mult).replace('.0', '').replace('.', ',') }}</b><span>hệ số tích điểm</span></a>
+        </div>
+        <div class="acc-box">
+          <div class="acc-box-head"><h2 class="h3">Đơn gần đây</h2><a class="link-sm" href="{{ url_for('acc.account_orders') }}">Xem tất cả →</a></div>
+          {% for o in orders[:3] %}{{ order_row(o) }}{% else %}
+          <div class="empty"><p class="empty-ic">🍵</p><p>Bạn chưa có đơn nào. Đơn đầu tiên sẽ được tích điểm ngay.</p><a class="btn btn-sm" href="{{ url_for('catalog') }}">Mua sắm ngay</a></div>{% endfor %}
+        </div>
+
+      {% elif tab == 'orders' %}
+        <div class="acc-box">
+          <div class="acc-box-head"><h2 class="h3">Lịch sử mua hàng</h2><span class="muted small">{{ orders | length }} đơn</span></div>
+          {% for o in orders %}{{ order_row(o) }}{% else %}
+          <div class="empty"><p class="empty-ic">📦</p><p>Chưa có đơn hàng nào gắn với tài khoản này.</p><a class="btn btn-sm" href="{{ url_for('catalog') }}">Khám phá sản phẩm</a></div>{% endfor %}
+          <p class="small muted">Đơn bạn vừa mua trên trình duyệt này trước khi đăng nhập cũng được gắn vào tài khoản. Đơn khác: <a href="{{ url_for('track') }}">tra cứu bằng mã đơn</a>.</p>
+        </div>
+
+      {% elif tab == 'rewards' %}
+        <div class="acc-box rw-balance">
+          <div><p class="muted small">Điểm khả dụng</p><p class="rw-pts"><b data-count="{{ u.points }}">{{ u.points }}</b> điểm</p>{% if pending %}<p class="small muted">+{{ pending }} điểm đang chờ cộng</p>{% endif %}</div>
+          <p class="small">Hạng <b>{{ tier.name }}</b> · tích ×{{ ('%.1f' % tier.mult).replace('.0', '').replace('.', ',') }} · 1 điểm cho mỗi {{ LOYALTY.earn_per | vnd }}</p>
+        </div>
+        <h2 class="h3 acc-h">Đổi điểm lấy voucher</h2>
+        <div class="rw-grid">
+          {% for r in LOYALTY.rewards %}{% set ok = u.points >= r.points %}
+          <form method="post" action="{{ url_for('acc.redeem', rid=r.id) }}" class="rw {{ 'ok' if ok }}" style="--k:{{ loop.index0 }}">
+            <p class="rw-val">{{ r.value | vnd }}</p><p class="small muted">cho đơn từ {{ r.min | vnd }}</p>
+            <div class="bar"><i style="--w:{{ [100, (u.points / r.points * 100) | round | int] | min }}%"></i></div>
+            <button class="btn btn-sm {{ 'btn-dark' if ok else 'btn-secondary' }}" {{ 'disabled' if not ok }}>{{ 'Đổi ' ~ r.points ~ ' điểm' if ok else 'Cần ' ~ r.points ~ ' điểm' }}</button>
+          </form>{% endfor %}
+        </div>
+        <h2 class="h3 acc-h">Voucher của bạn</h2>
+        <div class="vc-list">
+          {% for v in vouchers %}
+          <div class="vc"><div class="vc-val">{{ v.value | vnd }}</div><div class="vc-info"><b>{{ v.label }}</b><small>Đơn từ {{ v.min | vnd }} · HSD {{ v.expires[8:] }}/{{ v.expires[5:7] }}/{{ v.expires[:4] }}</small></div>
+            <button class="btn btn-sm btn-secondary" data-copy="{{ v.code }}">{{ m.icon('copy') }} {{ v.code }}</button></div>
+          {% else %}<p class="muted">Chưa có voucher khả dụng. Đổi điểm ở trên để nhận voucher.</p>{% endfor %}
+          <p class="small muted">Nhập mã ở giỏ hàng, hoặc chọn nhanh ở bước thanh toán.</p>
+        </div>
+        <div class="acc-grid2">
+          <div class="acc-box"><h2 class="h3">Lịch sử điểm</h2>
+            {% for l in log %}<div class="log-row"><span>{{ l.note }}<small class="muted"> · {{ l.created }}</small></span><b class="{{ 'plus' if l.delta > 0 else 'minus' }}">{{ '+' if l.delta > 0 }}{{ l.delta }}</b></div>
+            {% else %}<p class="muted small">Chưa có biến động điểm.</p>{% endfor %}</div>
+          <div class="acc-box"><h2 class="h3">Quyền lợi theo hạng</h2>
+            {% for t in LOYALTY.tiers %}<div class="perk-row {{ 'cur' if t.id == tier.id }}" style="--c:{{ t.color }}"><i></i><div><b>{{ t.name }}</b> <small class="muted">{{ 'mặc định' if not t.min else 'từ ' ~ (t.min | vnd) }}</small><p class="small">{{ t.perks | join(' · ') }}</p></div></div>{% endfor %}</div>
+        </div>
+
+      {% elif tab == 'settings' %}
+        <form method="post" class="acc-box" novalidate>
+          <input type="hidden" name="form" value="profile">
+          <h2 class="h3">Thông tin cá nhân</h2>
+          {% set pf = f if f.form == 'profile' else profile %}
+          {% set pe = errors if f.form == 'profile' else {} %}
+          <div class="grid-2">
+            {{ m.field('name', 'Họ tên', pe, pf.name, required=True, attrs='autocomplete="name"') }}
+            {{ m.field('phone', 'Số điện thoại', pe, pf.phone, 'tel', attrs='autocomplete="tel" inputmode="tel"') }}
+            <div class="field"><label>Email đăng nhập</label><input value="{{ u.email }}" disabled></div>
+            {{ m.field('birthday', 'Ngày sinh', pe, pf.birthday, 'date', hint='Không bắt buộc') }}
+          </div>
+          <h3 class="h4">Địa chỉ giao hàng mặc định</h3>
+          <p class="small muted">Dùng để điền sẵn ở bước thanh toán.</p>
+          <div class="grid-2">
+            <div class="field {{ 'has-error' if pe.province }}"><label for="f-province">Tỉnh / thành phố</label>
+              <select id="f-province" name="province"><option value="">— Chọn —</option>{% for p in provinces %}<option {{ 'selected' if pf.province == p }}>{{ p }}</option>{% endfor %}</select></div>
+            {{ m.field('district', 'Quận/huyện, phường/xã', pe, pf.district) }}
+            <div class="span-2">{{ m.field('street', 'Số nhà, tên đường', pe, pf.street) }}</div>
+          </div>
+          <button class="btn">Lưu thông tin</button>
+        </form>
+        <form method="post" class="acc-box" novalidate>
+          <input type="hidden" name="form" value="password">
+          <h2 class="h3">Đổi mật khẩu</h2>
+          {% set we = errors if f.form == 'password' else {} %}
+          <div class="grid-2">
+            {{ m.field('old', 'Mật khẩu hiện tại', we, '', 'password', True, attrs='autocomplete="current-password"') }}
+            <span></span>
+            {{ m.field('new', 'Mật khẩu mới', we, '', 'password', True, hint='Ít nhất 8 ký tự', attrs='autocomplete="new-password"') }}
+            {{ m.field('new2', 'Nhập lại mật khẩu mới', we, '', 'password', True, attrs='autocomplete="new-password"') }}
+          </div>
+          <button class="btn btn-secondary">Đổi mật khẩu</button>
+        </form>
+        <form method="post" action="{{ url_for('acc.logout') }}" class="acc-box acc-logout"><div><b>Đăng xuất khỏi thiết bị này</b><p class="small muted">Giỏ hàng hiện tại vẫn được giữ.</p></div><button class="btn btn-secondary">Đăng xuất</button></form>
+      {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const to = +el.dataset.count; if (RM || !to) return;
+    const t0 = performance.now(), D = 1200;
+    const f = t => { const k = Math.min(1, (t - t0) / D); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))).toLocaleString('vi-VN'); if (k < 1) requestAnimationFrame(f); };
+    el.textContent = '0'; requestAnimationFrame(f);
+  });
+  requestAnimationFrame(() => document.body.classList.add('acc-ready'));
+})();
+</script>
+{% endblock %}

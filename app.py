@@ -21,6 +21,7 @@ from flask import (Flask, abort, g, jsonify, redirect, render_template, request,
 from werkzeug.utils import secure_filename
 
 import data as D
+import accounts
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "trongvitra_v2.db")
@@ -30,6 +31,8 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "trong-vi-tra-dev-key")
 app.config["MAX_CONTENT_LENGTH"] = 32 * 1024 * 1024
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.permanent_session_lifetime = timedelta(days=30)
 ALLOWED_EXT = {"jpg", "jpeg", "png", "pdf"}
 
 # ------------------------------------------------------------------
@@ -125,6 +128,7 @@ def init_db():
         CREATE TABLE IF NOT EXISTS tickets (code TEXT PRIMARY KEY, order_code TEXT, created TEXT, data TEXT, status TEXT);
         CREATE TABLE IF NOT EXISTS subscribers (email TEXT PRIMARY KEY, created TEXT, source TEXT);
         """)
+        accounts.ensure_schema(c)
 
 
 def gen_code(prefix, n=6):
@@ -291,8 +295,10 @@ def cart_view(cart, province=None, method=None):
     # giảm giá
     discount, coupon_msg = 0, None
     cp = cart.get("coupon")
-    if cp and cp in D.COUPONS:
-        c = D.COUPONS[cp]
+    c = accounts.coupon_def(cp)
+    if cp and not c:                       # voucher hết hạn / đã dùng / đã đăng xuất
+        coupon_msg, cp = f"Mã {cp} không còn dùng được.", None
+    if c:
         if subtotal >= c["min"]:
             discount = subtotal * c["value"] // 100 if c["type"] == "percent" else c["value"]
         else:
@@ -316,6 +322,7 @@ def cart_view(cart, province=None, method=None):
         ship = sel["fee"] if sel else None
     total = subtotal - discount + (ship or 0)
     return {"lines": lines, "count": count, "subtotal": subtotal, "discount": discount, "coupon": cp,
+            "coupon_label": c["label"] if c else None,
             "coupon_msg": coupon_msg, "ship": ship, "ship_options": ship_options, "total": total,
             "issues": issues, "has_cake": has_cake, "prep_days": prep,
             "freeship_left": max(0, D.FREESHIP_THRESHOLD - (subtotal - discount))}
@@ -602,14 +609,15 @@ def api_coupon():
         cart["coupon"] = None
         save_cart(cart)
         return jsonify({"ok": True, "msg": "Đã bỏ mã giảm giá.", "cart": cart_json(cart)})
-    if code not in D.COUPONS:
+    c = accounts.coupon_def(code)
+    if not c:
         return jsonify({"ok": False, "msg": "Mã giảm giá không hợp lệ hoặc đã hết hạn."}), 400
     sub = cart_view(cart)["subtotal"]
-    if sub < D.COUPONS[code]["min"]:
-        return jsonify({"ok": False, "msg": f"Mã {code} áp dụng cho đơn từ {vnd(D.COUPONS[code]['min'])}."}), 400
+    if sub < c["min"]:
+        return jsonify({"ok": False, "msg": f"Mã {code} áp dụng cho đơn từ {vnd(c['min'])}."}), 400
     cart["coupon"] = code
     save_cart(cart)
-    return jsonify({"ok": True, "msg": f"Đã áp dụng: {D.COUPONS[code]['label']}", "cart": cart_json(cart)})
+    return jsonify({"ok": True, "msg": f"Đã áp dụng: {c['label']}", "cart": cart_json(cart)})
 
 
 @app.post("/api/cart/meta")
@@ -843,6 +851,10 @@ def checkout():
     if not cart["lines"]:
         return render_template("checkout.html", empty=True)
     f = request.form.to_dict() if request.method == "POST" else {"same_recipient": "1", "province": "", "ship": "standard"}
+    u = accounts.current_user()
+    if request.method == "GET" and u:                  # thành viên: điền sẵn thông tin đã lưu
+        f.update({"buyer_name": u["name"], "buyer_phone": u["phone"] or "", "buyer_email": u["email"],
+                  **{k: u["address"].get(k, "") for k in ("province", "district", "street")}})
     if request.method == "GET" and cart.get("vat"):
         f.update({"invoice": "1", **{k: cart["vat"].get(k, "") for k in ("tax_code", "company", "company_addr")}})
     v = cart_view(cart, f.get("province"), f.get("ship"))
@@ -891,12 +903,15 @@ def checkout():
                 except sqlite3.IntegrityError:
                     pass
             db().commit()
+            accounts.link_order(code, v["subtotal"] - v["discount"], v["coupon"])
             cart.update({"lines": [], "coupon": None, "note": "", "vat": None})
             save_cart(cart)
             session.setdefault("my_orders", [])
             session["my_orders"] = (session["my_orders"] + [code])[-20:]
             return redirect(url_for("order_result", code=code))
-    return render_template("checkout.html", empty=False, v=v, f=f, errors=errors, cart=cart,
+    earn = accounts.points_for(v["subtotal"] - v["discount"], u["spent"] if u else 0)
+    return render_template("checkout.html", empty=False, v=v, f=f, errors=errors, cart=cart, earn=earn,
+                           my_vouchers=accounts.user_vouchers(u["id"]) if u else [],
                            token=f.get("token") or uuid.uuid4().hex)
 
 
@@ -920,7 +935,7 @@ def get_order(code):
 
 @app.route("/don-hang/<code>")
 def order_result(code):
-    if code not in session.get("my_orders", []) and code not in session.get("verified", {}):
+    if code not in session.get("my_orders", []) and code not in session.get("verified", {}) and not accounts.owns(code):
         return redirect(url_for("track", ma=code))
     o = get_order(code)
     if not o:
@@ -930,7 +945,7 @@ def order_result(code):
 
 @app.post("/don-hang/<code>/da-chuyen-khoan")
 def order_paid_claim(code):
-    if code not in session.get("my_orders", []) and code not in session.get("verified", {}):
+    if code not in session.get("my_orders", []) and code not in session.get("verified", {}) and not accounts.owns(code):
         abort(403)
     o = get_order(code)
     if o and o["payment"] == "bank_pending":
@@ -1072,6 +1087,9 @@ def admin_order(code):
         o["history"].append({"step": o["status_idx"] + 1, "time": now_str()})
         db().execute("UPDATE orders SET status_idx=?, history=? WHERE code=?",
                      (o["status_idx"] + 1, json.dumps(o["history"]), code))
+        if o["status_idx"] + 1 == len(D.ORDER_STEPS) - 1:   # đã giao → cộng điểm thành viên
+            db().commit()
+            accounts.credit(code)
     elif act in D.PAYMENT_STATUS:
         db().execute("UPDATE orders SET payment=? WHERE code=?", (act, code))
     db().commit()
@@ -1088,6 +1106,7 @@ def too_big(_e):
     return render_template("404.html", msg="Tệp tải lên quá lớn (tối đa 10 MB mỗi tệp)."), 413
 
 
+accounts.init(app, db, get_order)
 init_db()
 
 if __name__ == "__main__":

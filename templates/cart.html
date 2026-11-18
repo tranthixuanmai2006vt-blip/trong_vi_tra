@@ -71,7 +71,9 @@
         <h2 class="h3">Tóm tắt đơn hàng</h2>
         <form class="coupon" id="couponForm"><label for="coupon" class="sr-only">Mã giảm giá</label>
           <input id="coupon" placeholder="Mã giảm giá" value="{{ v.coupon or '' }}"><button class="btn btn-sm btn-secondary">Áp dụng</button></form>
-        <small id="couponMsg" class="{{ 'err' if v.coupon_msg }}">{{ v.coupon_msg or (D.COUPONS[v.coupon].label if v.coupon) or '' }}</small>
+        <small id="couponMsg" class="{{ 'err' if v.coupon_msg }}">{{ v.coupon_msg or v.coupon_label or '' }}</small>
+        {% if current_user %}{% set mv = accounts_vouchers() %}{% if mv %}<div class="vchips" aria-label="Voucher của bạn">{% for vc in mv %}<button type="button" class="vchip" data-voucher="{{ vc.code }}" title="Đơn từ {{ vc.min | vnd }}">−{{ vc.value | vnd }} · {{ vc.code }}</button>{% endfor %}</div>{% endif %}
+        {% else %}<p class="small muted"><a href="{{ url_for('acc.login', next=url_for('cart_page')) }}">Đăng nhập</a> để dùng voucher thành viên và tích điểm.</p>{% endif %}
         <div class="sum-row"><span>Tạm tính</span><b id="sSub">{{ v.subtotal | vnd }}</b></div>
         <div class="sum-row"><span>Giảm giá</span><b id="sDisc">−{{ v.discount | vnd }}</b></div>
         <div class="sum-row"><span>Phí giao hàng</span><span class="muted">Tính sau khi nhập địa chỉ</span></div>
@@ -100,6 +102,7 @@
   </div>
 </section>
 {% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/account.css') }}">{% endblock %}
 {% block scripts %}
 <script>
 (function(){
@@ -130,6 +133,7 @@
     row.querySelector('[data-del]').onclick = async () => { const [, d] = await post('/api/cart/remove', {key}); row.remove(); toast('Đã xóa khỏi giỏ.'); apply(d.cart); };
     const vs = row.querySelector('[data-variant]'); if (vs) vs.onchange = async () => { const [, d] = await post('/api/cart/update', {key, sku: vs.value}); apply(d.cart); };
   });
+  document.querySelectorAll('[data-voucher]').forEach(b => b.onclick = () => { $('coupon').value = b.dataset.voucher; $('couponForm').requestSubmit(); });
   $('couponForm').onsubmit = async e => { e.preventDefault(); const [ok, d] = await post('/api/cart/coupon', {code: $('coupon').value});
     $('couponMsg').textContent = d.msg; $('couponMsg').className = ok ? 'ok' : 'err'; if (ok) apply(d.cart); };
   let t; $('note').oninput = () => { try { localStorage.setItem('tvt_note', $('note').value); } catch(e){} clearTimeout(t); t = setTimeout(() => post('/api/cart/meta', {note: $('note').value}), 500); };
