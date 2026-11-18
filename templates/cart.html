@@ -37,7 +37,7 @@
                     <p class="small muted">Số hộp cùng cấu hình: {{ l.qty }} · Chuẩn bị {{ l.quote.prep_days }} ngày</p>
                   </details></div>
               {% else %}
-                <a href="{{ l.url }}" class="ct-img">{{ m.art(l.product.art, l.product.color, l.name, note=False) }}</a>
+                <a href="{{ l.url }}" class="ct-img">{{ m.product_image(l.product) }}</a>
                 <div><a class="ct-name" href="{{ l.url }}">{{ l.name }}</a>
                   {% if l.variants|length > 1 %}
                   <select class="ct-variant" data-variant aria-label="Đổi phân loại">{% for vv in l.variants %}<option value="{{ vv.sku }}" {{ 'selected' if vv.sku==l.sku }} {{ 'disabled' if vv.stock<=0 }}>{{ vv.label }}{{ ' (tạm hết)' if vv.stock<=0 }}</option>{% endfor %}</select>
@@ -48,7 +48,7 @@
               <p class="err small ct-err" {{ 'hidden' if not l.errors }}>{{ l.errors[0] if l.errors }}</p>
             </div>
             <span class="ct-unit" data-label="Đơn giá">{{ l.unit_price | vnd }}</span>
-            <div class="stepper stepper-sm" data-label="Số lượng"><button data-q="-1" aria-label="Giảm">−</button><input type="number" value="{{ l.qty }}" min="1" aria-label="Số lượng {{ l.name }}"><button data-q="1" aria-label="Tăng">+</button></div>
+            <div class="stepper stepper-sm" data-label="Số lượng"><button data-q="-1" aria-label="Giảm" {{ 'disabled' if l.retired }}>−</button><input type="number" value="{{ l.qty }}" min="1" aria-label="Số lượng {{ l.name }}" {{ 'disabled' if l.retired }}><button data-q="1" aria-label="Tăng" {{ 'disabled' if l.retired }}>+</button></div>
             <b class="ct-total" data-label="Tổng">{{ l.total | vnd }}</b>
             <button class="ct-del" data-del aria-label="Xóa {{ l.name }}">✕</button>
           </div>

@@ -5,7 +5,7 @@
   <div class="container">
     {{ m.crumbs([('Sản phẩm', url_for('catalog')), ('Gift set', url_for('catalog', cat='gift-set')), (p.name, None)]) }}
     <div class="pdp">
-      <div class="pdp-gallery">{{ m.art(p.art, p.color, p.name) }}</div>
+      <div class="pdp-gallery">{{ m.product_image(p) }}</div>
       <div class="pdp-info">
         <p class="eyebrow">Gift set · {% for o in p.occasions %}{{ D.OCCASIONS[o] }}{{ ', ' if not loop.last }}{% endfor %}</p>
         <h1>{{ p.name }}</h1>

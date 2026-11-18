@@ -64,15 +64,44 @@
   if (window.DNA_PAGE !== 'result') {
     let ans = {};
     const form = $('dnaForm');
+    /* ----- thanh trượt (thay nhóm nút 1–5) ----- */
+    const LEVELS = { q1: ['Ít ngọt', 'Hơi ngọt', 'Ngọt vừa', 'Khá ngọt', 'Rất ngọt'] };
+    function levelText(r, v) {
+      const i = Math.max(0, Math.min(4, Math.round(v) - 1)), L = r.dataset.left, R = r.dataset.right;
+      return (LEVELS[r.name] || [L, 'Hơi nghiêng về “' + L + '”', 'Mức vừa', 'Hơi nghiêng về “' + R + '”', R])[i];
+    }
+    function paintRange(r) {
+      const box = r.closest('.slider'), on = r.dataset.touched === '1', v = +r.value;
+      r.style.setProperty('--p', ((v - 1) / 4 * 100) + '%');
+      box.classList.toggle('is-set', on);
+      box.querySelector('[data-now]').textContent = on ? levelText(r, v) : 'Kéo hoặc chạm vào thanh để chọn';
+      r.setAttribute('aria-valuetext', on ? levelText(r, v) : 'Chưa chọn');
+      box.querySelector('[data-keep]').hidden = on;
+    }
+    function setRange(r, v) {
+      if (v === null) { r.value = 3; r.dataset.touched = '0'; } else { r.value = v; r.dataset.touched = '1'; }
+      paintRange(r);
+    }
+    form.querySelectorAll('input[type="range"]').forEach(r => { r.dataset.touched = '0'; paintRange(r); });
+    form.addEventListener('input', e => {
+      if (e.target.type !== 'range') return;
+      e.target.dataset.touched = '1'; paintRange(e.target); readForm(); paint(); persist();
+    });
+    form.querySelectorAll('[data-keep]').forEach(b => b.onclick = () => {
+      const r = form.querySelector(`input[type="range"][name="${b.dataset.keep}"]`);
+      r.dataset.touched = '1'; paintRange(r); readForm(); paint(); persist();
+    });
     function readForm() {
       ans = {};
       DNA.questions.forEach(q => {
         if (q.type === 'multi') { const v = [...form.querySelectorAll(`[name="${q.id}"]:checked`)].map(i => i.value); if (v.length) ans[q.id] = v; }
+        else if (q.type === 'scale') { const r = form.querySelector(`input[type="range"][name="${q.id}"]`); if (r && r.dataset.touched === '1') ans[q.id] = String(r.value); }
         else { const i = form.querySelector(`[name="${q.id}"]:checked`); if (i) ans[q.id] = i.value; }
       });
     }
     function writeForm() {
       form.querySelectorAll('input').forEach(i => {
+        if (i.type === 'range') { setRange(i, ans[i.name] !== undefined ? +ans[i.name] : null); return; }
         const v = ans[i.name]; i.checked = Array.isArray(v) ? v.includes(i.value) : v === i.value;
       });
     }
@@ -95,7 +124,7 @@
       readForm(); paint(); persist();
     });
     form.querySelectorAll('[data-clear]').forEach(b => b.onclick = () => {
-      form.querySelectorAll(`[name="${b.dataset.clear}"]`).forEach(i => i.checked = false); readForm(); paint(); persist();
+      form.querySelectorAll(`[name="${b.dataset.clear}"]`).forEach(i => { if (i.type === 'range') setRange(i, null); else i.checked = false; }); readForm(); paint(); persist();
     });
     $('clearAll').onclick = () => {
       if (!confirm('Xóa tất cả câu trả lời? Kết quả Tea DNA cũ trên thiết bị này cũng sẽ bị xóa.')) return;
@@ -248,7 +277,9 @@
     const av = prof.ctx.avoid;
     const allergenOf = p => (p.allergens || []).join(' ').toLowerCase();
     let note = [];
+    if (DNA.products.some(p => p.type === 'tra' && !Array.isArray(p.dna))) note.push('Hồ sơ vị của danh mục trà mới đang cập nhật; chưa xếp hạng trà theo Tea DNA. Bạn có thể xem đầy đủ trà ở mục Sản phẩm.');
     let list = DNA.products.filter(p => {
+      if (!Array.isArray(p.dna) || p.dna.length !== 5) return false;
       if (av.includes('milk') && allergenOf(p).includes('sữa')) return false;
       if (av.includes('honey') && p.avoid.includes('honey')) return false;
       return true;
@@ -290,7 +321,7 @@
   /* ----- chia sẻ ----- */
   $('shareBtn').onclick = () => {
     const g = G(prof.group);
-    const text = `Tea DNA của mình là ${g.name} – ${g.tagline}. ${g.desc} Khám phá gu trà của bạn tại Trồng vị Trà:`;
+    const text = `Tea DNA của mình là ${g.name} – ${g.tagline}. ${g.desc} Khám phá gu trà của bạn tại Trồng Vị Nhà:`;
     const url = location.origin + '/tea-dna';
     $('dlgBody').innerHTML = `<h3 id="dlgTitle">Chia sẻ kết quả</h3><p class="small muted">Xem trước nội dung – không kèm email, thành phần muốn tránh hay câu trả lời.</p>
       <blockquote class="wish-quote">${esc(text)} ${url}</blockquote>
@@ -315,7 +346,7 @@
       if (withScore) DNA.axes.forEach((a, i) => { const v = prof.axes[a.key]; const y = 720 + i * 90;
         x.fillStyle = '#EDD4AB'; x.font = '500 34px "Be Vietnam Pro", Arial'; x.fillText(a.label + (v === null ? ': —' : `: ${v}/100`), 90, y);
         x.fillStyle = 'rgba(255,255,255,.2)'; x.fillRect(90, y + 18, 900, 12); if (v !== null) { x.fillStyle = '#8C9A4B'; x.fillRect(90, y + 18, 9 * v, 12); } });
-      x.fillStyle = '#EDD4AB'; x.font = '500 34px "Be Vietnam Pro", Arial'; x.fillText('Trồng vị Trà × Hằng Sơn Điền · Explore Tea. Create Your Way.', 90, 1260);
+      x.fillStyle = '#EDD4AB'; x.font = '500 34px "Be Vietnam Pro", Arial'; x.fillText('Trồng Vị Nhà × Hằng Sơn Điền · Explore Tea. Create Your Way.', 90, 1260);
       const a = document.createElement('a'); a.download = 'tea-dna-' + g.id + '.png'; a.href = c.toDataURL('image/png'); a.click();
     } catch (e) { toast('Không tạo được ảnh. Bạn có thể sao chép nội dung thay thế.', 'error'); }
   }

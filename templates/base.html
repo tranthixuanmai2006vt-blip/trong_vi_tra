@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ SITE.name }}{% endblock %} | {{ SITE.name }} × {{ SITE.partner }}</title>
   <meta name="description" content="{% block desc %}Trà tuyển chọn Hằng Sơn Điền, bánh mang hương trà và hộp quà theo cách của bạn.{% endblock %}">
+  <meta property="og:site_name" content="{{ SITE.name }}">
+  <meta property="og:title" content="{% block ogtitle %}{{ SITE.name }} × {{ SITE.partner }}{% endblock %}">
+  <meta property="og:description" content="Vị trà đong đầy, vị nhà sum vầy. Trà, bánh từ trà và hộp quà mang lời nhắn riêng.">
+  <meta property="og:type" content="website">
   <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&family=Be+Vietnam+Pro:wght@400;500;600&display=swap" rel="stylesheet">
@@ -14,7 +18,7 @@
 <body class="{% block bodyclass %}{% endblock %}">
 <a class="skip" href="#main">Bỏ qua đến nội dung chính</a>
 {% if D.DEMO_MODE %}
-<div class="demo-bar" role="note">Bản demo · Giá, tồn kho và thông tin liên hệ là <b>dữ liệu mẫu</b>, chờ doanh nghiệp xác nhận.</div>
+<div class="demo-bar" role="note">Bản demo · Danh mục và giá trà theo bảng nhóm cung cấp. Tồn kho, bánh, hộp quà, phí giao và thông tin liên hệ vẫn là <b>dữ liệu mẫu</b>.</div>
 {% endif %}
 
 <header class="header" id="header">
@@ -25,7 +29,7 @@
     <nav class="nav" id="nav" aria-label="Menu chính">
       <button class="nav-close" id="navClose" aria-label="Đóng menu">✕</button>
       <a href="{{ url_for('home') }}" class="{{ 'active' if endpoint=='home' }}">Trang chủ</a>
-      <a href="{{ url_for('about') }}" class="{{ 'active' if endpoint=='about' }}">Về Hằng Sơn Điền</a>
+      <a href="{{ url_for('about') }}" class="{{ 'active' if endpoint=='about' }}">Về chúng tôi</a>
       <div class="dd {{ 'active' if endpoint in ['catalog','product_detail'] }}">
         <button class="dd-btn" aria-expanded="false">Sản phẩm <span aria-hidden="true">▾</span></button>
         <div class="dd-menu">

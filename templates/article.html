@@ -25,7 +25,7 @@
         {% elif kind == 'p' %}<p>{{ text }}</p>
         {% elif kind == 'product' and BY_ID.get(text) %}{% set pp = BY_ID[text] %}
           <aside class="embed-product">
-            <div class="ep-img">{{ m.art(pp.art, pp.color, pp.name, note=False) }}</div>
+            <div class="ep-img">{{ m.product_image(pp) }}</div>
             <div><p class="eyebrow">Sản phẩm trong bài</p><h3><a href="{{ product_url(pp) }}">{{ pp.name }}</a></h3><p class="small muted">{{ pp.taste_note }}</p>
               <p class="price">{{ min_price(pp) | vnd }}</p>
               {% if in_stock(pp) and pp.variants|length == 1 %}<button class="btn btn-sm" data-add="{{ pp.variants[0].sku }}" data-name="{{ pp.name }}">Thêm vào giỏ</button>

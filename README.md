@@ -1,4 +1,8 @@
-# 🍵 Trồng vị Trà — Hằng Sơn Điền × Trà
+# 🍵 Trồng Vị Nhà — Hằng Sơn Điền × Trà
+
+**Cập nhật danh mục trà 18/11/2026:** xem `HUONG_DAN_CAP_NHAT_TRA.md` để biết 11 giá/quy cách đã sửa và tên file ảnh trong `static/img/products/`. Giá trà đã theo ảnh nhóm gửi; các dữ liệu khác vẫn là demo.
+
+**Ảnh banner và danh mục trang chủ:** xem `HUONG_DAN_ANH_BANNER.md`. Ảnh banner đặt trực tiếp trong `static/img/`; ảnh từng sản phẩm vẫn ở `static/img/products/`.
 
 Website bán trà, bánh từ trà, gift set + dịch vụ **Tạo hộp quà**, **Thiết kế riêng**, **Tea DNA**.
 Viết bằng Python (Flask), dựng theo file *[THDAKD] BRIEF WEB* và *[THDAKD] CHI TIẾT WEB*.
@@ -18,7 +22,7 @@ Trong PyCharm: Settings › Project › Python Interpreter › chọn `.venv/bin
 | Đường dẫn | Trang |
 |---|---|
 | `/` | Trang chủ (9 khối theo spec) |
-| `/ve-hang-son-dien` | Về Hằng Sơn Điền |
+| `/ve-chung-toi` | Về Hằng Sơn Điền |
 | `/san-pham`, `/san-pham/tra`, `/san-pham/banh`, `/san-pham/gift-set` | Danh mục + bộ lọc, sắp xếp, tìm kiếm |
 | `/san-pham/<loai>/<slug>` | Chi tiết trà / bánh / gift set |
 | `/dich-vu/tao-hop-qua` | Tạo hộp quà 6 bước (lưu nháp 24h trên trình duyệt) |
@@ -39,3 +43,10 @@ Khi có số liệu thật, sửa ở đó rồi đặt `DEMO_MODE = False` đ�
 
 Mã giảm giá mẫu để test: `TRONGVITRA10`, `CHAODUYEN`.
 Dữ liệu đơn/yêu cầu lưu ở `trongvitra_v2.db` (xóa file để reset). Tệp khách tải lên lưu ở `uploads/`.
+
+## Thay ảnh & font (bản nâng cấp)
+Web tự dùng ảnh thật nếu thấy file trong `static/img/`, chưa có thì hiện ảnh minh họa SVG:
+`cover-desktop.jpg` (16:7) · `cover-mobile.jpg` (4:5) · `cat-tra.jpg` `cat-banh.jpg` `cat-hopqua.jpg` (4:5) · `svc-tu-tao.jpg` `svc-theo-yeu-cau.jpg` (4:3) ·
+`doi-tra-bao-loc.jpg` · `giay-tra.jpg` · `story-1..4.jpg` · `region-olong.jpg` `region-matcha.jpg` `region-traxanh.jpg` · `qt-tra-1..4.jpg` `qt-banh-1..4.jpg` ·
+`team-main.jpg` `team-1.jpg` `team-2.jpg` · `cover-tra.jpg` `cover-banh.jpg` `cover-hopqua.jpg`.
+Font tiêu đề: bỏ `DFVN-Basteleur.woff2` (hoặc .ttf/.otf) vào `static/fonts/`; chưa có thì dùng Lora.

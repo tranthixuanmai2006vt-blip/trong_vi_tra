@@ -1,0 +1,508 @@
+[
+  {
+    "id": "T07",
+    "slug": "tra-o-long-sua-cao-cap",
+    "type": "tra",
+    "name": "Trà Ô Long Sữa Cao Cấp HSĐ",
+    "brand": "Hằng Sơn Điền",
+    "line": "Ô long",
+    "group": "o-long",
+    "image_stem": "tra-o-long-sua-cao-cap",
+    "region": "Thông tin vùng nguyên liệu đang cập nhật",
+    "art": "pouch",
+    "color": "#6A8543",
+    "taste_note": "Quy cách 200g · Trà Hằng Sơn Điền",
+    "desc": "Trà Ô Long Sữa Cao Cấp HSĐ, quy cách 200g. Giá niêm yết theo danh mục Hằng Sơn Điền do nhóm cung cấp.",
+    "variants": [
+      {
+        "sku": "HSD-T07-200",
+        "label": "Gói 200g",
+        "price": 180000,
+        "stock": 30,
+        "slots": 3
+      }
+    ],
+    "profile": {
+      "Dòng trà": "Ô long",
+      "Quy cách": "200g"
+    },
+    "brew": null,
+    "ingredients": "Xem thông tin thành phần trên bao bì sản phẩm.",
+    "storage": "Bảo quản theo hướng dẫn trên bao bì.",
+    "hsd": "Xem ngày sản xuất và hạn sử dụng in trên bao bì.",
+    "allergens": [],
+    "prep_days": 0,
+    "occasions": [
+      "moi-ngay",
+      "bieu-tang"
+    ],
+    "flavor": [],
+    "pair": [],
+    "dna": null,
+    "avoid": [
+      "caffeine"
+    ],
+    "rank": 1,
+    "new": false
+  },
+  {
+    "id": "T06",
+    "slug": "hong-tra-cao-cap",
+    "type": "tra",
+    "name": "Hồng Trà Cao Cấp HSĐ",
+    "brand": "Hằng Sơn Điền",
+    "line": "Hồng trà",
+    "group": "hong-tra",
+    "image_stem": "hong-tra-cao-cap",
+    "region": "Thông tin vùng nguyên liệu đang cập nhật",
+    "art": "pouch",
+    "color": "#6A8543",
+    "taste_note": "Quy cách 200g · Trà Hằng Sơn Điền",
+    "desc": "Hồng Trà Cao Cấp HSĐ, quy cách 200g. Giá niêm yết theo danh mục Hằng Sơn Điền do nhóm cung cấp.",
+    "variants": [
+      {
+        "sku": "HSD-HT-200",
+        "label": "Gói 200g",
+        "price": 180000,
+        "stock": 30,
+        "slots": 3
+      }
+    ],
+    "profile": {
+      "Dòng trà": "Hồng trà",
+      "Quy cách": "200g"
+    },
+    "brew": null,
+    "ingredients": "Xem thông tin thành phần trên bao bì sản phẩm.",
+    "storage": "Bảo quản theo hướng dẫn trên bao bì.",
+    "hsd": "Xem ngày sản xuất và hạn sử dụng in trên bao bì.",
+    "allergens": [],
+    "prep_days": 0,
+    "occasions": [
+      "moi-ngay",
+      "bieu-tang"
+    ],
+    "flavor": [],
+    "pair": [],
+    "dna": null,
+    "avoid": [
+      "caffeine"
+    ],
+    "rank": 2,
+    "new": false
+  },
+  {
+    "id": "T08",
+    "slug": "lao-tra-cao-cap",
+    "type": "tra",
+    "name": "Lão Trà Cao Cấp HSĐ",
+    "brand": "Hằng Sơn Điền",
+    "line": "Lão trà",
+    "group": "lao-tra",
+    "image_stem": "lao-tra-cao-cap",
+    "region": "Thông tin vùng nguyên liệu đang cập nhật",
+    "art": "pouch",
+    "color": "#6A8543",
+    "taste_note": "Quy cách 200g · Trà Hằng Sơn Điền",
+    "desc": "Lão Trà Cao Cấp HSĐ, quy cách 200g. Giá niêm yết theo danh mục Hằng Sơn Điền do nhóm cung cấp.",
+    "variants": [
+      {
+        "sku": "HSD-T08-200",
+        "label": "Gói 200g",
+        "price": 104000,
+        "stock": 30,
+        "slots": 3
+      }
+    ],
+    "profile": {
+      "Dòng trà": "Lão trà",
+      "Quy cách": "200g"
+    },
+    "brew": null,
+    "ingredients": "Xem thông tin thành phần trên bao bì sản phẩm.",
+    "storage": "Bảo quản theo hướng dẫn trên bao bì.",
+    "hsd": "Xem ngày sản xuất và hạn sử dụng in trên bao bì.",
+    "allergens": [],
+    "prep_days": 0,
+    "occasions": [
+      "moi-ngay",
+      "bieu-tang"
+    ],
+    "flavor": [],
+    "pair": [],
+    "dna": null,
+    "avoid": [
+      "caffeine"
+    ],
+    "rank": 3,
+    "new": false
+  },
+  {
+    "id": "T01",
+    "slug": "tra-dong-phuong-my-nhan",
+    "type": "tra",
+    "name": "Trà Đông Phương Mỹ Nhân Thượng Hạng HSĐ",
+    "brand": "Hằng Sơn Điền",
+    "line": "Ô long",
+    "group": "o-long",
+    "image_stem": "tra-dong-phuong-my-nhan",
+    "region": "Thông tin vùng nguyên liệu đang cập nhật",
+    "art": "pouch",
+    "color": "#6A8543",
+    "taste_note": "Quy cách 100g · Trà Hằng Sơn Điền",
+    "desc": "Trà Đông Phương Mỹ Nhân Thượng Hạng HSĐ, quy cách 100g. Giá niêm yết theo danh mục Hằng Sơn Điền do nhóm cung cấp.",
+    "variants": [
+      {
+        "sku": "HSD-DPMN-100",
+        "label": "Gói 100g",
+        "price": 296000,
+        "stock": 30,
+        "slots": 2
+      }
+    ],
+    "profile": {
+      "Dòng trà": "Ô long",
+      "Quy cách": "100g"
+    },
+    "brew": null,
+    "ingredients": "Xem thông tin thành phần trên bao bì sản phẩm.",
+    "storage": "Bảo quản theo hướng dẫn trên bao bì.",
+    "hsd": "Xem ngày sản xuất và hạn sử dụng in trên bao bì.",
+    "allergens": [],
+    "prep_days": 0,
+    "occasions": [
+      "moi-ngay",
+      "bieu-tang"
+    ],
+    "flavor": [],
+    "pair": [],
+    "dna": null,
+    "avoid": [
+      "caffeine"
+    ],
+    "rank": 4,
+    "new": false
+  },
+  {
+    "id": "T09",
+    "slug": "tra-o-long-tuyet-thuong-hang",
+    "type": "tra",
+    "name": "Trà Ô Long Tuyết Thượng Hạng HSĐ",
+    "brand": "Hằng Sơn Điền",
+    "line": "Ô long",
+    "group": "o-long",
+    "image_stem": "tra-o-long-tuyet-thuong-hang",
+    "region": "Thông tin vùng nguyên liệu đang cập nhật",
+    "art": "pouch",
+    "color": "#6A8543",
+    "taste_note": "Quy cách 100g · Trà Hằng Sơn Điền",
+    "desc": "Trà Ô Long Tuyết Thượng Hạng HSĐ, quy cách 100g. Giá niêm yết theo danh mục Hằng Sơn Điền do nhóm cung cấp.",
+    "variants": [
+      {
+        "sku": "HSD-T09-100",
+        "label": "Gói 100g",
+        "price": 370000,
+        "stock": 30,
+        "slots": 2
+      }
+    ],
+    "profile": {
+      "Dòng trà": "Ô long",
+      "Quy cách": "100g"
+    },
+    "brew": null,
+    "ingredients": "Xem thông tin thành phần trên bao bì sản phẩm.",
+    "storage": "Bảo quản theo hướng dẫn trên bao bì.",
+    "hsd": "Xem ngày sản xuất và hạn sử dụng in trên bao bì.",
+    "allergens": [],
+    "prep_days": 0,
+    "occasions": [
+      "moi-ngay",
+      "bieu-tang"
+    ],
+    "flavor": [],
+    "pair": [],
+    "dna": null,
+    "avoid": [
+      "caffeine"
+    ],
+    "rank": 5,
+    "new": false
+  },
+  {
+    "id": "T10",
+    "slug": "tra-o-long-que-hoa-thuong-hang",
+    "type": "tra",
+    "name": "Trà Ô Long Quế Hoa Thượng Hạng HSĐ",
+    "brand": "Hằng Sơn Điền",
+    "line": "Ô long",
+    "group": "o-long",
+    "image_stem": "tra-o-long-que-hoa-thuong-hang",
+    "region": "Thông tin vùng nguyên liệu đang cập nhật",
+    "art": "pouch",
+    "color": "#6A8543",
+    "taste_note": "Quy cách 100g · Trà Hằng Sơn Điền",
+    "desc": "Trà Ô Long Quế Hoa Thượng Hạng HSĐ, quy cách 100g. Giá niêm yết theo danh mục Hằng Sơn Điền do nhóm cung cấp.",
+    "variants": [
+      {
+        "sku": "HSD-T10-100",
+        "label": "Gói 100g",
+        "price": 222000,
+        "stock": 30,
+        "slots": 2
+      }
+    ],
+    "profile": {
+      "Dòng trà": "Ô long",
+      "Quy cách": "100g"
+    },
+    "brew": null,
+    "ingredients": "Xem thông tin thành phần trên bao bì sản phẩm.",
+    "storage": "Bảo quản theo hướng dẫn trên bao bì.",
+    "hsd": "Xem ngày sản xuất và hạn sử dụng in trên bao bì.",
+    "allergens": [],
+    "prep_days": 0,
+    "occasions": [
+      "moi-ngay",
+      "bieu-tang"
+    ],
+    "flavor": [],
+    "pair": [],
+    "dna": null,
+    "avoid": [
+      "caffeine"
+    ],
+    "rank": 6,
+    "new": false
+  },
+  {
+    "id": "T11",
+    "slug": "tra-o-long-tu-quy",
+    "type": "tra",
+    "name": "Trà Ô Long Tứ Quý HSĐ",
+    "brand": "Hằng Sơn Điền",
+    "line": "Ô long",
+    "group": "o-long",
+    "image_stem": "tra-o-long-tu-quy",
+    "region": "Thông tin vùng nguyên liệu đang cập nhật",
+    "art": "pouch",
+    "color": "#6A8543",
+    "taste_note": "Quy cách 250g · Trà Hằng Sơn Điền",
+    "desc": "Trà Ô Long Tứ Quý HSĐ, quy cách 250g. Giá niêm yết theo danh mục Hằng Sơn Điền do nhóm cung cấp.",
+    "variants": [
+      {
+        "sku": "HSD-T11-250",
+        "label": "Gói 250g",
+        "price": 130000,
+        "stock": 30,
+        "slots": 3
+      }
+    ],
+    "profile": {
+      "Dòng trà": "Ô long",
+      "Quy cách": "250g"
+    },
+    "brew": null,
+    "ingredients": "Xem thông tin thành phần trên bao bì sản phẩm.",
+    "storage": "Bảo quản theo hướng dẫn trên bao bì.",
+    "hsd": "Xem ngày sản xuất và hạn sử dụng in trên bao bì.",
+    "allergens": [],
+    "prep_days": 0,
+    "occasions": [
+      "moi-ngay",
+      "bieu-tang"
+    ],
+    "flavor": [],
+    "pair": [],
+    "dna": null,
+    "avoid": [
+      "caffeine"
+    ],
+    "rank": 7,
+    "new": false
+  },
+  {
+    "id": "T12",
+    "slug": "tra-o-long-kim-tuyen",
+    "type": "tra",
+    "name": "Trà Ô Long Kim Tuyên HSĐ",
+    "brand": "Hằng Sơn Điền",
+    "line": "Ô long",
+    "group": "o-long",
+    "image_stem": "tra-o-long-kim-tuyen",
+    "region": "Thông tin vùng nguyên liệu đang cập nhật",
+    "art": "pouch",
+    "color": "#6A8543",
+    "taste_note": "Quy cách 250g · Trà Hằng Sơn Điền",
+    "desc": "Trà Ô Long Kim Tuyên HSĐ, quy cách 250g. Giá niêm yết theo danh mục Hằng Sơn Điền do nhóm cung cấp.",
+    "variants": [
+      {
+        "sku": "HSD-T12-250",
+        "label": "Gói 250g",
+        "price": 110000,
+        "stock": 30,
+        "slots": 3
+      }
+    ],
+    "profile": {
+      "Dòng trà": "Ô long",
+      "Quy cách": "250g"
+    },
+    "brew": null,
+    "ingredients": "Xem thông tin thành phần trên bao bì sản phẩm.",
+    "storage": "Bảo quản theo hướng dẫn trên bao bì.",
+    "hsd": "Xem ngày sản xuất và hạn sử dụng in trên bao bì.",
+    "allergens": [],
+    "prep_days": 0,
+    "occasions": [
+      "moi-ngay",
+      "bieu-tang"
+    ],
+    "flavor": [],
+    "pair": [],
+    "dna": null,
+    "avoid": [
+      "caffeine"
+    ],
+    "rank": 8,
+    "new": false
+  },
+  {
+    "id": "T13",
+    "slug": "tra-o-long-cao-son",
+    "type": "tra",
+    "name": "Trà Ô Long Cao Sơn HSĐ",
+    "brand": "Hằng Sơn Điền",
+    "line": "Ô long",
+    "group": "o-long",
+    "image_stem": "tra-o-long-cao-son",
+    "region": "Thông tin vùng nguyên liệu đang cập nhật",
+    "art": "pouch",
+    "color": "#6A8543",
+    "taste_note": "Quy cách 250g · Trà Hằng Sơn Điền",
+    "desc": "Trà Ô Long Cao Sơn HSĐ, quy cách 250g. Giá niêm yết theo danh mục Hằng Sơn Điền do nhóm cung cấp.",
+    "variants": [
+      {
+        "sku": "HSD-T13-250",
+        "label": "Gói 250g",
+        "price": 130000,
+        "stock": 30,
+        "slots": 3
+      }
+    ],
+    "profile": {
+      "Dòng trà": "Ô long",
+      "Quy cách": "250g"
+    },
+    "brew": null,
+    "ingredients": "Xem thông tin thành phần trên bao bì sản phẩm.",
+    "storage": "Bảo quản theo hướng dẫn trên bao bì.",
+    "hsd": "Xem ngày sản xuất và hạn sử dụng in trên bao bì.",
+    "allergens": [],
+    "prep_days": 0,
+    "occasions": [
+      "moi-ngay",
+      "bieu-tang"
+    ],
+    "flavor": [],
+    "pair": [],
+    "dna": null,
+    "avoid": [
+      "caffeine"
+    ],
+    "rank": 9,
+    "new": false
+  },
+  {
+    "id": "T14",
+    "slug": "tra-o-long-tu-quy-cao-cap",
+    "type": "tra",
+    "name": "Trà Ô Long Tứ Quý Cao Cấp HSĐ",
+    "brand": "Hằng Sơn Điền",
+    "line": "Ô long",
+    "group": "o-long",
+    "image_stem": "tra-o-long-tu-quy-cao-cap",
+    "region": "Thông tin vùng nguyên liệu đang cập nhật",
+    "art": "pouch",
+    "color": "#6A8543",
+    "taste_note": "Quy cách 250g · Trà Hằng Sơn Điền",
+    "desc": "Trà Ô Long Tứ Quý Cao Cấp HSĐ, quy cách 250g. Giá niêm yết theo danh mục Hằng Sơn Điền do nhóm cung cấp.",
+    "variants": [
+      {
+        "sku": "HSD-T14-250",
+        "label": "Gói 250g",
+        "price": 225000,
+        "stock": 30,
+        "slots": 3
+      }
+    ],
+    "profile": {
+      "Dòng trà": "Ô long",
+      "Quy cách": "250g"
+    },
+    "brew": null,
+    "ingredients": "Xem thông tin thành phần trên bao bì sản phẩm.",
+    "storage": "Bảo quản theo hướng dẫn trên bao bì.",
+    "hsd": "Xem ngày sản xuất và hạn sử dụng in trên bao bì.",
+    "allergens": [],
+    "prep_days": 0,
+    "occasions": [
+      "moi-ngay",
+      "bieu-tang"
+    ],
+    "flavor": [],
+    "pair": [],
+    "dna": null,
+    "avoid": [
+      "caffeine"
+    ],
+    "rank": 10,
+    "new": false
+  },
+  {
+    "id": "T15",
+    "slug": "tra-o-long-kim-tuyen-cao-cap",
+    "type": "tra",
+    "name": "Trà Ô Long Kim Tuyên Cao Cấp HSĐ",
+    "brand": "Hằng Sơn Điền",
+    "line": "Ô long",
+    "group": "o-long",
+    "image_stem": "tra-o-long-kim-tuyen-cao-cap",
+    "region": "Thông tin vùng nguyên liệu đang cập nhật",
+    "art": "pouch",
+    "color": "#6A8543",
+    "taste_note": "Quy cách 250g · Trà Hằng Sơn Điền",
+    "desc": "Trà Ô Long Kim Tuyên Cao Cấp HSĐ, quy cách 250g. Giá niêm yết theo danh mục Hằng Sơn Điền do nhóm cung cấp.",
+    "variants": [
+      {
+        "sku": "HSD-T15-250",
+        "label": "Gói 250g",
+        "price": 225000,
+        "stock": 30,
+        "slots": 3
+      }
+    ],
+    "profile": {
+      "Dòng trà": "Ô long",
+      "Quy cách": "250g"
+    },
+    "brew": null,
+    "ingredients": "Xem thông tin thành phần trên bao bì sản phẩm.",
+    "storage": "Bảo quản theo hướng dẫn trên bao bì.",
+    "hsd": "Xem ngày sản xuất và hạn sử dụng in trên bao bì.",
+    "allergens": [],
+    "prep_days": 0,
+    "occasions": [
+      "moi-ngay",
+      "bieu-tang"
+    ],
+    "flavor": [],
+    "pair": [],
+    "dna": null,
+    "avoid": [
+      "caffeine"
+    ],
+    "rank": 11,
+    "new": false
+  }
+]

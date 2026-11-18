@@ -64,7 +64,7 @@
 {% set ok = in_stock(p) %}{% set v0 = p.variants[0] %}
 <article class="pcard {{ 'is-out' if not ok }}">
   <a href="{{ product_url(p) }}" class="pcard-img" aria-label="Xem chi tiết {{ p.name }}">
-    {{ art(p.art, p.color, p.name, note=False) }}
+    {{ product_image(p) }}
     <span class="badges">
       {% if not ok %}<span class="badge badge-out">Tạm hết</span>{% endif %}
       {% if p.made_to_order %}<span class="badge badge-pre">Cần đặt trước</span>{% endif %}
@@ -119,4 +119,46 @@
 {% elif name == 'gift' %}<svg viewBox="0 0 24 24" class="ic"><rect x="3" y="8" width="18" height="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5 12v9h14v-9M12 8v13M12 8C10 3 6 4 7.5 7M12 8c2-5 6-4 4.5-1" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
 {% elif name == 'pen' %}<svg viewBox="0 0 24 24" class="ic"><path d="M4 20h4L19 9l-4-4L4 16z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
 {% endif %}
+{%- endmacro %}
+
+
+{# ====== Ảnh thật nếu có file trong static/img/, chưa có thì hiện ảnh minh họa SVG ======
+   file: tên trong static/img (vd 'cover-desktop.jpg'); kind/color: ảnh SVG tạm; cap: chú thích đúng tính chất ảnh #}
+{% macro pic(file, alt, ratio='4/3', kind='leaf', color='#8C9A4B', cap='') -%}
+{% if file and has_img(file) %}
+<figure class="pic" style="aspect-ratio: {{ ratio }}">
+  <img src="{{ site_image_url(file) }}" alt="{{ alt }}" loading="lazy" decoding="async">
+  {% if cap %}<figcaption>{{ cap }}</figcaption>{% endif %}
+</figure>
+{% else %}
+{{ art(kind, color, alt, ratio) }}
+{% endif %}
+{%- endmacro %}
+
+{# ====== Đồi trà (SVG) – ảnh tạm cho khối câu chuyện, thay bằng ảnh thật ====== #}
+{% macro hills(ratio='4/3') -%}
+<div class="art hills" style="aspect-ratio: {{ ratio }}" role="img" aria-label="Ảnh minh họa đồi trà">
+  <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="width:100%;height:100%">
+    <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6E6C4"/><stop offset="1" stop-color="#FBF3DF"/></linearGradient></defs>
+    <rect width="400" height="300" fill="url(#sky)"/>
+    <circle cx="300" cy="82" r="30" fill="#F1C877" opacity=".75"/>
+    <path d="M0 150 Q90 100 190 140 T400 120 V300 H0Z" fill="#B7C58A"/>
+    <path d="M0 185 Q110 135 220 175 T400 158 V300 H0Z" fill="#8FA55B"/>
+    <path d="M0 225 Q120 180 240 215 T400 200 V300 H0Z" fill="#5E7D2A"/>
+    <g stroke="#3B630D" stroke-width="3" fill="none" opacity=".45" stroke-linecap="round">
+      <path d="M-10 262 Q110 222 230 252 T420 238"/><path d="M-10 280 Q120 244 240 272 T420 262"/>
+    </g>
+  </svg>
+  <span class="art-note">Ảnh minh họa</span>
+</div>
+{%- endmacro %}
+
+
+{% macro product_image(p, ratio='1/1', note=False) -%}
+{% set src = product_photo_url(p) %}
+{% if src %}
+<div class="product-photo" style="aspect-ratio: {{ ratio }}">
+  <img src="{{ src }}" alt="{{ p.name }} – {{ p.variants[0].label }}" loading="lazy" decoding="async">
+</div>
+{% else %}{{ art(p.art, p.color, p.name, ratio, note) }}{% endif %}
 {%- endmacro %}

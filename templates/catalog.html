@@ -5,8 +5,31 @@
 <section class="page-hero section-cream">
   <div class="container">
     {{ m.crumbs([('Sản phẩm', url_for('catalog') if loai else None)] + ([(D.TYPE_LABEL[loai], None)] if loai in D.TYPE_LABEL else [])) }}
+    {% set covers = {
+      'tra': ('Trà', 'Một ấm trà, một khoảng thảnh thơi.', 'cover-tra.jpg', [('pouch','#7C8F3A'),('tin','#B4762E'),('pouch','#5E7D2A')]),
+      'banh': ('Bánh từ trà', 'Thêm chút ngọt cho buổi ngồi cùng nhau.', 'cover-banh.jpg', [('cake','#C08A3E'),('cookie','#7C9A3F'),('madeleine','#D2A24C')]),
+      'gift': ('Hộp quà', 'Chọn một món quà, gửi một lời thương.', 'cover-hopqua.jpg', [('giftbox','#3B630D'),('card','#503021'),('giftbox','#8C9A4B')]) } %}
+    {% if loai in covers %}
+    {% set cv = covers[loai] %}
+    {% set cover_src = site_image_url(cv[2]) %}
+    {% set mobile_src = site_image_url(cv[2].replace('.jpg', '-mobile.jpg')) %}
+    <div class="cat-cover cat-cover-{{ loai }} {{ 'has-photo' if cover_src }}">
+      {% if cover_src %}
+      <picture class="cat-cover-photo">
+        {% if mobile_src %}<source media="(max-width: 767px)" srcset="{{ mobile_src }}">{% endif %}
+        <img src="{{ cover_src }}" alt="{{ cv[0] }} Trồng Vị Nhà" fetchpriority="high">
+      </picture>
+      {% endif %}
+      <div class="cat-cover-text">
+        <h1>{{ cv[0] }}</h1>
+        <p class="lead">{{ cv[1] }}</p>
+      </div>
+      {% if not cover_src %}<div class="category-photo-pending">Ảnh {{ cv[0] | lower }} đang cập nhật</div>{% endif %}
+    </div>
+    {% else %}
     <h1>Khám phá Trà • Bánh từ trà • Hộp quà</h1>
     <p class="lead">Một nơi để chọn vị trà mình thích, chiếc bánh đi cùng và món quà gửi người thương.</p>
+    {% endif %}
     <nav class="tabs tabs-link" aria-label="Danh mục">
       <a class="tab {{ 'active' if not loai }}" href="{{ url_for('catalog') }}">Tất cả <small>{{ D.PRODUCTS|length }}</small></a>
       <a class="tab {{ 'active' if loai=='tra' }}" href="{{ url_for('catalog', cat='tra') }}">Trà <small>{{ counts.tra }}</small></a>

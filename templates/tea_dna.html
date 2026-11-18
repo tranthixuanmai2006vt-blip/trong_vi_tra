@@ -27,10 +27,12 @@
       <fieldset class="dq" id="{{ q.id }}" data-qid="{{ q.id }}" data-type="{{ q.type }}">
         <legend><span class="dq-no">Câu {{ loop.index }}</span><span class="dq-text">{{ q.text }}</span></legend>
         {% if q.type == 'scale' %}
-        <div class="scale">
-          <span class="pole">{{ q.left }}</span>
-          <div class="scale-btns">{% for i in range(1, 6) %}<label class="sbtn"><input type="radio" name="{{ q.id }}" value="{{ i }}"><span>{{ i }}</span></label>{% endfor %}</div>
-          <span class="pole pole-r">{{ q.right }}</span>
+        <div class="slider" data-slider="{{ q.id }}">
+          <p class="slider-now" aria-live="polite"><span data-now>Kéo hoặc chạm vào thanh để chọn</span></p>
+          <input type="range" class="range" name="{{ q.id }}" min="1" max="5" step="0.25" value="3"
+                 aria-label="{{ q.text }}" aria-valuetext="Chưa chọn" data-left="{{ q.left }}" data-right="{{ q.right }}">
+          <div class="slider-poles"><span>{{ q.left }}</span><span>{{ q.right }}</span></div>
+          <button type="button" class="btn btn-sm btn-secondary slider-keep" data-keep="{{ q.id }}">Chọn mức này</button>
         </div>
         {% elif q.type == 'single' %}
         <div class="opts {{ 'opts-grid' if q.grid }}">{% for oid, label, val in q.options %}<label class="ocard"><input type="radio" name="{{ q.id }}" value="{{ oid }}"><span>{{ label }}</span></label>{% endfor %}</div>

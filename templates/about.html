@@ -1,30 +1,61 @@
 {% extends 'base.html' %}{% import 'macros.html' as m with context %}
-{% block title %}Về Hằng Sơn Điền{% endblock %}
+{% block title %}Về chúng tôi{% endblock %}
 {% block content %}
+{# 01 – MỞ ĐẦU: hai câu chuyện #}
 <section class="page-hero section-cream">
   <div class="container hero-grid">
     <div>
-      {{ m.crumbs([('Về Hằng Sơn Điền', None)]) }}
-      <h1>Về Hằng Sơn Điền</h1>
-      <p class="lead">Từ sự trân trọng lá trà Việt, chúng tôi phát triển các sản phẩm trà dành cho việc thưởng thức và trao tặng. {{ SITE.name }} là không gian giới thiệu trà, bánh từ trà và những món quà mang dấu ấn riêng.</p>
+      {{ m.crumbs([('Về chúng tôi', None)]) }}
+      <h1>Hai câu chuyện, cùng vun một vị nhà</h1>
+      <p class="lead">Một bên là những lá trà được chọn lọc. Một bên là những chiếc bánh, hộp quà và lời nhắn gửi đi. Đặt cạnh nhau, chúng thành một hành trình từ đồi trà đến bàn ăn của người thân.</p>
       <div class="cta-row">
         <a href="{{ url_for('catalog', cat='tra') }}" class="btn">Khám phá dòng trà</a>
-        <a href="#cau-chuyen" class="btn btn-secondary">Đọc hành trình thương hiệu</a>
+        <a href="#cau-chuyen" class="btn btn-secondary">Đọc hành trình</a>
       </div>
     </div>
     <div class="about-logo"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Hằng Sơn Điền × Trà"></div>
   </div>
 </section>
 
-<section class="section" id="cau-chuyen">
-  <div class="container narrow">
-    <div class="sec-head"><h2>Câu chuyện phía sau tên gọi</h2></div>
-    <ol class="timeline">
-      <li><b>Khởi nguồn từ tình yêu trà</b><p>Hằng Sơn Điền (恒山田) – “ruộng trên núi bền lâu” – gửi gắm mong muốn gìn giữ những đồi trà và người làm trà.</p></li>
-      <li><b>Duy trì lựa chọn trà chất lượng</b><p>Tập trung vào các dòng ô long, matcha và trà xanh, chọn lọc kỹ trước khi đến tay người thưởng trà.</p></li>
-      <li><b>Phát triển trải nghiệm trà – bánh – quà</b><p>Cùng {{ SITE.name }} đưa trà vào bánh, vào hộp quà và vào những khoảnh khắc kết nối.</p></li>
+<section class="section section-tight">
+  <div class="container">
+    <div class="duo">
+      <article class="duo-card reveal">
+        <p class="eyebrow">Doanh nghiệp</p>
+        <h2 class="h3">{{ SITE.partner }}</h2>
+        <p>Doanh nghiệp cung cấp sản phẩm trà: ô long, matcha, trà xanh, hồng trà, được chọn lọc kỹ trước khi đến tay người thưởng trà.</p>
+      </article>
+      <span class="duo-x" aria-hidden="true">×</span>
+      <article class="duo-card reveal">
+        <p class="eyebrow">Dự án</p>
+        <h2 class="h3">{{ SITE.name }}</h2>
+        <p>Dự án phát triển bánh từ trà, hộp quà cá nhân hóa và ứng dụng giấy trà, đưa trà vào những khoảnh khắc ăn uống và trao tặng.</p>
+      </article>
+    </div>
+    <ol class="link-chain" aria-label="Mối liên kết">
+      <li>Nguồn trà</li><li>Cách thưởng thức mới</li><li>Món quà gửi đi</li>
     </ol>
-    <p class="note">* Ý nghĩa tên gọi, các mốc thời gian và trích dẫn sẽ được cập nhật theo nội dung chủ thương hiệu duyệt.</p>
+    <p class="note center">* Hằng Sơn Điền là tên doanh nghiệp; Trồng Vị Nhà là tên dự án. Mốc thời gian và quy mô chỉ bổ sung khi có dữ liệu xác nhận.</p>
+  </div>
+</section>
+
+{# 02 – CÂU CHUYỆN DẠNG KHUNG ẢNH #}
+<section class="section" id="cau-chuyen">
+  <div class="container">
+    <div class="sec-head"><h2>Câu chuyện đi qua từng chặng</h2></div>
+    <ol class="mosaic">
+      {% for no, label, title, text, file, kind, color in [
+        ('01','Khởi nguồn','Nơi lá trà bắt đầu','Hằng Sơn Điền (恒山田) mang ý nghĩa “ruộng trên núi bền lâu”, gửi gắm mong muốn gìn giữ đồi trà và người làm trà.','story-1.jpg','leaf','#5E7D2A'),
+        ('02','Thử nghiệm','Trà gặp chiếc bánh','Lá trà, bột matcha và nước cốt trà bước vào căn bếp, trở thành hương vị chính trong từng mẻ bánh nhỏ.','story-2.jpg','cake','#C08A3E'),
+        ('03','Hoàn thiện','Gói lại thành món quà','Chọn hộp, giấy gói, thiệp, rồi viết lời nhắn riêng. Mỗi hộp quà được chuẩn bị như một lá thư nhỏ.','story-3.jpg','giftbox','#503021'),
+        ('04','Trao đi','Đem vị nhà đến người nhận','Món quà đến tay người thương, mở ra một buổi ngồi cùng nhau bên ấm trà và đĩa bánh.','story-4.jpg','pouch','#8C9A4B')] %}
+      <li class="mo mo-{{ loop.index }} reveal">
+        <div class="mo-img">{{ m.pic(file, title, '4/3', kind, color) }}</div>
+        <div class="mo-text"><span class="mo-label">{{ no }} · {{ label }}</span><h3>{{ title }}</h3><p>{{ text }}</p></div>
+      </li>
+      {% endfor %}
+    </ol>
+    <p class="note">* Ảnh hiện là ảnh minh họa; sẽ thay bằng ảnh vùng trà, làm bánh, gói quà và trao quà khi có.</p>
   </div>
 </section>
 
@@ -40,29 +71,35 @@
   </div>
 </section>
 
+{# 03 – HÀNH TRÌNH TỪ VÙNG TRÀ (mỗi vùng một ảnh 4:3) #}
 <section class="section" id="nguon-tra">
   <div class="container">
     <div class="sec-head"><h2>Hành trình từ vùng trà</h2><p class="muted">Chọn một vùng để xem các dòng trà liên quan.</p></div>
-    <div class="region-grid">
+    <div class="region-grid region-cards">
       {% set regions = [
-        ('Vùng ô long cao nguyên', 'o-long', 'Khí hậu mát quanh năm, sương sớm – phù hợp các dòng ô long lên men nhẹ đến lên men cao.'),
-        ('Vùng trà xanh che bóng', 'matcha', 'Lá trà được che bóng trước thu hoạch để giữ màu xanh và vị umami cho matcha.'),
-        ('Vùng trà xanh trung du', 'tra-xanh', 'Nguồn trà xanh dùng ướp hoa nhài theo phương pháp truyền thống.')] %}
-      {% for name, grp, desc in regions %}
-      <details class="region reveal" {{ 'open' if loop.first }}>
-        <summary><h3>{{ name }}</h3><span class="tag">{{ D.TEA_GROUPS[grp] }}</span></summary>
-        <p>{{ desc }}</p>
-        <ul class="mini-list">
-          {% for p in D.PRODUCTS if p.type=='tra' and p.region==name %}<li><a href="{{ product_url(p) }}">{{ p.name }}</a></li>{% endfor %}
-        </ul>
-        <a class="link" href="{{ url_for('catalog', cat='tra', nhom=grp) }}">Xem dòng trà →</a>
-      </details>
+        ('Vùng ô long cao nguyên', 'o-long', 'Khí hậu mát quanh năm, sương sớm.', 'region-olong.jpg', '#7C8F3A'),
+        ('Vùng trà xanh che bóng', 'matcha', 'Lá được che bóng để giữ màu xanh, vị umami.', 'region-matcha.jpg', '#5E7D2A'),
+        ('Vùng trà xanh trung du', 'tra-xanh', 'Nguồn trà xanh dùng ướp hoa nhài.', 'region-traxanh.jpg', '#8C9A4B')] %}
+      {% for name, grp, desc, file, color in regions %}
+      <article class="region-card reveal">
+        <div class="rc-img">{{ m.pic(file, name, '4/3', 'leaf', color) }}</div>
+        <div class="rc-body">
+          <span class="tag">{{ D.TEA_GROUPS[grp] }}</span>
+          <h3>{{ name }}</h3>
+          <p>{{ desc }}</p>
+          <ul class="mini-list">
+            {% for p in D.PRODUCTS if p.type=='tra' and p.region==name %}<li><a href="{{ product_url(p) }}">{{ p.name }}</a></li>{% endfor %}
+          </ul>
+          <a class="link" href="{{ url_for('catalog', cat='tra', nhom=grp) }}">Xem dòng trà →</a>
+        </div>
+      </article>
       {% endfor %}
     </div>
-    <p class="note">* Tên vùng, tỉnh, mùa vụ và đối tác cung cấp chỉ hiển thị khi đã được xác nhận theo từng SKU.</p>
+    <p class="note">* Ảnh là ảnh minh họa. Tên vùng, tỉnh, mùa vụ và đối tác cung cấp chỉ hiển thị khi đã được xác nhận theo từng SKU.</p>
   </div>
 </section>
 
+{# 04 – QUY TRÌNH: bộ 4 khung liên kết #}
 <section class="section section-cream" id="chat-luong">
   <div class="container">
     <div class="sec-head"><h2>Chăm chút từ lá trà đến thành phẩm</h2></div>
@@ -71,18 +108,19 @@
       <button class="tab" data-tab="banh-qt" role="tab" aria-selected="false">Quy trình bánh</button>
       <button class="tab" data-tab="cl" role="tab" aria-selected="false">Chất lượng</button>
     </div>
-    <ol class="steps-row tabpanel" data-panel="tra-qt">
-      <li><b>Tiếp nhận nguyên liệu</b><span>Kiểm tra lô lá trà đầu vào.</span></li>
-      <li><b>Phân loại, kiểm tra</b><span>Loại bỏ lá, cọng không đạt.</span></li>
-      <li><b>Chế biến, đóng gói</b><span>Theo quy trình từng dòng trà.</span></li>
-      <li><b>Lưu kho, phân phối</b><span>Khô ráo, tránh mùi.</span></li>
+    {% set procs = {
+      'tra-qt': [('Chọn nguyên liệu','Kiểm tra lô lá trà đầu vào.','qt-tra-1.jpg','leaf'),('Phân loại, kiểm tra','Loại bỏ lá, cọng không đạt.','qt-tra-2.jpg','filter'),('Chế biến, đóng gói','Theo quy trình từng dòng trà.','qt-tra-3.jpg','pouch'),('Thành phẩm','Lưu kho khô ráo, tránh mùi.','qt-tra-4.jpg','tin')],
+      'banh-qt': [('Chọn nguyên liệu','Cân đúng công thức, dùng trà Hằng Sơn Điền.','qt-banh-1.jpg','leaf'),('Phối, thử công thức','Nướng theo mẻ nhỏ.','qt-banh-2.jpg','cookie'),('Kiểm tra, đóng gói','Hộp kín, phù hợp từng loại bánh.','qt-banh-3.jpg','giftbox'),('Thành phẩm','Ghi nhãn: thành phần, dị ứng, ngày làm, HSD.','qt-banh-4.jpg','cake')] } %}
+    {% for key, steps in procs.items() %}
+    <ol class="frames tabpanel" data-panel="{{ key }}" {{ 'hidden' if not loop.first }}>
+      {% for t, d, f, k in steps %}
+      <li class="frame frame-{{ loop.index }}">
+        <div class="frame-img">{{ m.pic(f, t, '1/1', k, '#8C9A4B') }}</div>
+        <span class="frame-no">{{ loop.index }}</span><b>{{ t }}</b><span>{{ d }}</span>
+      </li>
+      {% endfor %}
     </ol>
-    <ol class="steps-row tabpanel" data-panel="banh-qt" hidden>
-      <li><b>Chuẩn bị nguyên liệu</b><span>Cân đúng công thức, trà Hằng Sơn Điền.</span></li>
-      <li><b>Nướng</b><span>Theo mẻ nhỏ.</span></li>
-      <li><b>Đóng gói</b><span>Hộp kín, phù hợp từng loại bánh.</span></li>
-      <li><b>Ghi nhãn</b><span>Thành phần, dị ứng, ngày làm, HSD.</span></li>
-    </ol>
+    {% endfor %}
     <div class="tabpanel" data-panel="cl" hidden>
       <details class="acc"><summary>Kiểm tra đầu vào</summary><p>Mô tả tiêu chí kiểm tra sẽ được cập nhật theo tài liệu doanh nghiệp.</p></details>
       <details class="acc"><summary>Chứng nhận & hồ sơ công bố</summary><p>Chỉ hiển thị chứng nhận khi có bản công khai được phép. Hiện đang cập nhật.</p></details>
@@ -105,11 +143,17 @@
   </div>
 </section>
 
+{# 05 – ĐỘI NGŨ: collage ảnh người thật (chưa có ảnh -> khung chờ, không dùng người AI) #}
 <section class="section section-tint">
-  <div class="container narrow center">
-    <h2>Những người đứng sau tách trà</h2>
-    <p class="lead center-text">Chân dung đội ngũ và đối tác sản xuất sẽ được giới thiệu khi có sự đồng ý. Nếu bạn muốn đồng hành, hợp tác hay chọn quà cho doanh nghiệp, hãy kết nối với chúng tôi.</p>
-    <div class="cta-row center-row"><a href="{{ url_for('contact') }}" class="btn">Liên hệ với chúng tôi</a><a href="{{ url_for('custom_design') }}" class="btn btn-secondary">Thiết kế hộp quà</a></div>
+  <div class="container">
+    <div class="sec-head"><h2>Những người cùng vun vị nhà</h2>
+      <p class="lead">Từ người làm trà đến nhóm phát triển bánh, hộp quà và giấy trà: mỗi người giữ một mắt xích để món quà đến tay bạn trọn vẹn.</p></div>
+    <div class="collage">
+      <div class="col-main">{% if has_img('team-main.jpg') %}{{ m.pic('team-main.jpg','Nhóm Trồng Vị Nhà và Hằng Sơn Điền','4/3') }}{% else %}<div class="ph"><span>Ảnh nhóm</span><small>Sẽ bổ sung khi được đồng ý công bố</small></div>{% endif %}</div>
+      <div class="col-a">{% if has_img('team-1.jpg') %}{{ m.pic('team-1.jpg','Đang làm trà','1/1') }}{% else %}<div class="ph"><span>Đang làm trà</span></div>{% endif %}</div>
+      <div class="col-b">{% if has_img('team-2.jpg') %}{{ m.pic('team-2.jpg','Đang làm bánh','1/1') }}{% else %}<div class="ph"><span>Làm bánh · gói quà</span></div>{% endif %}</div>
+    </div>
+    <div class="cta-row center-row"><a href="{{ url_for('contact') }}" class="btn">Liên hệ với chúng tôi</a></div>
   </div>
 </section>
 {% endblock %}

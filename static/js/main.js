@@ -1,4 +1,4 @@
-/* ================= TRỒNG VỊ TRÀ – script chung ================= */
+/* ================= TRỒNG VỊ NHÀ – script chung ================= */
 const vndFmt = n => (Math.round(n) || 0).toLocaleString('vi-VN') + 'đ';
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -139,5 +139,9 @@ if (bt) { let t = null; bt.onclick = () => {
 /* ---------- Hiệu ứng xuất hiện ---------- */
 if (!reduceMotion && 'IntersectionObserver' in window) {
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .1 });
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  document.querySelectorAll('.reveal').forEach(el => {
+    const sibs = [...el.parentElement.children].filter(c => c.classList.contains('reveal'));
+    el.style.setProperty('--d', Math.min(sibs.indexOf(el), 4) * 75 + 'ms');   // trễ nhau ~75ms, tối đa 4 thẻ
+    io.observe(el);
+  });
 } else document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));

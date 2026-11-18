@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-TRỒNG VỊ TRÀ — Hằng Sơn Điền × Trà
+TRỒNG VỊ NHÀ — Hằng Sơn Điền × Trà
 Website bán trà, bánh từ trà, gift set + dịch vụ tạo hộp quà, thiết kế riêng, Tea DNA.
 
 Chạy trong PyCharm:   Run 'app.py'   →  mở http://127.0.0.1:8000
@@ -167,6 +167,9 @@ def giftbox_quote(cfg):
     for it in cfg.get("items", []):
         ref = BY_SKU.get(it.get("sku"))
         qty = int(it.get("qty", 0) or 0)
+        if not ref and qty > 0:
+            errors.append("Có món trà cũ không còn trong danh mục. Vui lòng chọn lại món cho hộp quà.")
+            continue
         if not ref or qty <= 0 or ref[0]["type"] not in ("tra", "banh"):
             continue
         p, v = ref
@@ -256,6 +259,14 @@ def cart_view(cart, province=None, method=None):
             continue
         ref = BY_SKU.get(ln["sku"])
         if not ref:
+            issues.append("Có sản phẩm cũ không còn trong danh mục. Vui lòng xóa hoặc tạo lại giỏ hàng.")
+            retired = {"name": "Sản phẩm cũ không còn trong danh mục", "slug": "retired", "art": "pouch",
+                       "color": "#8C9A4B", "variants": [{"label": ln["sku"]}]}
+            lines.append({**ln, "retired": True, "name": retired["name"], "variant": ln["sku"],
+                          "product": retired, "variants": [], "unit_price": 0, "total": 0,
+                          "errors": ["Món này đã ngừng bán. Vui lòng xóa và chọn lại trà."],
+                          "url": url_for("catalog", cat="tra")})
+            count += ln["qty"]
             continue
         p, v = ref
         err = None
@@ -317,9 +328,52 @@ def cart_count():
         return 0
 
 
+def has_img(name):
+    return bool(site_image_url(name))
+
+
+def site_image_url(name):
+    """Resolve named page photos, keeping their real image extension."""
+    if not name or os.path.basename(name) != name:
+        return None
+    stem = os.path.splitext(name)[0]
+    for ext in ("webp", "jpg", "jpeg", "png"):
+        filename = "img/" + stem + "." + ext
+        path = os.path.join(app.static_folder, filename)
+        try:
+            stamp = os.stat(path).st_mtime_ns
+        except (FileNotFoundError, NotADirectoryError):
+            continue
+        return url_for("static", filename=filename, v=stamp)
+    return None
+
+
+def product_photo_url(p):
+    """One image for catalog, detail, cart, gift builder and Tea DNA.
+    Resolve on every render, so replacing the file needs no code changes.
+    """
+    stem = p.get("image_stem", p.get("slug", ""))
+    if not stem or os.path.basename(stem) != stem:
+        return None
+    for ext in ("webp", "jpg", "jpeg", "png"):
+        filename = "img/products/" + stem + "." + ext
+        path = os.path.join(app.static_folder, filename)
+        try:
+            stamp = os.stat(path).st_mtime_ns
+        except (FileNotFoundError, NotADirectoryError):
+            continue
+        return url_for("static", filename=filename, v=stamp)
+    return None
+
+
+app.jinja_env.globals["product_photo_url"] = product_photo_url
+app.jinja_env.globals["site_image_url"] = site_image_url
+
+
 @app.context_processor
 def inject():
-    return {"SITE": D.SITE, "cart_count": cart_count(), "year": datetime.now().year, "endpoint": request.endpoint}
+    return {"SITE": D.SITE, "cart_count": cart_count(), "year": datetime.now().year, "endpoint": request.endpoint,
+            "has_img": has_img}
 
 
 # ------------------------------------------------------------------
@@ -327,22 +381,20 @@ def inject():
 # ------------------------------------------------------------------
 @app.route("/")
 def home():
-    prods = [p for p in D.PRODUCTS]
-    tabs = {
-        "ban-chay": sorted(prods, key=lambda p: p["rank"])[:8],
-        "tra": [p for p in prods if p["type"] == "tra"],
-        "banh": [p for p in prods if p["type"] == "banh"],
-        "gift": [p for p in prods if p["type"] == "gift"],
-    }
     arts = sorted(D.ARTICLES, key=lambda a: a["date"], reverse=True)
     feat = next((a for a in arts if a["featured"]), arts[0])
     others = [a for a in arts if a is not feat][:3]
-    return render_template("index.html", tabs=tabs, feat=feat, others=others)
+    return render_template("index.html", feat=feat, others=others)
+
+
+@app.route("/ve-chung-toi")
+def about():
+    return render_template("about.html")
 
 
 @app.route("/ve-hang-son-dien")
-def about():
-    return render_template("about.html")
+def about_old():
+    return redirect(url_for("about"), code=301)
 
 
 # ------------------------------------------------------------------
@@ -500,6 +552,9 @@ def api_cart_update():
     ln = next((l for l in cart["lines"] if l["key"] == d.get("key")), None)
     if not ln:
         return jsonify({"ok": False, "msg": "Dòng hàng không còn trong giỏ."}), 404
+    if ln["kind"] == "product" and ln["sku"] not in BY_SKU:
+        return jsonify({"ok": False, "msg": "Món cũ đã ngừng bán. Vui lòng xóa và chọn lại trà.",
+                        "cart": cart_json(cart)}), 400
     if "sku" in d and ln["kind"] == "product":
         new = BY_SKU.get(d["sku"])
         if new and new[0]["id"] == BY_SKU[ln["sku"]][0]["id"]:
@@ -606,7 +661,7 @@ def giftbox_page():
     bx = {"products": [{**{k: p[k] for k in ("id", "name", "type", "taste_note", "color", "art")},
                         "brand": p.get("brand"), "url": product_url(p), "allergens": p.get("allergens", []),
                         "prep_days": p.get("prep_days", 0), "hsd": p.get("hsd", ""), "storage": p.get("storage", ""),
-                        "desc": p.get("desc", ""), "variants": p["variants"]} for p in pool],
+                        "desc": p.get("desc", ""), "image_url": product_photo_url(p), "variants": p["variants"]} for p in pool],
           "boxes": D.BOXES, "papers": D.PAPERS, "cards": D.CARDS, "accessories": D.ACCESSORIES,
           "wishes": D.WISH_SAMPLES, "packing_days": D.GIFTBOX_PACKING_DAYS}
     pre = request.args.get("sku")
@@ -693,8 +748,8 @@ def article(slug):
 # ------------------------------------------------------------------
 def dna_payload():
     from flask import get_template_attribute
-    art = get_template_attribute("macros.html", "art")
-    prods = [{"art_html": str(art(p["art"], p["color"], p["name"], note=False)),"id": p["id"], "name": p["name"], "type": p["type"], "url": product_url(p), "dna": p["dna"],
+    photo = get_template_attribute("macros.html", "product_image")
+    prods = [{"art_html": str(photo(p)),"id": p["id"], "name": p["name"], "type": p["type"], "url": product_url(p), "dna": p["dna"],
               "avoid": p.get("avoid", []), "allergens": p.get("allergens", []), "price": min_price(p),
               "sku": next((v["sku"] for v in p["variants"] if v["stock"] > 0), None), "stock": in_stock(p),
               "taste": p.get("taste_note", ""), "color": p.get("color"), "art": p.get("art")}

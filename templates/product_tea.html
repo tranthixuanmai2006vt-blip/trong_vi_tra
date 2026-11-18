@@ -5,7 +5,7 @@
   <div class="container">
     {{ m.crumbs([('Sản phẩm', url_for('catalog')), ('Trà', url_for('catalog', cat='tra')), (p.name, None)]) }}
     <div class="pdp">
-      <div class="pdp-gallery">{{ m.art(p.art, p.color, p.name) }}</div>
+      <div class="pdp-gallery">{{ m.product_image(p) }}</div>
       <div class="pdp-info">
         <p class="eyebrow">{{ p.brand }} · {{ p.line }}</p>
         <h1>{{ p.name }}</h1>
@@ -43,6 +43,7 @@
     </div>
     <div>
       <h2>Pha một ấm trà ngon</h2>
+      {% if p.brew %}
       <table class="brew-table">
         <tr><th>Lượng trà</th><td>{{ p.brew.g }} g</td></tr>
         <tr><th>Nước</th><td>{{ p.brew.ml }} ml</td></tr>
@@ -54,6 +55,7 @@
         <button class="btn btn-sm btn-secondary" data-copy="{{ p.name }}: {{ p.brew.g }}g trà / {{ p.brew.ml }}ml nước {{ p.brew.temp }}°C, hãm {{ p.brew.time_s }} giây, pha {{ p.brew.steeps }} lần.">{{ m.icon('copy') }} Sao chép công thức</button>
         <button class="btn btn-sm btn-secondary" id="brewTimer" data-sec="{{ p.brew.time_s }}">⏱ Hẹn giờ {{ p.brew.time_s }} giây</button>
       </div>
+      {% else %}<p class="muted">Hướng dẫn pha cho sản phẩm này đang cập nhật. Xem hướng dẫn trên bao bì hoặc liên hệ để được tư vấn.</p>{% endif %}
       <p class="muted small">Bảo quản: {{ p.storage }} Hạn dùng: {{ p.hsd }}</p>
       <a class="link-sm" href="{{ url_for('article', slug='huong-dan-chon-tra') }}">Xem hướng dẫn chi tiết →</a>
     </div>
@@ -64,7 +66,7 @@
   <div class="container narrow">
     <h2>Thông tin sản phẩm</h2>
     <details class="acc" open><summary>Thành phần</summary><p>{{ p.ingredients }}</p></details>
-    <details class="acc"><summary>Khối lượng & đóng gói</summary><p>{{ p.variants | map(attribute='label') | join(', ') }}. Túi/hũ kín, có lớp chống ẩm.</p></details>
+    <details class="acc"><summary>Khối lượng & đóng gói</summary><p>{{ p.variants | map(attribute='label') | join(', ') }}. Xem hình thức đóng gói thực tế trên bao bì.</p></details>
     <details class="acc"><summary>NSX / HSD</summary><p>{{ p.hsd }}</p></details>
     <details class="acc"><summary>Bảo quản</summary><p>{{ p.storage }}</p></details>
     <details class="acc"><summary>Đơn vị chịu trách nhiệm</summary><p>{{ SITE.company }}. Địa chỉ: {{ SITE.address or 'đang cập nhật' }}.</p></details>
@@ -79,7 +81,7 @@
     <div class="pair-grid">
       {% for c in pairs if c.type == 'banh' %}
       <article class="pair">
-        <a href="{{ product_url(c) }}" class="pair-img">{{ m.art(c.art, c.color, c.name, note=False) }}</a>
+        <a href="{{ product_url(c) }}" class="pair-img">{{ m.product_image(c) }}</a>
         <div>
           <h3><a href="{{ product_url(c) }}">{{ c.name }}</a></h3>
           <p class="muted">{{ c.pair_reason.get(p.id, c.taste_note) }}</p>

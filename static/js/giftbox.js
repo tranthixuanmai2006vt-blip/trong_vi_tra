@@ -87,7 +87,7 @@
       const chosen = p.variants.filter(v => st.items[v.sku] > 0);
       const allOut = p.variants.every(v => v.stock <= 0);
       return `<article class="bx-card ${chosen.length ? 'selected' : ''} ${allOut ? 'is-out' : ''}">
-        <div class="bx-art" style="--c:${p.color}"></div>
+        <div class="bx-art ${p.image_url ? 'has-photo' : ''}" style="--c:${p.color}">${p.image_url ? `<img src="${esc(p.image_url)}" alt="${esc(p.name)}" loading="lazy">` : ''}</div>
         <div class="bx-body"><h4>${esc(p.name)}</h4><p class="small muted">${esc(p.taste_note)}</p>
           ${p.type === 'banh' ? `<p class="small"><span class="pill-warn">Dị ứng: ${esc(p.allergens.join(', '))}</span> · Chuẩn bị ${p.prep_days} ngày</p>` : ''}
           <button class="link-sm" data-detail="${p.id}">Xem chi tiết</button>
