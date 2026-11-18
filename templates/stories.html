@@ -1,76 +1,155 @@
 {% extends 'base.html' %}{% import 'macros.html' as m with context %}
 {% block title %}Chuyện trà{% endblock %}
+{% block bodyclass %}page-stories{% endblock %}
 {% block content %}
-<section class="page-hero section-cream">
-  <div class="container">
-    {{ m.crumbs([('Chuyện trà', None)]) }}
-    <h1>Chuyện trà</h1>
-    <p class="lead">Tin tức, câu chuyện người làm trà, hướng dẫn pha và những kiến thức thú vị bên tách trà.</p>
+{% macro story_image(file, alt, ratio='4/3') -%}
+  <div class="story-image" style="--story-ratio: {{ ratio }}">
+    {% if has_img(file) %}
+      <img src="{{ url_for('static', filename='img/' + file) }}" alt="{{ alt }}" loading="lazy" decoding="async">
+    {% else %}
+      <div class="story-image-empty" aria-label="Vị trí ảnh sẽ được bổ sung">
+        <span class="story-image-mark" aria-hidden="true">✳</span>
+        <span>Ảnh bài viết</span>
+        <small>{{ file }}</small>
+      </div>
+    {% endif %}
+  </div>
+{%- endmacro %}
+
+{# 01 — Mở đầu theo tinh thần trang chủ / Về chúng tôi #}
+<section class="story-hero">
+  <div class="container story-hero-grid">
+    <div class="story-hero-copy">
+      {{ m.crumbs([('Chuyện trà', None)]) }}
+      <p class="eyebrow">Góc thưởng trà · Đọc chậm một chút</p>
+      <h1>Chuyện bên<br>tách trà <em>nhà</em></h1>
+      <p class="lead">Từ cách nhận ra một vị trà, những người nâng niu lá trà, đến cách pha một ấm ngon và trao nhau món quà nhỏ — mỗi câu chuyện đều bắt đầu bằng một lần ngồi lại.</p>
+      <div class="story-hero-actions">
+        <a class="btn" href="#bai-viet">Khám phá câu chuyện <span aria-hidden="true">↓</span></a>
+        <a class="link" href="{{ url_for('tea_dna') }}">Tìm gu trà của bạn →</a>
+      </div>
+      <div class="story-hero-meta"><span>Kiến thức</span><i></i><span>Con người</span><i></i><span>Khoảnh khắc</span></div>
+    </div>
+    <div class="story-hero-collage" aria-label="Khu vực ảnh minh họa chuyện trà">
+      <div class="story-hero-photo story-hero-photo-main">{{ story_image('stories/cover.jpg', 'Câu chuyện về trà', '4/3') }}</div>
+      <div class="story-hero-photo story-hero-photo-small">{{ story_image('stories/leaf.jpg', 'Lá trà', '1/1') }}</div>
+      <span class="story-hero-stamp">Từ lá trà<br>đến vị nhà</span>
+    </div>
   </div>
 </section>
 
-<section class="section section-tight">
+{# 02 — Bài được chọn: khung ảnh để trống, thêm ảnh sau bằng đúng tên file hiển thị #}
+<section class="section story-feature-section">
   <div class="container">
-    <a class="feature-post" href="{{ url_for('article', slug=feat.slug) }}">
-      {{ m.art('leaf', feat.color, feat.title, '16/9') }}
-      <div class="post-body">
+    <div class="story-section-heading">
+      <div><p class="eyebrow">Mở đầu từ đây</p><h2>Một câu chuyện được chọn</h2></div>
+      <span class="story-index">01 / {{ '%02d'|format(arts|length) }}</span>
+    </div>
+    <a class="story-feature" href="{{ url_for('article', slug=feat.slug) }}">
+      <div class="story-feature-visual">{{ story_image('stories/' + feat.slug + '.jpg', feat.title, '5/4') }}<span class="story-photo-caption">Ảnh minh họa · có thể thay sau</span></div>
+      <div class="story-feature-copy">
         <span class="tag">{{ D.ARTICLE_CATS[feat.cat] }}</span>
-        <h2>{{ feat.title }}</h2><p class="lead">{{ feat.summary }}</p>
-        <p class="small muted"><time>{{ feat.date | vndate }}</time> · {{ feat.author }}</p>
-        <span class="btn">Đọc bài</span>
+        <p class="story-feature-kicker">Câu chuyện nổi bật</p>
+        <h3>{{ feat.title }}</h3>
+        <p class="story-summary">{{ feat.summary }}</p>
+        <div class="story-feature-meta"><time>{{ feat.date | vndate }}</time><span>·</span><span>{{ feat.author }}</span></div>
+        <span class="story-read-link">Đọc câu chuyện <b aria-hidden="true">↗</b></span>
       </div>
     </a>
   </div>
 </section>
 
-<section class="section section-tight">
+{# 03 — Lối vào theo chủ đề #}
+<section class="story-path-section">
   <div class="container">
-    <div class="tabs" role="tablist" id="artTabs">
-      <button class="tab active" data-f="" role="tab" aria-selected="true">Tất cả</button>
-      {% for k, v in D.ARTICLE_CATS.items() %}<button class="tab" data-f="{{ k }}" role="tab" aria-selected="false">{{ v }}</button>{% endfor %}
+    <div class="story-section-heading story-path-heading">
+      <div><p class="eyebrow">Chọn điều bạn tò mò</p><h2>Mỗi tách trà, một lối kể</h2></div>
+      <p class="muted">Chạm một chủ đề để lọc bài viết bên dưới.</p>
     </div>
-    <div class="art-grid" id="artGrid">
-      {% for a in rest %}
-      <a class="post post-card" data-cat="{{ a.cat }}" href="{{ url_for('article', slug=a.slug) }}">
-        {{ m.art('leaf', a.color, a.title, '4/3', note=False) }}
-        <div class="post-body"><span class="tag">{{ D.ARTICLE_CATS[a.cat] }}</span><h3>{{ a.title }}</h3><time class="small muted">{{ a.date | vndate }}</time></div>
-      </a>
-      {% if loop.index % 3 == 2 and feature_prods %}
-        {% set fp = feature_prods[(loop.index // 3) % feature_prods|length] %}
-        <div class="inline-product" data-cat="_product">
-          <p class="eyebrow">Sản phẩm nổi bật</p>{{ m.product_card(fp) }}
-        </div>
-      {% endif %}
+    <div class="story-paths" aria-label="Khám phá theo chủ đề">
+      {% for key, label, note, no in [
+        ('kien-thuc','Hiểu vị trà','Hương, hậu vị và cách chọn trà','01'),
+        ('nguoi-trong','Người giữ lá trà','Vùng trà và những bàn tay chăm trà','02'),
+        ('huong-dan','Pha một ấm ngon','Công thức dễ làm tại nhà','03'),
+        ('tra-banh','Trà gặp món ngon','Cách kết hợp trà, bánh và quà','04')]
+      %}
+      <button class="story-path" type="button" data-story-filter="{{ key }}">
+        <span class="story-path-no">{{ no }}</span><span><b>{{ label }}</b><small>{{ note }}</small></span><span class="story-path-arrow" aria-hidden="true">↗</span>
+      </button>
       {% endfor %}
     </div>
-    <p class="center"><button class="btn btn-secondary" id="moreBtn">Xem thêm</button></p>
+  </div>
+</section>
 
-    <div class="newsletter">
-      <h2>Đừng bỏ lỡ những câu chuyện trà vị</h2>
-      <form id="nlForm" novalidate><label for="nlEmail" class="sr-only">Email</label>
-        <input id="nlEmail" type="email" placeholder="Email của bạn" autocomplete="email"><button class="btn">Đăng ký</button></form>
-      <p class="small" id="nlMsg" role="status"></p>
-      <p class="tiny muted">Chúng tôi cam kết bảo mật email của bạn.</p>
+{# 04 — Kho bài viết cuộn dọc #}
+<section class="section story-archive" id="bai-viet">
+  <div class="container">
+    <div class="story-section-heading">
+      <div><p class="eyebrow">Thư viện chuyện trà</p><h2>Lật mở từng câu chuyện</h2></div>
+      <span class="story-count">{{ rest|length }} bài viết</span>
     </div>
+    <div class="story-filter-wrap">
+      <div class="tabs story-tabs" role="tablist" id="artTabs" aria-label="Lọc bài viết theo danh mục">
+        <button class="tab active" data-f="" role="tab" aria-selected="true">Tất cả</button>
+        {% for k, v in D.ARTICLE_CATS.items() %}<button class="tab" data-f="{{ k }}" role="tab" aria-selected="false">{{ v }}</button>{% endfor %}
+      </div>
+    </div>
+    <div class="story-grid" id="artGrid">
+      {% for a in rest %}
+      <a class="story-card" data-cat="{{ a.cat }}" href="{{ url_for('article', slug=a.slug) }}">
+        <div class="story-card-visual">{{ story_image('stories/' + a.slug + '.jpg', a.title, '4/3') }}<span class="story-card-arrow" aria-hidden="true">↗</span></div>
+        <div class="story-card-body">
+          <div class="story-card-meta"><span class="tag">{{ D.ARTICLE_CATS[a.cat] }}</span><time>{{ a.date | vndate }}</time></div>
+          <h3>{{ a.title }}</h3><p>{{ a.summary }}</p>
+          <span class="story-card-read">Đọc bài <span aria-hidden="true">→</span></span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    <p class="center story-more-wrap"><button class="btn btn-secondary" id="moreBtn" type="button">Xem thêm câu chuyện</button></p>
+    <p class="story-empty muted" id="storyEmpty" hidden>Chưa có bài viết trong chủ đề này. Bạn thử chọn chủ đề khác nha.</p>
+  </div>
+</section>
+
+{# 05 — Một điểm dừng nhẹ ở cuối trang #}
+<section class="story-end-section">
+  <div class="container story-end-card">
+    <div><p class="eyebrow">Một gợi ý dành riêng cho bạn</p><h2>Chưa biết bắt đầu từ vị trà nào?</h2><p>Thử vài câu hỏi ngắn để khám phá gu trà, rồi quay lại đọc những câu chuyện hợp với mình.</p></div>
+    <a class="btn btn-light" href="{{ url_for('tea_dna') }}">Khám phá Tea DNA <span aria-hidden="true">→</span></a>
   </div>
 </section>
 {% endblock %}
 {% block scripts %}
 <script>
-const cards = [...document.querySelectorAll('#artGrid > *')]; let shown = 6, filter = '';
-function paint() {
-  let i = 0;
-  cards.forEach(c => { const match = !filter ? true : c.dataset.cat === filter; const show = match && i < shown; if (match) i++; c.hidden = !show; });
-  const total = cards.filter(c => !filter || c.dataset.cat === filter).length, b = document.getElementById('moreBtn');
-  if (shown >= total) { b.textContent = 'Bạn đã xem hết bài viết'; b.disabled = true; } else { b.textContent = 'Xem thêm'; b.disabled = false; }
-  if (!total) document.getElementById('artGrid').insertAdjacentHTML('beforeend', '<p class="muted empty-note">Chưa có bài trong mục này.</p>');
+const cards = [...document.querySelectorAll('#artGrid .story-card')];
+const tabs = [...document.querySelectorAll('#artTabs .tab')];
+const pathButtons = [...document.querySelectorAll('[data-story-filter]')];
+const more = document.getElementById('moreBtn');
+const empty = document.getElementById('storyEmpty');
+let shown = 6, filter = '';
+function paintStories() {
+  const matches = cards.filter(card => !filter || card.dataset.cat === filter);
+  cards.forEach(card => { card.hidden = !matches.includes(card) || matches.indexOf(card) >= shown; });
+  empty.hidden = matches.length > 0;
+  more.hidden = matches.length <= 6;
+  more.disabled = shown >= matches.length;
+  more.textContent = shown >= matches.length ? 'Bạn đã xem hết câu chuyện' : 'Xem thêm câu chuyện';
 }
-document.querySelectorAll('#artTabs .tab').forEach(t => t.onclick = () => {
-  document.querySelectorAll('.empty-note').forEach(e => e.remove());
-  document.querySelectorAll('#artTabs .tab').forEach(x => { x.classList.toggle('active', x === t); x.setAttribute('aria-selected', x === t); });
-  filter = t.dataset.f; shown = 6; paint();
-});
-document.getElementById('moreBtn').onclick = () => { shown += 6; paint(); };
-paint();
+function setStoryFilter(value) {
+  filter = value; shown = 6;
+  tabs.forEach(tab => {
+    const active = tab.dataset.f === value;
+    tab.classList.toggle('active', active);
+    tab.setAttribute('aria-selected', String(active));
+  });
+  paintStories();
+}
+tabs.forEach(tab => tab.addEventListener('click', () => setStoryFilter(tab.dataset.f)));
+pathButtons.forEach(button => button.addEventListener('click', () => {
+  setStoryFilter(button.dataset.storyFilter);
+  document.getElementById('bai-viet').scrollIntoView({ behavior: 'smooth' });
+}));
+more.addEventListener('click', () => { shown += 6; paintStories(); });
+paintStories();
 </script>
 {% endblock %}

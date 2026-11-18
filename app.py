@@ -756,8 +756,7 @@ def stories():
     arts = sorted(D.ARTICLES, key=lambda a: a["date"], reverse=True)
     feat = next((a for a in arts if a["featured"]), arts[0])
     rest = [a for a in arts if a is not feat]
-    feature_prods = [p for p in sorted(D.PRODUCTS, key=lambda p: p["rank"]) if in_stock(p) and p["type"] != "gift"][:3]
-    return render_template("stories.html", feat=feat, rest=rest, feature_prods=feature_prods)
+    return render_template("stories.html", feat=feat, rest=rest, arts=arts)
 
 
 @app.route("/chuyen-tra/<slug>")
