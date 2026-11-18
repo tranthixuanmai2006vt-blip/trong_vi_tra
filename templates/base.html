@@ -55,6 +55,13 @@
       <span class="nav-ink" id="navInk" aria-hidden="true"></span>
     </nav>
     <div class="utils">
+      <div class="lang-sw" data-lang-switch>
+        <button class="util lang-btn" type="button" data-lang-btn aria-haspopup="true" aria-expanded="false" aria-label="Chọn ngôn ngữ / Language">{{ m.icon('globe') }}<b>VI</b></button>
+        <div class="lang-menu notranslate" data-lang-menu hidden translate="no">
+          <a href="#" data-lang="vi" lang="vi">Tiếng Việt</a><a href="#" data-lang="en" lang="en">English</a><a href="#" data-lang="zh-TW" lang="zh-TW">繁體中文（台灣）</a>
+          <small>EN / 繁中: dịch tự động</small>
+        </div>
+      </div>
       <button class="util" id="searchBtn" aria-label="Tìm kiếm" aria-expanded="false">{{ m.icon('search') }}</button>
       <a class="util util-text" href="{{ url_for('track') }}" title="Tra cứu đơn">{{ m.icon('truck') }}<span>Tra cứu</span></a>
       {% if current_user %}
@@ -124,6 +131,7 @@
 <div class="toast-wrap" id="toasts" aria-live="polite"></div>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="{{ url_for('static', filename='js/nav.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lang.js') }}"></script>
 {% with msgs = get_flashed_messages(with_categories=true) %}{% if msgs %}
 <script>{% for cat, msg in msgs %}toast({{ msg | tojson }}, {{ ('error' if cat == 'error' else 'ok') | tojson }});{% endfor %}</script>
 {% endif %}{% endwith %}

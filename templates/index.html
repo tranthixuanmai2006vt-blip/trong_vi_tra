@@ -57,7 +57,7 @@
     <div class="sec-head"><h2>Trao quà theo cách của riêng bạn</h2></div>
     <div class="svc-grid">
       <article class="svc-card reveal">
-        <div class="svc-img">{{ m.pic('svc-tu-tao.jpg', 'Hộp quà có sẵn cùng các món và phụ kiện', '4/3', 'giftbox', '#8C9A4B') }}</div>
+        <div class="svc-img">{{ m.pic('svc-tu-tao.jpg', 'Hộp quà có sẵn cùng các món và phụ kiện', '2/1', 'giftbox', '#8C9A4B') }}</div>
         <div class="svc-body">
           <p class="eyebrow">Chọn mẫu có sẵn, xem giá ngay</p>
           <h3>Tự tạo hộp quà</h3>
@@ -66,7 +66,7 @@
         </div>
       </article>
       <article class="svc-card reveal">
-        <div class="svc-img">{{ m.pic('svc-theo-yeu-cau.jpg', 'Mẫu hộp, thiệp và tag thiết kế riêng', '4/3', 'card', '#503021') }}</div>
+        <div class="svc-img">{{ m.pic('svc-theo-yeu-cau.jpg', 'Mẫu hộp, thiệp và tag thiết kế riêng', '2/1', 'card', '#503021') }}</div>
         <div class="svc-body">
           <p class="eyebrow">Gửi nhu cầu, nhận tư vấn và báo giá</p>
           <h3>Thiết kế hộp quà theo yêu cầu</h3>
@@ -83,7 +83,7 @@
   <div class="container story-grid story-55">
     <div class="story-photo reveal">
       {% if has_img('doi-tra-bao-loc.jpg') %}
-        {{ m.pic('doi-tra-bao-loc.jpg', 'Đồi trà Bảo Lộc buổi sớm', '4/3', cap='Ảnh minh họa cảnh quan đồi trà Bảo Lộc') }}
+        {{ m.pic('doi-tra-bao-loc.jpg', 'Đồi trà Bảo Lộc buổi sớm', '3/1', cap='Ảnh minh họa cảnh quan đồi trà Bảo Lộc') }}
       {% else %}{{ m.hills('4/3') }}{% endif %}
     </div>
     <div class="reveal">
@@ -105,7 +105,7 @@
       <p class="note">* Quy trình và ứng dụng cụ thể đang được xác nhận.</p>
       <div class="cta-row"><a class="btn btn-secondary" href="{{ url_for('about') }}#giay-tra">Khám phá giấy trà</a></div>
     </div>
-    <div class="reveal">{{ m.pic('giay-tra.jpg', 'Giấy trà thủ công', '4/3', 'card', '#8C9A4B') }}</div>
+    <div class="reveal">{{ m.pic('giay-tra.jpg', 'Giấy trà thủ công', '3/1', 'card', '#8C9A4B') }}</div>
   </div>
 </section>
 
@@ -120,26 +120,38 @@
       <div class="cta-row"><a href="{{ url_for('tea_dna') }}" class="btn btn-light btn-lg">Khám phá gu trà</a></div>
     </div>
     {% set g = D.DNA_GROUPS[0] %}
-    <aside class="dna-card reveal reveal-card" aria-label="Hồ sơ gu trà minh họa">
-      <span class="dna-card-badge">Hồ sơ minh họa</span>
+    <aside class="dna-card dna-live reveal reveal-card" aria-label="13 nhân vật Tea DNA" data-groups='{{ D.DNA_GROUPS | map(attribute="id") | list | tojson }}'>
+      <span class="dna-card-badge">1 trong 13 nhân vật</span>
       <div class="dna-card-top">
-        <svg viewBox="0 0 120 110" class="dna-cup" aria-hidden="true">
-          <path d="M44 14c-6 8 6 12 0 22M60 10c-6 8 6 12 0 22M76 14c-6 8 6 12 0 22" stroke="#EDD4AB" stroke-width="3" fill="none" stroke-linecap="round" opacity=".8"/>
-          <path d="M26 46h68v18c0 18-14 30-34 30S26 82 26 64Z" fill="{{ g.color }}"/>
-          <path d="M94 52h8a10 10 0 0 1 0 20h-9" stroke="{{ g.color }}" stroke-width="5" fill="none"/>
-          <ellipse cx="60" cy="46" rx="34" ry="6" fill="#FAF7F0" opacity=".35"/>
-          <ellipse cx="60" cy="102" rx="40" ry="5" fill="#000" opacity=".18"/>
-        </svg>
-        <div><p class="tiny muted-light">Nhóm gu trà</p><h3>{{ g.name }}</h3><p class="tiny">{{ g.tagline }}</p></div>
+        <div class="dna-live-img">{% for x in D.DNA_GROUPS %}<img src="{{ url_for('static', filename='img/teadna/' ~ x.id ~ '-sm.webp') }}" alt="" data-id="{{ x.id }}" data-name="{{ x.name }}" data-tag="{{ x.tagline }}" data-proto="{{ x.proto | join(',') }}" data-tint="{{ D.DNA_GROUP_ART[x.id][0] }}" class="{{ 'on' if loop.first }}" {{ 'loading=lazy' if not loop.first }}>{% endfor %}</div>
+        <div><p class="tiny muted-light">Nhóm gu trà</p><h3 id="dnaLiveName">{{ g.name }}</h3><p class="tiny" id="dnaLiveTag">{{ g.tagline }}</p></div>
       </div>
-      <div class="dna-bars-demo">
-        {% for ax, w in [('Độ ngọt',75),('Độ chua',45),('Độ đắng',20),('Độ đậm trà',35),('Hương',70)] %}
-        <div><span>{{ ax }}</span><i style="--w: {{ w }}%"></i></div>
+      <div class="dna-bars-live">
+        {% for a in D.DNA_AXES %}
+        <div><span>{{ a.label }}</span><i><b style="width: {{ g.proto[loop.index0] }}%"></b></i></div>
         {% endfor %}
       </div>
+      <a class="dna-live-dots" href="{{ url_for('tea_dna') }}" aria-label="Làm Tea DNA để biết bạn là nhân vật nào">{% for x in D.DNA_GROUPS %}<i class="{{ 'on' if loop.first }}"></i>{% endfor %}</a>
     </aside>
   </div>
 </section>
+
+<script>
+(function () {
+  const card = document.querySelector('.dna-live'); if (!card || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const imgs = [...card.querySelectorAll('.dna-live-img img')], bars = [...card.querySelectorAll('.dna-bars-live b')], dots = [...card.querySelectorAll('.dna-live-dots i')];
+  let i = 0;
+  setInterval(() => {
+    if (document.hidden) return;
+    imgs[i].classList.remove('on'); dots[i].classList.remove('on'); i = (i + 1) % imgs.length;
+    const im = imgs[i]; im.classList.add('on'); dots[i].classList.add('on');
+    card.style.setProperty('--tint', im.dataset.tint);
+    const n = document.getElementById('dnaLiveName'), t = document.getElementById('dnaLiveTag');
+    n.textContent = im.dataset.name; t.textContent = im.dataset.tag; n.classList.remove('swap'); void n.offsetWidth; n.classList.add('swap');
+    im.dataset.proto.split(',').forEach((v, k) => bars[k].style.width = v + '%');
+  }, 2800);
+})();
+</script>
 
 {# 07 – CHUYỆN TRÀ #}
 <section class="section">
@@ -147,7 +159,7 @@
     <div class="sec-head sec-head-row"><h2>Những câu chuyện bên tách trà</h2><a class="link" href="{{ url_for('stories') }}">Xem tất cả câu chuyện →</a></div>
     <div class="blog-grid">
       <a class="post post-big reveal" href="{{ url_for('article', slug=feat.slug) }}">
-        {{ m.art('leaf', feat.color, feat.title, '16/9') }}
+        {% if has_img('blog-' ~ feat.slug ~ '.jpg') %}{{ m.pic('blog-' ~ feat.slug ~ '.jpg', feat.title, '16/9') }}{% else %}{{ m.art('leaf', feat.color, feat.title, '16/9') }}{% endif %}
         <div class="post-body"><span class="tag">{{ D.ARTICLE_CATS[feat.cat] }}</span><time>{{ feat.date | vndate }}</time>
           <h3>{{ feat.title }}</h3><p>{{ feat.summary }}</p><span class="link">Đọc bài →</span></div>
       </a>
