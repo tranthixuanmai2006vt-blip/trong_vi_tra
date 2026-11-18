@@ -31,7 +31,7 @@
 <section class="section">
   <div class="container two-col">
     <div>
-      <h2>Hương trà từ Bảo Lộc</h2>
+      <h2>{{ p.story_heading or 'Hương trà từ Bảo Lộc' }}</h2>
       {% for paragraph in p.story %}<p>{{ paragraph }}</p>{% endfor %}
     </div>
     <div>
@@ -64,12 +64,12 @@
         <tr><th>Lượng trà</th><td>{{ p.brew.g }} g</td></tr>
         <tr><th>Nước</th><td>{{ p.brew.ml }} ml</td></tr>
         <tr><th>Nhiệt độ</th><td>{{ p.brew.temp }}°C</td></tr>
-        <tr><th>Thời gian (nước đầu)</th><td>{{ p.brew.time_s }} giây</td></tr>
-        <tr><th>Số lần pha</th><td>{{ p.brew.steeps }} lần</td></tr>
+        <tr><th>Thời gian (nước đầu)</th><td>{{ p.brew.time_label or (p.brew.time_s ~ ' giây') }}</td></tr>
+        {% if p.brew.steeps %}<tr><th>Số lần pha</th><td>{{ p.brew.steeps }} lần</td></tr>{% endif %}
       </table>
       <p class="muted">{{ p.brew.note or '' }}</p>
       <div class="cta-row">
-        <button class="btn btn-sm btn-secondary" data-copy="{{ p.name }}: {{ p.brew.g }}g trà / {{ p.brew.ml }}ml nước {{ p.brew.temp }}°C, hãm {{ p.brew.time_s }} giây, pha {{ p.brew.steeps }} lần.">{{ m.icon('copy') }} Sao chép công thức</button>
+        <button class="btn btn-sm btn-secondary" data-copy="{{ p.name }}: {{ p.brew.g }}g trà / {{ p.brew.ml }}ml nước {{ p.brew.temp }}°C, hãm {{ p.brew.time_label or (p.brew.time_s ~ ' giây') }}{% if p.brew.steeps %}, pha {{ p.brew.steeps }} lần{% endif %}. {{ p.brew.note or '' }}">{{ m.icon('copy') }} Sao chép công thức</button>
         <button class="btn btn-sm btn-secondary" id="brewTimer" data-sec="{{ p.brew.timer_s or p.brew.time_s }}">⏱ Hẹn giờ {{ p.brew.timer_s or p.brew.time_s }} giây</button>
       </div>
       {% else %}<p class="muted">Hướng dẫn pha cho sản phẩm này đang cập nhật. Xem hướng dẫn trên bao bì hoặc liên hệ để được tư vấn.</p>{% endif %}
@@ -80,11 +80,11 @@
   </div>
 </section>
 
-{% if p.suitable_for %}
+{% if p.suitable_for or p.commitments %}
 <section class="section section-cream">
-  <div class="container two-col">
-    <div><h2>Phù hợp với</h2><ul>{% for item in p.suitable_for %}<li>{{ item }}</li>{% endfor %}</ul></div>
-    <div><h2>Cam kết</h2><ul>{% for item in p.commitments %}<li>{{ item }}</li>{% endfor %}</ul></div>
+  <div class="container {{ 'two-col' if p.suitable_for and p.commitments else 'narrow' }}">
+    {% if p.suitable_for %}<div><h2>Phù hợp với</h2><ul>{% for item in p.suitable_for %}<li>{{ item }}</li>{% endfor %}</ul></div>{% endif %}
+    {% if p.commitments %}<div><h2>Cam kết</h2><ul>{% for item in p.commitments %}<li>{{ item }}</li>{% endfor %}</ul></div>{% endif %}
   </div>
 </section>
 {% endif %}
