@@ -8,7 +8,7 @@ Giá, tên và khối lượng 11 sản phẩm trà đã được sửa theo ả
     Đặt DEMO_MODE = False để ẩn dải thông báo "Bản demo" trên website.
 """
 
-DEMO_MODE = True
+DEMO_MODE = False
 
 # -----------------------------------------------------------------
 # THÔNG TIN CHUNG  (để trống "" → website tự hiện "Đang cập nhật")
