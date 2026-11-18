@@ -5,12 +5,13 @@
   <div class="container hero-grid hero-grid-sm">
     <div>
       {{ m.crumbs([('Dịch vụ', None), ('Tạo hộp quà', None)]) }}
-      <h1>Một hộp quà, theo cách của bạn.</h1>
-      <p class="lead">Chọn trà, bánh và cách gói để gửi một món quà mang dấu ấn riêng. Giá được cập nhật theo lựa chọn của bạn.</p>
-      <p class="muted small">Sử dụng sản phẩm, mẫu hộp và phụ kiện có sẵn. Muốn in logo hay thiết kế mới? <a class="link" href="{{ url_for('custom_design') }}" id="toCustom">Cần thiết kế riêng?</a></p>
-      <a href="#builder" class="btn btn-lg" id="startBtn">Bắt đầu tạo quà</a>
+      <p class="eyebrow">Dịch vụ · Tạo hộp quà</p>
+      <h1>Gói một chút hương trà, gửi trọn lời thương.</h1>
+      <p class="lead">Tự chọn trà, bánh, hộp và thiệp. Mỗi bước sẽ hiện riêng để bạn dễ xem lựa chọn và giá trước khi tiếp tục.</p>
+      <div class="giftbox-hero-actions"><a href="#builder" class="btn btn-lg" id="startBtn">Bắt đầu chọn quà <span aria-hidden="true">↓</span></a><a class="link" href="{{ url_for('custom_design') }}" id="toCustom">Cần thiết kế riêng? →</a></div>
+      <p class="muted small">Giá tạm tính cập nhật theo lựa chọn. Phí vận chuyển tính ở bước thanh toán.</p>
     </div>
-    <div>{{ m.art('giftbox', '#8C9A4B', 'hộp quà tự tạo', '4/3') }}</div>
+    <div class="giftbox-hero-visual"><div class="giftbox-photo-placeholder"><span aria-hidden="true">✳</span><b>Ảnh hộp quà</b><small>Chừa chỗ để thêm ảnh sau</small></div><span class="giftbox-hero-stamp">Chọn từng món<br>theo gu của bạn</span></div>
   </div>
 </section>
 
@@ -45,14 +46,14 @@
 
         {# BƯỚC 2 #}
         <div class="step" data-step="2" hidden>
-          <h2 tabindex="-1">Chọn chiếc hộp vừa với món quà của bạn</h2>
+          <h2 tabindex="-1">Chọn chiếc hộp cho món quà</h2>
           <p class="muted" id="slotInfo"></p>
           <div class="opt-grid" id="bxBoxes"></div>
         </div>
 
         {# BƯỚC 3 #}
         <div class="step" data-step="3" hidden>
-          <h2 tabindex="-1">Chọn lớp gói cho lời gửi trao</h2>
+          <h2 tabindex="-1">Chọn giấy gói</h2>
           <p class="muted small">Giấy thủ công có thể khác nhẹ về sắc độ và bề mặt. Ảnh là mẫu chất liệu, không phải ảnh thành phẩm chính xác.</p>
           <div class="opt-grid" id="bxPapers"></div>
         </div>

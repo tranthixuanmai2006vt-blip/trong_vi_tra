@@ -86,16 +86,19 @@
       const opts = p.variants.map(v => `<option value="${v.sku}" ${v.stock <= 0 ? 'disabled' : ''}>${esc(v.label)} – ${vnd(v.price)}${v.stock <= 0 ? ' (tạm hết)' : ''}</option>`).join('');
       const chosen = p.variants.filter(v => st.items[v.sku] > 0);
       const allOut = p.variants.every(v => v.stock <= 0);
+      const teaPacks = p.type === 'tra'
+        ? `<div class="bx-tea-packs">${p.variants.map(v => `<div class="bx-tea-pack"><span class="bx-pack-tag">${esc(v.label.replace(/^Gói\s*/i, ''))}</span><button class="btn btn-sm" data-addtea="${v.sku}" ${v.stock <= 0 ? 'disabled' : ''}>Thêm vào hộp</button></div>`).join('')}</div>`
+        : `<div class="bx-add"><select data-var="${p.id}" aria-label="Quy cách ${esc(p.name)}">${opts}</select><button class="btn btn-sm" data-addbox="${p.id}">Thêm vào hộp</button></div>`;
       return `<article class="bx-card ${chosen.length ? 'selected' : ''} ${allOut ? 'is-out' : ''}">
         <div class="bx-art ${p.image_url ? 'has-photo' : ''}" style="--c:${p.color}">${p.image_url ? `<img src="${esc(p.image_url)}" alt="${esc(p.name)}" loading="lazy">` : ''}</div>
         <div class="bx-body"><h4>${esc(p.name)}</h4><p class="small muted">${esc(p.taste_note)}</p>
           ${p.type === 'banh' ? `<p class="small"><span class="pill-warn">Dị ứng: ${esc(p.allergens.join(', '))}</span> · Chuẩn bị ${p.prep_days} ngày</p>` : ''}
           <button class="link-sm" data-detail="${p.id}">Xem chi tiết</button>
-          ${allOut ? '<p class="err small">Tạm hết hàng</p>' : `<div class="bx-add"><select data-var="${p.id}" aria-label="Quy cách ${esc(p.name)}">${opts}</select>
-          <button class="btn btn-sm" data-addbox="${p.id}">Thêm vào hộp</button></div>`}
+          ${allOut ? '<p class="err small">Tạm hết hàng</p>' : teaPacks}
           ${chosen.map(v => `<div class="bx-chosen"><span>${esc(v.label)}</span><div class="stepper stepper-sm"><button data-dec="${v.sku}" aria-label="Giảm">−</button><b>${st.items[v.sku]}</b><button data-inc="${v.sku}" aria-label="Tăng">+</button></div></div>`).join('')}
         </div></article>`;
     }).join('');
+    $('bxItems').querySelectorAll('[data-addtea]').forEach(b => b.onclick = () => changeQty(b.dataset.addtea, 1));
     $('bxItems').querySelectorAll('[data-addbox]').forEach(b => b.onclick = () => {
       const sku = $('bxItems').querySelector(`[data-var="${b.dataset.addbox}"]`).value; changeQty(sku, 1);
     });

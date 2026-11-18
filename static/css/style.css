@@ -909,6 +909,40 @@ h1, h2, h3 { text-transform: none; }
 .bx-art.has-photo::before,.bx-art.has-photo::after{display:none}
 .bx-art.has-photo img{width:100%;height:100%;object-fit:contain;display:block}
 
+/* ---------- Gift box service refresh ---------- */
+.giftbox-hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin:22px 0 12px}
+.giftbox-hero-actions .link{font-weight:600;color:var(--action)}
+.giftbox-hero-visual{position:relative;min-height:330px;display:grid;place-items:center}
+.giftbox-photo-placeholder{position:relative;width:88%;aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:1px dashed #A9AD81;border-radius:24px;background:radial-gradient(ellipse at 50% 110%,#E7D9B8,transparent 55%),linear-gradient(145deg,#FBF7EF,#F0E7D3);color:var(--text-2);box-shadow:0 24px 50px -40px rgba(47,59,42,.42)}
+.giftbox-photo-placeholder span{font-size:34px;color:var(--accent)}
+.giftbox-photo-placeholder b{font:600 22px var(--serif);color:var(--text)}
+.giftbox-photo-placeholder small{font-size:13px}
+.giftbox-hero-stamp{position:absolute;right:0;bottom:5%;display:grid;place-items:center;width:104px;height:104px;border-radius:50%;background:var(--dark);color:var(--bg-section);text-align:center;font:italic 600 15px/1.25 var(--serif);transform:rotate(7deg);box-shadow:0 14px 28px rgba(47,59,42,.2)}
+#builder{scroll-margin-top:92px}
+#stepbar{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 12px;scrollbar-width:thin;scroll-snap-type:x proximity}
+#stepbar li{flex:0 0 clamp(170px,20%,230px);scroll-snap-align:start}
+#stepbar button{min-height:60px;padding:10px 12px;background:#FFFEFA;border-radius:14px;font-size:14px;line-height:1.35}
+#stepbar .current button{border:2px solid var(--action);background:var(--selected-bg)}
+.step h2{font-size:clamp(28px,3vw,38px);margin:8px 0 20px}
+.step-nav{margin-top:26px;padding-top:20px;border-top:1px solid var(--line)}
+.bx-card{grid-template-columns:86px minmax(0,1fr);align-items:start;gap:14px;padding:16px;border-radius:16px;box-shadow:0 8px 24px -22px rgba(80,48,33,.38);transition:border-color .2s,transform .2s,box-shadow .2s}
+.bx-card:hover{transform:translateY(-2px);box-shadow:0 14px 30px -24px rgba(80,48,33,.42)}
+.bx-card.selected{border-width:2px}
+.bx-art{width:86px;height:86px;border-radius:13px}
+.bx-card h4{font-family:var(--serif);font-size:18px;line-height:1.28}
+.bx-body{gap:8px}
+.bx-body>.small.muted{font-size:14px;line-height:1.55}
+.bx-tea-packs{display:grid;gap:8px;margin-top:3px}
+.bx-tea-pack{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bx-pack-tag{display:inline-flex;align-items:center;min-height:30px;padding:4px 11px;border-radius:999px;background:var(--selected-bg);color:var(--action);font-size:13px;font-weight:700;white-space:nowrap}
+.bx-tea-pack .btn{white-space:nowrap}
+.bx-add{align-items:center}
+.bx-add select{min-width:0;width:auto;flex:1}
+.bx-chosen{font-size:13px;padding:6px 8px 6px 10px}
+.builder{gap:24px}
+.summary{border-radius:18px}
+@media(max-width:767px){.giftbox-hero-visual{min-height:260px}.giftbox-photo-placeholder{width:90%}.giftbox-hero-stamp{width:84px;height:84px;font-size:13px}#stepbar li{flex-basis:190px}.bx-grid{grid-template-columns:1fr}.bx-card{grid-template-columns:72px minmax(0,1fr);gap:12px;padding:13px}.bx-art{width:72px;height:72px}}
+
 /* Named cover photos: full banner on desktop, photo above text on mobile. */
 .cat-cover.has-photo{display:block;position:relative;padding:0;isolation:isolate}
 .cat-cover-photo{position:absolute;inset:0;z-index:-2;display:block}
