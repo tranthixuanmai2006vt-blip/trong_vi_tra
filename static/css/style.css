@@ -812,3 +812,14 @@ h1, h2, h3 { text-transform: none; }
  .cat-cover.has-photo .cat-cover-text{width:100%;min-height:0;padding:22px}
  .category-photo-pending{min-height:150px}
 }
+/* Banner Trà và Bánh: lớp phủ dịu hơn Gift set */
+.cat-cover-tra.has-photo::after,
+.cat-cover-banh.has-photo::after {
+  background: linear-gradient(
+    90deg,
+    rgba(246, 236, 215, 0.82) 0%,
+    rgba(246, 236, 215, 0.62) 30%,
+    rgba(246, 236, 215, 0.12) 55%,
+    transparent 72%
+  );
+}
