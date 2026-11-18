@@ -4,51 +4,44 @@
 {% set base_url = url_for('catalog', cat=cat) %}
 {% macro giftset_cards() %}
 {% set giftsets = [
-  ('khoi-huong', 'Khơi Hương', '#6A8543', 'Mở đầu bằng hương trà thanh dịu.'),
-  ('tron-vi', 'Trọn Vị', '#B18C58', 'Một hộp quà đủ đầy trà và bánh.'),
-  ('giao-hoa', 'Giao Hòa', '#8C5B4B', 'Nơi hương trà gặp vị bánh thân quen.')
+  ('khoi-huong', 'Khơi Hương', '#6A8543'),
+  ('tron-vi', 'Trọn Vị', '#B18C58'),
+  ('giao-hoa', 'Giao Hòa', '#8C5B4B')
 ] %}
 <div class="pgrid pgrid-3 catalog-product-grid catalog-gift-grid">
-  {% for stem, name, color, note in giftsets %}
+  {% for stem, name, color in giftsets %}
   {% set photo = photo_url_for_stem(stem) %}
   <article class="pcard pcard-gift catalog-gift-card">
     <a href="{{ url_for('custom_design') }}" class="pcard-img" aria-label="Tìm hiểu gift set {{ name }}">
       {% if photo %}<div class="product-photo"><img src="{{ photo }}" alt="Gift set {{ name }}" loading="lazy" decoding="async"></div>
-      {% else %}{{ m.art('giftbox', color, 'Gift set ' + name, '5/4') }}{% endif %}
+      {% else %}{{ m.art('giftbox', color, 'Gift set ' + name, '5/4', False) }}{% endif %}
     </a>
-    <div class="pcard-body">
-      <p class="pcard-type">Gift set · Trồng Vị Nhà</p>
-      <h3 class="pcard-name">{{ name }}</h3>
-      <p class="catalog-gift-note">{{ note }}</p>
-      <div class="pcard-foot">
-        <span class="catalog-gift-price">Báo giá theo thành phần</span>
-        <a class="btn btn-sm btn-secondary" href="{{ url_for('custom_design') }}">Tùy chỉnh</a>
-      </div>
-    </div>
+    <div class="pcard-body"><h3 class="pcard-name">{{ name }}</h3></div>
   </article>
   {% endfor %}
 </div>
+{% endmacro %}
+{% macro portfolio_card(p) %}
+<article class="portfolio-card">
+  <a class="portfolio-card-link" href="{{ product_url(p) }}" aria-label="Xem {{ p.name }}">
+    {{ m.product_image(p, '5/4', False) }}
+    <h3>{{ p.name }}</h3>
+  </a>
+</article>
 {% endmacro %}
 <section class="page-hero section-cream">
   <div class="container">
     {{ m.crumbs([('Sản phẩm', url_for('catalog') if loai else None)] + ([(D.TYPE_LABEL[loai], None)] if loai in D.TYPE_LABEL else [])) }}
     {% if loai in ['tra', 'banh'] %}
     {% set category_title = 'Trà' if loai == 'tra' else 'Bánh từ trà' %}
-    <div class="collection-cover collection-cover-{{ loai }}">
-      <div class="collection-collage" aria-label="Một số sản phẩm {{ category_title | lower }}">
-        {% for p in cover_items %}
-        <a class="collection-collage-item collection-collage-item-{{ loop.index }}" href="{{ product_url(p) }}" aria-label="Xem {{ p.name }}">
-          {{ m.product_image(p, '1/1') }}
-        </a>
-        {% endfor %}
-      </div>
-      <div class="collection-cover-copy">
-        <span class="collection-kicker">TRỒNG VỊ NHÀ · {{ counts[loai] }} SẢN PHẨM</span>
+    {% set cover_file = 'cover-tra.png' if loai == 'tra' else 'cover-banh.jpg' %}
+    {% set cover_src = site_image_url(cover_file) %}
+    <div class="cat-cover cat-cover-{{ loai }} has-photo">
+      {% if cover_src %}<picture class="cat-cover-photo"><img src="{{ cover_src }}" alt="{{ category_title }} – Trồng Vị Nhà" fetchpriority="high"></picture>{% endif %}
+      <div class="cat-cover-text">
         <h1>{{ 'Vị trà thân quen' if loai == 'tra' else 'Vị bánh ấm lòng' }}</h1>
-        <p>{{ 'Trồng nên hương trà, lưu giữ vị nhà' if loai == 'tra' else 'Ủ hương trà cho bánh, vun chút ngọt cho nhà' }}</p>
-        <a class="collection-cta" href="#danh-sach-san-pham">Khám phá {{ category_title | lower }} <span aria-hidden="true">↓</span></a>
+        <p class="lead">{{ 'Trồng nên hương trà, lưu giữ vị nhà' if loai == 'tra' else 'Ủ hương trà cho bánh, vun chút ngọt cho nhà' }}</p>
       </div>
-      <span class="collection-mark" aria-hidden="true">{{ 'TRÀ' if loai == 'tra' else 'BÁNH' }}</span>
     </div>
     {% elif loai == 'gift' %}
     {% set cover_src = site_image_url('cover-hopqua.jpg') %}
@@ -57,7 +50,11 @@
       <div class="cat-cover-text"><h1>Vị nhà trao nhau</h1><p class="lead">Gói hương trà, gom vị bánh, gửi tình nhà</p></div>
     </div>
     {% else %}
-    <div class="cat-cover cat-cover-all"><div class="cat-cover-text"><h1>Gói vị thân quen</h1><p class="lead">Vị trà thanh, vị bánh ngọt, vị thương gói ghém trong từng món quà. Hôm nay, bạn thích vị nào?</p></div></div>
+    {% set cover_src = site_image_url('cover-hopqua.png') %}
+    <div class="cat-cover cat-cover-all {{ 'has-photo' if cover_src }}">
+      {% if cover_src %}<picture class="cat-cover-photo"><img src="{{ cover_src }}" alt="Trà, bánh và gift set Trồng Vị Nhà" fetchpriority="high"></picture>{% endif %}
+      <div class="cat-cover-text"><h1>Gói vị thân quen</h1><p class="lead">Vị trà thanh, vị bánh ngọt, vị thương gói ghém trong từng món quà. Hôm nay, bạn thích vị nào?</p></div>
+    </div>
     {% endif %}
   </div>
 </section>
@@ -101,8 +98,8 @@
       </div>
     </header>
     {% if key in ['tra', 'banh'] %}
-      <div class="pgrid pgrid-3 catalog-product-grid">
-        {% for p in section_items %}{{ m.product_card(p, show_gift_cta=(key != 'gift')) }}{% endfor %}
+      <div class="pgrid pgrid-3 catalog-product-grid catalog-portfolio-grid">
+        {% for p in section_items %}{{ portfolio_card(p) }}{% endfor %}
       </div>
     {% else %}
       {{ giftset_cards() }}

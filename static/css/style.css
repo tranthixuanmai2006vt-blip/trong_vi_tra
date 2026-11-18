@@ -1060,6 +1060,26 @@ body:has(.dna-reveal:not([hidden])) .msg-bubble, body:has(.drawer:not([hidden]))
 .catalog-gift-note{font-size:14px;color:var(--text-2);min-height:44px}
 .catalog-gift-card .pcard-foot{margin-top:12px;padding-top:12px;align-items:center;flex-wrap:wrap}
 .catalog-gift-price{font-size:14px;font-weight:600;color:var(--text-2)}
+.catalog-product-grid{align-items:stretch}
+.catalog-product-grid .pcard:nth-child(3n + 2),.catalog-product-grid .pcard:nth-child(3n + 2):hover{transform:none}
+.catalog-product-grid .pcard{height:100%}
+.catalog-portfolio-grid{grid-auto-rows:1fr}
+.portfolio-card{min-width:0;height:100%;background:#fff;border:1px solid #EADFCB;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(80,48,33,.04);transition:box-shadow .2s,transform .2s}
+.portfolio-card:hover{box-shadow:0 10px 28px rgba(80,48,33,.1);transform:translateY(-3px)}
+.portfolio-card-link{display:flex;flex-direction:column;height:100%;color:var(--text);text-decoration:none}
+.portfolio-card-link>.product-photo,.portfolio-card-link>.art{width:100%;aspect-ratio:5/4!important;border-radius:0;background:linear-gradient(160deg,#FBF6EA,#F2E8D3)}
+.portfolio-card-link>.product-photo img{width:100%;height:100%;object-fit:cover}
+.portfolio-card-link>.pcard-img{width:100%}
+.portfolio-card-link h3{font:600 19px/1.35 var(--serif);margin:0;padding:17px 18px 20px;min-height:80px}
+.portfolio-card-link:hover h3{color:var(--action)}
+.catalog-gift-card .pcard-body{padding:17px 18px 20px}
+.catalog-gift-card .pcard-name{min-height:0;margin:0;font-size:19px}
+.pcard-tra .pcard-type,.pcard-banh .pcard-type{color:var(--action)}
+.cat-cover-tra.has-photo::after,.cat-cover-banh.has-photo::after{background:linear-gradient(90deg,rgba(250,247,240,.97) 0%,rgba(250,247,240,.94) 32%,rgba(250,247,240,.76) 52%,rgba(250,247,240,.12) 72%,transparent 80%)}
+.cat-cover-tra .cat-cover-text .lead,.cat-cover-banh .cat-cover-text .lead{white-space:nowrap;max-width:none;font-size:clamp(14px,1.4vw,17px)}
+.cat-cover-all.has-photo::after{background:linear-gradient(90deg,rgba(250,247,240,.97) 0%,rgba(250,247,240,.94) 34%,rgba(250,247,240,.78) 54%,rgba(250,247,240,.12) 74%,transparent 82%)}
+.catalog-story-section .catalog-story-title h2{white-space:nowrap}
+.catalog-story-section .catalog-story-copy p{max-width:none}
 @media(max-width:767px){
  .catalog-tabbar{top:64px}
  .catalog-tabbar .container{padding-left:12px;padding-right:12px}
@@ -1071,37 +1091,11 @@ body:has(.dna-reveal:not([hidden])) .msg-bubble, body:has(.drawer:not([hidden]))
  .catalog-story-copy{justify-self:start;font-size:16px;padding-left:27px}
  .catalog-story-copy p{font-size:19px}
  .catalog-product-grid .pcard:nth-child(3n + 2),.catalog-product-grid .pcard:nth-child(3n + 2):hover{transform:none}
+ .catalog-portfolio-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .portfolio-card-link h3{font-size:16px;padding:12px;min-height:64px}
+ .cat-cover-tra .cat-cover-text .lead,.cat-cover-banh .cat-cover-text .lead{white-space:normal}
  .catalog-gift-note{min-height:0}
 }
 
 .nav > a, .dd-btn, .dd-product-link, .util { white-space: nowrap; }
 @media (max-width: 1320px) { .util-text span { display: none; } }
-
-/* ---------- Trang chủ: thẻ Tea DNA với 13 nhân vật ---------- */
-.dna-live { --tint: #FEDFA2; }
-.dna-live::before { background: var(--tint) !important; transition: background .8s ease; }
-.dna-live-img { position: relative; width: 104px; height: 104px; flex: none; border-radius: 50%; overflow: hidden; background: #fff; box-shadow: 0 0 0 4px rgba(255,255,255,.25), 0 14px 26px -14px rgba(0,0,0,.6); }
-.dna-live-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(.85) rotate(-8deg); transition: opacity .6s ease, transform .7s cubic-bezier(.34,1.56,.64,1); }
-.dna-live-img img.on { opacity: 1; transform: none; }
-.dna-live #dnaLiveName.swap, .dna-live #dnaLiveTag { animation: dnaSwap .5s cubic-bezier(.22,1,.36,1); }
-@keyframes dnaSwap { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-.dna-bars-live div { display: grid; grid-template-columns: 120px 1fr; gap: 12px; align-items: center; margin: 14px 0; font-size: 14px; color: #E9E2D2; }
-.dna-bars-live i { height: 8px; border-radius: 4px; background: rgba(255,255,255,.15); overflow: hidden; }
-.dna-bars-live b { display: block; height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--accent), var(--tint)); transition: width .9s cubic-bezier(.22,1,.36,1), background .8s; }
-.dna-live-dots { display: flex; gap: 6px; justify-content: center; margin-top: 10px; }
-.dna-live-dots i { width: 6px; height: 6px; border-radius: 3px; background: rgba(255,255,255,.25); transition: width .4s, background .4s; }
-.dna-live-dots i.on { width: 18px; background: var(--tint); }
-.dna-live::before { opacity: .3 !important; }
-
-/* ---------- Chọn ngôn ngữ ---------- */
-.lang-sw { position: relative; }
-.lang-btn { gap: 5px; } .lang-btn b { font: 600 13px var(--sans); }
-.lang-menu { position: absolute; right: 0; top: calc(100% + 6px); min-width: 200px; background: #fff; border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 6px; z-index: 70; display: grid; animation: langIn .2s ease; }
-@keyframes langIn { from { opacity: 0; transform: translateY(-6px); } }
-.lang-menu a { padding: 9px 12px; border-radius: 9px; text-decoration: none; font-size: 15px; }
-.lang-menu a:hover { background: var(--bg-tint); } .lang-menu a.on { background: var(--selected-bg); color: var(--action); font-weight: 600; }
-.lang-menu small { padding: 6px 12px 4px; color: var(--text-2); font-size: 12px; border-top: 1px solid var(--line); margin-top: 4px; }
-/* ẩn thanh công cụ mặc định của Google Dịch */
-.skiptranslate iframe, iframe.skiptranslate, .goog-te-banner-frame, #goog-gt-tt, .goog-te-balloon-frame, .VIpgJd-ZVi9od-ORHb-OEVmcd, .VIpgJd-ZVi9od-aZ2wEe-wOHMyf { display: none !important; }
-body { top: 0 !important; position: static !important; }
-.goog-text-highlight, font[style*="background-color"] { background: none !important; box-shadow: none !important; }
