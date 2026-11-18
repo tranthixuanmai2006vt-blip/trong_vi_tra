@@ -16,7 +16,7 @@
       {% if photo %}<div class="product-photo"><img src="{{ photo }}" alt="Gift set {{ name }}" loading="lazy" decoding="async"></div>
       {% else %}{{ m.art('giftbox', color, 'Gift set ' + name, '5/4', False) }}{% endif %}
     </a>
-    <div class="pcard-body"><h3 class="pcard-name">{{ name }}</h3></div>
+    <div class="pcard-body"><h3 class="pcard-name">Gift set {{ name }}</h3></div>
   </article>
   {% endfor %}
 </div>
