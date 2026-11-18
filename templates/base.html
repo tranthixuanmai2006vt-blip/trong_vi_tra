@@ -30,10 +30,10 @@
       <button class="nav-close" id="navClose" aria-label="Đóng menu">✕</button>
       <a href="{{ url_for('home') }}" class="{{ 'active' if endpoint=='home' }}">Trang chủ</a>
       <a href="{{ url_for('about') }}" class="{{ 'active' if endpoint=='about' }}">Về chúng tôi</a>
-      <div class="dd {{ 'active' if endpoint in ['catalog','product_detail'] }}">
-        <button class="dd-btn" aria-expanded="false">Sản phẩm <span aria-hidden="true">▾</span></button>
+      <div class="dd dd-split {{ 'active' if endpoint in ['catalog','product_detail'] }}">
+        <a class="dd-link" href="{{ url_for('catalog') }}">Sản phẩm</a>
+        <button class="dd-btn dd-caret" aria-expanded="false" aria-label="Mở danh mục sản phẩm"><span aria-hidden="true">▾</span></button>
         <div class="dd-menu">
-          <a href="{{ url_for('catalog') }}">Tất cả sản phẩm</a>
           <a href="{{ url_for('catalog', cat='tra') }}">Trà</a>
           <a href="{{ url_for('catalog', cat='banh') }}">Bánh từ trà</a>
           <a href="{{ url_for('catalog', cat='gift-set') }}">Gift set</a>

@@ -88,6 +88,13 @@
 {% endblock %}
 {% block scripts %}
 <script>
+/* Chọn vị khác -> đổi ảnh bánh tương ứng */
+document.querySelectorAll('[name=sku][data-image]').forEach(r => r.addEventListener('change', () => {
+  const img = document.querySelector('.pdp-gallery img'); if (img && r.dataset.image) img.src = r.dataset.image;
+}));
+</script>
+
+<script>
 (function(){ const d = new Date(); let n = {{ p.prep_days }} + 1; while (n > 0) { d.setDate(d.getDate()+1); if (d.getDay()!==0) n--; }
   document.getElementById('earliest').textContent = d.toLocaleDateString('vi-VN') + ' (ước tính, chưa gồm vận chuyển)'; })();
 </script>

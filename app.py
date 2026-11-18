@@ -349,11 +349,8 @@ def site_image_url(name):
     return None
 
 
-def product_photo_url(p):
-    """One image for catalog, detail, cart, gift builder and Tea DNA.
-    Resolve on every render, so replacing the file needs no code changes.
-    """
-    stem = p.get("image_stem", p.get("slug", ""))
+def photo_url_for_stem(stem):
+    """URL ảnh trong static/img/products/<stem>.(webp|jpg|jpeg|png) nếu file tồn tại."""
     if not stem or os.path.basename(stem) != stem:
         return None
     for ext in ("webp", "jpg", "jpeg", "png"):
@@ -367,7 +364,15 @@ def product_photo_url(p):
     return None
 
 
+def product_photo_url(p):
+    """One image for catalog, detail, cart, gift builder and Tea DNA.
+    Resolve on every render, so replacing the file needs no code changes.
+    """
+    return photo_url_for_stem(p.get("image_stem", p.get("slug", "")))
+
+
 app.jinja_env.globals["product_photo_url"] = product_photo_url
+app.jinja_env.globals["photo_url_for_stem"] = photo_url_for_stem
 app.jinja_env.globals["site_image_url"] = site_image_url
 
 
@@ -479,6 +484,9 @@ def strip_accents(s):
 
 @app.route("/san-pham/<cat>/<slug>")
 def product_detail(cat, slug):
+    # link cũ của 3 vị Cracker Meringue Cookies -> trang gộp
+    if slug.startswith("cracker-meringue-cookies-"):
+        return redirect(url_for("product_detail", cat=cat, slug="cracker-meringue-cookies"), code=301)
     p = BY_SLUG.get(slug)
     if not p or p["type"] == "addon" or D.TYPE_ROUTE[p["type"]] != cat:
         abort(404)

@@ -146,12 +146,13 @@ class TeaCatalogTests(unittest.TestCase):
                 file.unlink(missing_ok=True)
 
     def test_cookie_and_mochi_prices_in_cart_and_gift(self):
-        cookies = [web.BY_ID[pid] for pid in ['BC01', 'BC02', 'BC03']]
+        cookies = [web.BY_ID['BC01']]
         mochi = web.BY_ID['BC04']
-        self.assertEqual(5, sum(p['type'] == 'banh' for p in web.D.PRODUCTS))
+        self.assertEqual(3, sum(p['type'] == 'banh' for p in web.D.PRODUCTS))
         for product in cookies:
-            self.assertEqual([('Pack 2 cái', 2500), ('Combo 2 pack (4 cái)', 4000)],
-                             [(v['label'], v['price']) for v in product['variants']])
+            self.assertEqual(3, len(product['flavors']))
+            self.assertEqual([('Pack 2 cái', 2500), ('Combo 2 pack (4 cái)', 4000)] * 3,
+                             [(v['size'], v['price']) for v in product['variants']])
         self.assertEqual(('1 cái', 7500), (mochi['variants'][0]['label'], mochi['variants'][0]['price']))
         paparoti = web.BY_ID['BC05']
         self.assertEqual(('1 cái', 10000), (paparoti['variants'][0]['label'], paparoti['variants'][0]['price']))
@@ -168,8 +169,8 @@ class TeaCatalogTests(unittest.TestCase):
         self.assertEqual(400, self.client.post('/api/cart/add', json={'sku': 'TVT-BQM-6'}).status_code)
 
     def test_bakery_photo_is_shared_and_home_unchanged(self):
-        product = web.BY_ID['BC02']
-        photo = Path(web.app.static_folder) / 'img/products' / (product['slug'] + '.png')
+        product = web.BY_ID['BC01']
+        photo = Path(web.app.static_folder) / 'img/products' / (product['image_stem'] + '.png')
         self.assertFalse(photo.exists())
         before = self.client.get('/').get_data(as_text=True)
         try:
