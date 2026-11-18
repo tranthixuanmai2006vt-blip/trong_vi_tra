@@ -1,6 +1,12 @@
 {% extends 'base.html' %}{% import 'macros.html' as m with context %}
 {% block title %}{{ a.title }}{% endblock %}
 {% block desc %}{{ a.summary }}{% endblock %}
+{% from 'stories.html' import story_image with context %}
+{% block head %}
+<style>
+  .article-cover .story-image { margin-top: 24px; border-radius: 12px; }
+</style>
+{% endblock %}
 {% block content %}
 <article class="article">
   <header class="article-cover section-cream">
@@ -11,7 +17,7 @@
       <p class="lead">{{ a.summary }}</p>
       <p class="small muted">{{ a.author }} · <time>{{ a.date | vndate }}</time> · {{ (words / 200) | round(0, 'ceil') | int }} phút đọc</p>
     </div>
-    <div class="container narrow">{{ m.art('leaf', a.color, a.title, '21/9') }}</div>
+    <div class="container narrow">{{ story_image('stories/' + a.slug + '.jpg', a.title, '4/3') }}</div>
   </header>
 
   <div class="container article-layout {{ 'no-toc' if not toc }}">
@@ -50,38 +56,21 @@
 <section class="section section-tint">
   <div class="container">
     <h2>Đọc thêm</h2>
-    <div class="art-grid">
+    <div class="story-grid">
       {% for r in related %}
-      <a class="post post-card" href="{{ url_for('article', slug=r.slug) }}">{{ m.art('leaf', r.color, r.title, '4/3', note=False) }}
-        <div class="post-body"><span class="tag">{{ D.ARTICLE_CATS[r.cat] }}</span><h3>{{ r.title }}</h3></div></a>
+      <a class="story-card" href="{{ url_for('article', slug=r.slug) }}">
+        {{ story_image('stories/' + r.slug + '.jpg', r.title, '4/3') }}
+        <div class="story-card-body">
+          <span class="tag">{{ D.ARTICLE_CATS[r.cat] }}</span>
+          <h3>{{ r.title }}</h3>
+          <p>{{ r.summary }}</p>
+          <span class="story-card-read">Đọc bài <span aria-hidden="true">→</span></span>
+        </div>
+      </a>
       {% endfor %}
     </div>
-    {% set rp = [] %}{% for pid in a.products if BY_ID.get(pid) %}{% set _ = rp.append(BY_ID[pid]) %}{% endfor %}
-    {% if rp %}<h3 class="mt">Sản phẩm liên quan</h3><div class="pgrid pgrid-3">{% for p in rp %}{{ m.product_card(p) }}{% endfor %}</div>{% endif %}
   </div>
 </section>
 {% endif %}
 
-<section class="section">
-  <div class="container">
-    <div class="newsletter">
-      <h2>Đừng bỏ lỡ những câu chuyện trà vị</h2>
-      <form id="nlForm" novalidate><label for="nlEmail" class="sr-only">Email</label>
-        <input id="nlEmail" type="email" placeholder="Email của bạn" autocomplete="email"><button class="btn">Đăng ký</button></form>
-      <p class="small" id="nlMsg" role="status"></p>
-      <p class="tiny muted">Chúng tôi cam kết bảo mật email của bạn.</p>
-    </div>
-    <div class="social">
-      <h2>#KhoanhKhacTeaDNA</h2>
-      <div class="social-grid">{% for c in ['#8C9A4B','#B4762E','#EDD4AB','#3B630D','#C08A3E','#503021'] %}<div>{{ m.art(['pouch','cookie','giftbox','tin','cake','madeleine'][loop.index0], c, 'khoảnh khắc trà', note=False) }}</div>{% endfor %}</div>
-      {% if SITE.facebook %}<a class="btn btn-secondary" href="{{ SITE.facebook }}" target="_blank" rel="noopener">Theo dõi chúng tôi ↗</a>
-      {% else %}<p class="small muted">Trang mạng xã hội đang được cập nhật.</p>{% endif %}
-    </div>
-  </div>
-</section>
-{% endblock %}
-{% block scripts %}
-<script>
-document.querySelectorAll('.prose .art').forEach(el => { el.style.cursor = 'zoom-in'; el.onclick = () => openLightbox(el); });
-</script>
 {% endblock %}

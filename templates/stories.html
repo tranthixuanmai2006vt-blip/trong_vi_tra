@@ -21,7 +21,7 @@
   <div class="container story-hero-grid">
     <div class="story-hero-copy">
       {{ m.crumbs([('Chuyện trà', None)]) }}
-      <p class="eyebrow">Góc thưởng trà · Đọc chậm một chút</p>
+      <p class="eyebrow">Góc thưởng trà</p>
       <h1>Chuyện bên<br>tách trà <em>nhà</em></h1>
       <p class="lead">Từ cách nhận ra một vị trà, những người nâng niu lá trà, đến cách pha một ấm ngon và trao nhau món quà nhỏ — mỗi câu chuyện đều bắt đầu bằng một lần ngồi lại.</p>
       <div class="story-hero-actions">
@@ -42,7 +42,7 @@
 <section class="section story-feature-section">
   <div class="container">
     <div class="story-section-heading">
-      <div><p class="eyebrow">Mở đầu từ đây</p><h2>Một câu chuyện được chọn</h2></div>
+      <div><h2>Một câu chuyện được chọn</h2></div>
       <span class="story-index">01 / {{ '%02d'|format(arts|length) }}</span>
     </div>
     <a class="story-feature" href="{{ url_for('article', slug=feat.slug) }}">
@@ -56,28 +56,6 @@
         <span class="story-read-link">Đọc câu chuyện <b aria-hidden="true">↗</b></span>
       </div>
     </a>
-  </div>
-</section>
-
-{# 03 — Lối vào theo chủ đề #}
-<section class="story-path-section">
-  <div class="container">
-    <div class="story-section-heading story-path-heading">
-      <div><p class="eyebrow">Chọn điều bạn tò mò</p><h2>Mỗi tách trà, một lối kể</h2></div>
-      <p class="muted">Chạm một chủ đề để lọc bài viết bên dưới.</p>
-    </div>
-    <div class="story-paths" aria-label="Khám phá theo chủ đề">
-      {% for key, label, note, no in [
-        ('kien-thuc','Hiểu vị trà','Hương, hậu vị và cách chọn trà','01'),
-        ('nguoi-trong','Người giữ lá trà','Vùng trà và những bàn tay chăm trà','02'),
-        ('huong-dan','Pha một ấm ngon','Công thức dễ làm tại nhà','03'),
-        ('tra-banh','Trà gặp món ngon','Cách kết hợp trà, bánh và quà','04')]
-      %}
-      <button class="story-path" type="button" data-story-filter="{{ key }}">
-        <span class="story-path-no">{{ no }}</span><span><b>{{ label }}</b><small>{{ note }}</small></span><span class="story-path-arrow" aria-hidden="true">↗</span>
-      </button>
-      {% endfor %}
-    </div>
   </div>
 </section>
 
@@ -123,7 +101,6 @@
 <script>
 const cards = [...document.querySelectorAll('#artGrid .story-card')];
 const tabs = [...document.querySelectorAll('#artTabs .tab')];
-const pathButtons = [...document.querySelectorAll('[data-story-filter]')];
 const more = document.getElementById('moreBtn');
 const empty = document.getElementById('storyEmpty');
 let shown = 6, filter = '';
@@ -145,10 +122,6 @@ function setStoryFilter(value) {
   paintStories();
 }
 tabs.forEach(tab => tab.addEventListener('click', () => setStoryFilter(tab.dataset.f)));
-pathButtons.forEach(button => button.addEventListener('click', () => {
-  setStoryFilter(button.dataset.storyFilter);
-  document.getElementById('bai-viet').scrollIntoView({ behavior: 'smooth' });
-}));
 more.addEventListener('click', () => { shown += 6; paintStories(); });
 paintStories();
 </script>
