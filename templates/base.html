@@ -77,16 +77,14 @@
       <a href="{{ url_for('home') }}" class="f-logo"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="{{ SITE.name }}"></a>
       <p><b>{{ SITE.name }}</b> – không gian giới thiệu trà tuyển chọn, bánh từ trà và hộp quà theo cách của bạn.</p>
       <p class="f-small">Sản phẩm trà của {{ SITE.company }}.</p>
-      <p class="f-small">Địa chỉ: {{ SITE.address or 'Đang cập nhật' }}{% if SITE.tax_code %} · MST: {{ SITE.tax_code }}{% endif %}</p>
+      {% if SITE.tax_code %}<p class="f-small">MST: {{ SITE.tax_code }}</p>{% endif %}
     </div>
     <div>
       <h4>Liên hệ</h4>
       <p>Hotline: {% if SITE.hotline %}<a href="tel:{{ SITE.hotline }}">{{ SITE.hotline }}</a>{% else %}Đang cập nhật{% endif %}</p>
       <p>Email: {% if SITE.email %}<a href="mailto:{{ SITE.email }}">{{ SITE.email }}</a>{% else %}Đang cập nhật{% endif %}</p>
-      <p>Giờ hỗ trợ: {{ SITE.support_hours or 'Đang cập nhật' }}</p>
-      {% if SITE.zalo %}<p><a href="{{ SITE.zalo }}" target="_blank" rel="noopener">Zalo ↗</a></p>{% endif %}
-      {% if SITE.facebook %}<p><a href="{{ SITE.facebook }}" target="_blank" rel="noopener">Facebook ↗</a></p>{% endif %}
       <a href="{{ url_for('contact') }}">Gửi lời nhắn →</a>
+      <p>Địa chỉ: {{ SITE.address or 'Đang cập nhật' }}</p>
     </div>
     <div>
       <h4>Hỗ trợ đặt hàng</h4>
@@ -108,6 +106,12 @@
   <div class="container f-bottom">© {{ year }} {{ SITE.name }} × {{ SITE.partner }}. Bảo lưu mọi quyền.</div>
 </footer>
 
+{% if SITE.messenger %}
+<a class="msg-bubble" href="{{ SITE.messenger }}" target="_blank" rel="noopener" aria-label="Nhắn tin cho {{ SITE.name }} qua Messenger (mở tab mới)">
+  <svg viewBox="0 0 36 36" aria-hidden="true"><path fill="currentColor" d="M18 3C9.7 3 3 9.2 3 17c0 4.4 2.2 8.4 5.6 11V33l5.1-2.8c1.4.4 2.8.6 4.3.6 8.3 0 15-6.2 15-14S26.3 3 18 3Zm1.5 18.8-3.8-4.1-7.5 4.1 8.2-8.7 3.9 4.1 7.4-4.1-8.2 8.7Z"/></svg>
+  <span class="msg-bubble-tip">Chat với {{ SITE.name }}</span>
+</a>
+{% endif %}
 <div class="toast-wrap" id="toasts" aria-live="polite"></div>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% block scripts %}{% endblock %}

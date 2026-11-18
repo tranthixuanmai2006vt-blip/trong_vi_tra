@@ -480,7 +480,7 @@
         x.fillStyle = '#503021'; x.font = '500 28px "Be Vietnam Pro", Arial'; x.fillText(a.label, 150, y + 10);
         x.fillStyle = 'rgba(80,48,33,.12)'; x.fillRect(400, y - 4, 440, 14); if (v !== null && v !== undefined) { x.fillStyle = '#3B630D'; x.fillRect(400, y - 4, 4.4 * v, 14); }
         x.textAlign = 'right'; x.fillText(v === null || v === undefined ? '—' : String(v), 930, y + 10); });
-      x.textAlign = 'center'; x.fillStyle = '#503021'; x.font = '500 28px "Be Vietnam Pro", Arial'; x.fillText('Trồng Vị Nhà × Hằng Sơn Điền · Explore Tea. Create Your Way.', 540, 1300);
+      x.textAlign = 'center'; x.fillStyle = '#503021'; x.font = '500 28px "Be Vietnam Pro", Arial'; x.fillText('Trồng Vị Nhà × Hằng Sơn Điền', 540, 1300);
       const a = document.createElement('a'); a.download = 'tea-dna-' + g.id + '.png'; a.href = c.toDataURL('image/png'); a.click();
     } catch (e) { toast('Không tạo được ảnh. Bạn có thể sao chép nội dung thay thế.', 'error'); }
   }
