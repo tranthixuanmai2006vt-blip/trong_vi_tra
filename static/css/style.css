@@ -1407,3 +1407,75 @@ body:has(.dna-reveal:not([hidden])) .msg-bubble, body:has(.drawer:not([hidden]))
 @media(max-width:767px){.custom-process-thread{display:none}.custom-terms-section .terms-grid{grid-template-columns:1fr}.design-request-heading{padding:18px 0 34px}.design-request-heading .crumbs{margin-bottom:24px}.design-request-heading h1{font-size:42px}.custom-terms-section .term{min-height:0}.bx-card{min-height:140px}.bx-body,.bx-card-tea .bx-body{min-height:110px}}
 .catalog-portfolio-grid .portfolio-card-link[href*="paparoti-matcha"]>.product-photo img,
 .pcard-banh .pcard-img[href*="paparoti-matcha"] .product-photo img{object-fit:contain;padding:9%;transform:translateY(-6%) scale(.88)}
+
+/* Product catalog refresh: warm framed covers, clear green accents, calm image cards. */
+.cat-cover.has-photo{min-height:clamp(250px,27vw,360px);border:1px solid rgba(59,99,13,.12);border-radius:24px;box-shadow:0 18px 46px -38px rgba(47,59,42,.42)}
+.cat-cover.has-photo .cat-cover-text{min-height:clamp(250px,27vw,360px);padding:clamp(24px,3.4vw,46px)}
+.cat-cover.has-photo::after{background:linear-gradient(90deg,rgba(250,247,240,.94) 0%,rgba(250,247,240,.82) 36%,rgba(250,247,240,.36) 58%,rgba(250,247,240,.04) 78%,transparent 88%)}
+.cat-cover-text h1{color:var(--text);letter-spacing:-.025em}
+.cat-cover-text .lead{max-width:560px;color:var(--text-2);line-height:1.65}
+.cat-cover-gift.has-photo::after{background:linear-gradient(90deg,rgba(250,247,240,.93) 0%,rgba(250,247,240,.78) 35%,rgba(250,247,240,.3) 57%,transparent 82%)}
+.catalog-story-section{position:relative}
+.catalog-story-tra{background:linear-gradient(180deg,#F6F2E7 0%,#FAF7F0 100%)}
+.catalog-story-banh{background:linear-gradient(180deg,#ECEFDF 0%,#F7F4E9 100%)}
+.catalog-story-title{border-left-color:#8C9A4B}
+.catalog-story-copy a{color:#3B630D}
+.catalog-tabbar{border-bottom-color:#DED7C7}
+.catalog-tabbar .tab{transition:background .2s,color .2s,border-color .2s,transform .2s}
+.catalog-tabbar .tab.active{background:#EEF0DF;color:#3B630D;border-color:#8C9A4B}
+.catalog-tabbar .tab.active small{color:#3B630D}
+.catalog-product-grid .portfolio-card,.catalog-product-grid .catalog-gift-card{border-color:#E4D8C5;border-radius:20px;box-shadow:0 8px 26px -24px rgba(56,48,31,.35)}
+.catalog-product-grid .portfolio-card:hover,.catalog-product-grid .catalog-gift-card:hover{border-color:#B6BC86;box-shadow:0 16px 32px -24px rgba(47,59,42,.3)}
+.portfolio-card-link>.product-photo,.portfolio-card-link>.art,.catalog-gift-card .pcard-img .product-photo{background:linear-gradient(145deg,#FBF8F0,#F1E9D7)}
+.portfolio-card-link h3{min-height:72px;padding:16px 18px 18px}
+.catalog-gift-card .pcard-body{background:#fffdf9}
+.catalog-gift-card .pcard-name{color:var(--text)}
+/* Whole tea/cake packages remain centered in their frame; no special vertical nudge. */
+.catalog-portfolio-grid .portfolio-card-link>.product-photo img,
+.pcard-tra .pcard-img .product-photo img,
+.pcard-banh .pcard-img .product-photo img{object-fit:contain!important;padding:10%!important;transform:none!important;object-position:center!important}
+.catalog-portfolio-grid .portfolio-card-link[href*="paparoti-matcha"]>.product-photo img,
+.pcard-banh .pcard-img[href*="paparoti-matcha"] .product-photo img{padding:12%!important;transform:none!important;object-fit:contain!important}
+.catalog-gift-card .pcard-img .product-photo img{object-fit:contain!important;padding:10%!important;transform:none!important;object-position:center!important}
+@media(max-width:767px){
+ .cat-cover.has-photo{min-height:0;border-radius:18px}
+ .cat-cover.has-photo .cat-cover-text{min-height:0}
+ .cat-cover.has-photo::after,.cat-cover-gift.has-photo::after{display:none}
+ .catalog-story-section{padding-top:48px;padding-bottom:54px}
+ .portfolio-card-link h3{min-height:62px}
+}
+
+/* Gift-box builder: selected item quantities live below the actions, never over the image/tag. */
+.bx-chosen{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-width:0;box-sizing:border-box;margin-top:8px;padding:8px 10px;background:#fff;border-radius:10px;font-size:13px;line-height:1.35}
+.bx-chosen>span{min-width:0;overflow-wrap:anywhere}
+.bx-chosen .stepper{flex:0 0 auto;white-space:nowrap}
+.bx-card .bx-media{align-self:start}
+.bx-card .bx-body{min-width:0}
+.bx-card .bx-actions{min-width:0;gap:8px}
+.bx-card .bx-actions .link-sm{flex:0 0 auto}
+.bx-card .bx-actions .btn{flex:0 0 auto}
+.bx-card .bx-tea-packs{max-width:86px}
+@media(max-width:767px){.bx-card .bx-actions{flex-wrap:wrap}.bx-chosen{gap:6px;padding:7px}.bx-chosen .stepper{gap:6px}}
+
+/* Gift-box banner: slightly shorter with a quiet warm veil behind the copy. */
+.giftbox-hero-section{padding:22px 0 54px}
+.giftbox-hero-banner{min-height:clamp(360px,34vw,450px);border-radius:24px}
+.giftbox-hero-image{object-position:center 55%}
+.giftbox-hero-banner::after{background:linear-gradient(90deg,rgba(250,247,240,.30) 0%,rgba(250,247,240,.24) 28%,rgba(250,247,240,.10) 48%,rgba(28,43,29,.04) 68%,transparent 82%)}
+.giftbox-hero-copy{width:min(53%,610px);padding:30px clamp(24px,3.5vw,48px);color:#fff1dc;text-shadow:0 2px 16px rgba(25,34,19,.34)}
+.giftbox-hero-copy .crumbs,.giftbox-hero-copy .crumbs a{color:rgba(255,245,226,.94)}
+.giftbox-hero-copy .eyebrow{margin-top:20px;color:#e2dda1}
+.giftbox-hero-copy h1{font-size:clamp(36px,4.2vw,54px);line-height:1.04;color:#fff1dc;text-shadow:0 2px 18px rgba(25,34,19,.42)}
+.giftbox-hero-copy .lead{font-size:17px;color:rgba(255,245,226,.98)}
+.giftbox-hero-copy .link{color:#f0daa9}
+.giftbox-hero-stamp{width:92px;height:92px;font-size:13px}
+@media(max-width:767px){
+ .giftbox-hero-section{padding:14px 0 38px}
+ .giftbox-hero-banner{min-height:460px;border-radius:18px}
+ .giftbox-hero-image{object-position:64% center}
+ .giftbox-hero-banner::after{background:linear-gradient(90deg,rgba(28,43,29,.40),rgba(28,43,29,.22) 62%,rgba(28,43,29,.08))}
+ .giftbox-hero-copy{width:100%;padding:22px 20px}
+ .giftbox-hero-copy .crumbs{margin-bottom:20px}
+ .giftbox-hero-copy h1{font-size:clamp(36px,9vw,48px)}
+ .giftbox-hero-stamp{width:76px;height:76px;right:12px;bottom:12px;font-size:11px}
+}
