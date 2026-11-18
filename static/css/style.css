@@ -1099,7 +1099,18 @@ body:has(.dna-reveal:not([hidden])) .msg-bubble, body:has(.drawer:not([hidden]))
 
 /* Gift set images: show the full box inside the product frame. */
 .catalog-gift-card .pcard-img .product-photo{background:#FAF7F0}
-.catalog-gift-card .pcard-img .product-photo img{object-fit:contain;padding:10%}
+.catalog-gift-card .pcard-img .product-photo img {
+  object-fit: contain;
+  padding: 0;
+}
 
+.catalog-gift-card:nth-child(1) .pcard-img .product-photo img {
+  transform: scale(.8);
+}
+
+.catalog-gift-card:nth-child(2) .pcard-img .product-photo img,
+.catalog-gift-card:nth-child(3) .pcard-img .product-photo img {
+  transform: scale(1.12);
+}
 .nav > a, .dd-btn, .dd-product-link, .util { white-space: nowrap; }
 @media (max-width: 1320px) { .util-text span { display: none; } }
