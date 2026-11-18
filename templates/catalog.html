@@ -77,26 +77,28 @@
 </section>
 
 {% if landing %}
-{% for key, heading, eyebrow, description in [
-  ('tra', 'Trà', '01 · HƯƠNG TRÀ HẰNG SƠN ĐIỀN', 'Trồng nên hương trà, lưu giữ vị nhà'),
-  ('banh', 'Bánh từ trà', '02 · VỊ NGỌT TỪ HƯƠNG TRÀ', 'Ủ hương trà cho bánh, vun chút ngọt cho nhà'),
-  ('gift', 'Gift set', '03 · VỊ NHÀ TRAO NHAU', 'Gói hương trà, gom vị bánh, gửi tình nhà')
+{% for key, heading in [
+  ('tra', 'Trà'),
+  ('banh', 'Bánh từ trà'),
+  ('gift', 'Gift set')
 ] %}
 {% set section_items = items|selectattr('type', 'equalto', key)|list %}
 <section class="catalog-story-section catalog-story-{{ key }}" id="catalog-{{ key }}">
   <div class="container">
-    <header class="catalog-story-head">
-      <div class="catalog-story-title">
-        <p class="eyebrow">{{ eyebrow }}</p>
-        <h2>{{ heading }}</h2>
-      </div>
-      <div class="catalog-story-copy">
-        <p>{{ description }}</p>
-        {% if key == 'tra' %}<a href="{{ url_for('catalog', cat='tra') }}">Khám phá các dòng trà <span aria-hidden="true">→</span></a>
-        {% elif key == 'banh' %}<a href="{{ url_for('catalog', cat='banh') }}">Xem các loại bánh <span aria-hidden="true">→</span></a>
-        {% else %}<a href="{{ url_for('custom_design') }}">Tùy chỉnh hộp quà <span aria-hidden="true">→</span></a>{% endif %}
-      </div>
-    </header>
+<header class="catalog-story-head">
+  <div class="catalog-story-title">
+    <h2>{{ heading }}</h2>
+  </div>
+  <div class="catalog-story-copy">
+    {% if key == 'tra' %}
+      <a href="{{ url_for('catalog', cat='tra') }}">Khám phá các dòng trà <span aria-hidden="true">→</span></a>
+    {% elif key == 'banh' %}
+      <a href="{{ url_for('catalog', cat='banh') }}">Xem các loại bánh <span aria-hidden="true">→</span></a>
+    {% else %}
+      <a href="{{ url_for('custom_design') }}">Tùy chỉnh hộp quà <span aria-hidden="true">→</span></a>
+    {% endif %}
+  </div>
+</header>
     {% if key in ['tra', 'banh'] %}
       <div class="pgrid pgrid-3 catalog-product-grid catalog-portfolio-grid">
         {% for p in section_items %}{{ portfolio_card(p) }}{% endfor %}
@@ -122,7 +124,7 @@
   <div class="container shop">
     {% if loai in ['tra', 'banh'] %}
     <div class="collection-frame-head">
-      <div><span class="collection-kicker">BỘ SƯU TẬP</span><h2>{{ 'Chọn vị trà của bạn' if loai == 'tra' else 'Chọn dòng bánh yêu thích' }}</h2></div>
+    <h2>{{ 'Các loại trà' if loai == 'tra' else 'Các loại bánh' }}</h2>
       <span class="collection-count">{{ items|length }} món</span>
     </div>
     <nav class="collection-categories" aria-label="Lọc theo dòng {{ 'trà' if loai == 'tra' else 'bánh' }}">

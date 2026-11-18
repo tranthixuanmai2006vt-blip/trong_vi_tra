@@ -1114,3 +1114,21 @@ body:has(.dna-reveal:not([hidden])) .msg-bubble, body:has(.drawer:not([hidden]))
 }
 .nav > a, .dd-btn, .dd-product-link, .util { white-space: nowrap; }
 @media (max-width: 1320px) { .util-text span { display: none; } }
+.catalog-jump-tabs .tab.active {
+  background: #EEF0DF;
+  color: #3B630D;
+  border-color: #3B630D;
+}
+
+.catalog-jump-tabs .tab.active small {
+  color: #3B630D;
+}
+
+.catalog-gift-card:nth-child(1) .pcard-img .product-photo img {
+  transform: translateY(-20px) scale(.68);
+}
+
+.catalog-gift-card:nth-child(2) .pcard-img .product-photo img,
+.catalog-gift-card:nth-child(3) .pcard-img .product-photo img {
+  transform: scale(1.02);
+}
