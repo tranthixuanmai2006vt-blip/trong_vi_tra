@@ -121,7 +121,7 @@
       <article class="ab-region ab-rv">
         <div class="ab-region-img">{{ m.pic(file, name, '4/3', 'leaf', color) }}{% if not has_img(file) %}<span class="ab-pending">Ảnh vùng trà đang cập nhật</span>{% endif %}</div>
         <div class="ab-region-body">
-          <span class="tag">{{ D.TEA_GROUPS[grp] }}</span>
+          {% if D.TEA_GROUPS.get(grp) %}<span class="tag">{{ D.TEA_GROUPS[grp] }}</span>{% endif %}
           <h3>{{ name }}</h3>
           <p>{{ desc }}</p>
           <ul class="mini-list">
@@ -132,7 +132,6 @@
       </article>
       {% endfor %}
     </div>
-    <p class="note center">* Tên vùng, tỉnh, mùa vụ và đối tác cung cấp chỉ hiển thị khi đã được xác nhận theo từng SKU; ảnh vùng cần là ảnh thực địa có chú thích.</p>
   </div>
 </section>
 
@@ -165,7 +164,6 @@
       <details class="acc"><summary>Kiểm tra đầu vào</summary><p>Mô tả tiêu chí kiểm tra sẽ được cập nhật theo tài liệu doanh nghiệp.</p></details>
       <details class="acc"><summary>Chứng nhận & hồ sơ công bố</summary><p>Chỉ hiển thị chứng nhận khi có bản công khai được phép. Hiện đang cập nhật.</p></details>
     </div>
-    <p class="note center">* Mỗi quy trình cần 4 ảnh thật (qt-tra-1.jpg … qt-banh-4.jpg trong static/img); trong lúc chờ là hình minh họa.</p>
     <div class="cta-row center-row"><a class="btn btn-secondary" href="{{ url_for('catalog') }}">Xem thông tin sản phẩm</a></div>
   </div>
 </section>
@@ -191,19 +189,6 @@
   <div class="container">
     <div class="sec-head center"><p class="eyebrow">Đội ngũ</p><h2>Những người cùng vun vị nhà</h2>
       <p class="lead">Người làm trà của {{ SITE.partner }} giữ chất lượng từng lá trà; nhóm phát triển {{ SITE.name }} thử công thức bánh, thiết kế hộp quà và giấy trà. Mỗi người giữ một mắt xích để món quà đến tay bạn trọn vẹn.</p></div>
-    <div class="ab-collage">
-      {% for file, label, sub, ic, cls in [
-        ('team-main.jpg', 'Ảnh nhóm', 'Sẽ bổ sung khi được đồng ý công bố', '👥', 'c-main'),
-        ('team-1.jpg', 'Bàn tay làm trà', 'Người làm trà · ' ~ SITE.partner, '🍃', 'c-a'),
-        ('team-2.jpg', 'Bàn tay làm bánh', 'Nhóm phát triển · ' ~ SITE.name, '🍪', 'c-b'),
-        ('team-3.jpg', 'Bàn tay gói quà', 'Nhóm phát triển · ' ~ SITE.name, '🎁', 'c-c')] %}
-      <figure class="ab-tile {{ cls }} ab-rv">
-        {% if has_img(file) %}<img src="{{ url_for('static', filename='img/' + file) }}" alt="{{ label }}" loading="lazy">
-        {% else %}<div class="ab-ph"><span aria-hidden="true">{{ ic }}</span><b>{{ label }}</b></div>{% endif %}
-        <figcaption>{{ sub }}</figcaption>
-      </figure>
-      {% endfor %}
-    </div>
     <div class="cta-row center-row"><a href="{{ url_for('contact') }}" class="btn">Liên hệ với chúng tôi</a></div>
   </div>
 </section>
