@@ -10,6 +10,9 @@ import app as web
 class TeaCatalogTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
+        self.old_static = web.app.static_folder
+        web.app.static_folder = str(Path(self.tmp.name) / 'static')
+        (Path(web.app.static_folder) / 'img/products').mkdir(parents=True)
         self.old_db = web.DB_PATH
         web.DB_PATH = str(Path(self.tmp.name) / 'test.db')
         web.init_db()
@@ -18,6 +21,7 @@ class TeaCatalogTests(unittest.TestCase):
 
     def tearDown(self):
         web.DB_PATH = self.old_db
+        web.app.static_folder = self.old_static
         self.tmp.cleanup()
 
     def test_exact_catalog_and_price(self):
@@ -144,6 +148,32 @@ class TeaCatalogTests(unittest.TestCase):
         finally:
             for file in created:
                 file.unlink(missing_ok=True)
+
+    def test_catalog_copy_navigation_and_cookie_group(self):
+        html = self.client.get('/san-pham').get_data(as_text=True)
+        self.assertIn('Gói vị thân quen', html)
+        self.assertIn('<br><span class="cover-question">Hôm nay, bạn thích vị nào?</span>', html)
+        self.assertIn('Mỗi khoảnh khắc - mỗi vị riêng', html)
+        self.assertNotIn('Tất cả sản phẩm</a>', html)
+        self.assertIn('dd-product-link', html)
+        for cat, heading, description in [
+            ('tra', 'Vị trà thân quen', 'Trồng nên hương trà, lưu giữ vị nhà'),
+            ('banh', 'Vị bánh ấm lòng', 'Ủ hương trà trong bánh, vun chút ngọt cho nhà'),
+            ('gift-set', 'Gói vị nhà trao nhau', 'Gói hương trà, gom vị bánh, gửi chút tình nhà')]:
+            body = self.client.get('/san-pham/' + cat).get_data(as_text=True)
+            self.assertIn('<h1>' + heading + '</h1>', body)
+            self.assertIn(description, body)
+        body = self.client.get('/san-pham/banh').get_data(as_text=True)
+        self.assertEqual(1, body.count('>Chọn vị bánh</a>'))
+        for old in ('truyen-thong', 'matcha', 'oolong'):
+            response = self.client.get('/san-pham/banh/cracker-meringue-cookies-' + old)
+            self.assertEqual(301, response.status_code)
+            self.assertTrue(response.location.endswith('/cracker-meringue-cookies'))
+        body = self.client.get('/san-pham/banh/cracker-meringue-cookies').get_data(as_text=True)
+        self.assertIn('data-flavor-select', body)
+        self.assertEqual(6, body.count('name="sku"'))
+        for flavor in ('Truyền thống', 'Matcha', 'Oolong'):
+            self.assertIn('data-flavor-option="' + flavor + '"', body)
 
     def test_cookie_and_mochi_prices_in_cart_and_gift(self):
         cookies = [web.BY_ID['BC01']]

@@ -67,6 +67,7 @@
   <a href="{{ product_url(p) }}" class="pcard-img" aria-label="Xem chi tiết {{ p.name }}">
     {{ product_image(p, '5/4') }}
     <span class="badges">
+      {% if p.type == 'tra' %}<span class="badge badge-pack">{{ p.variants | map(attribute='label') | join(' · ') }}</span>{% endif %}
       {% if not ok %}<span class="badge badge-out">Tạm hết</span>{% endif %}
       {% if p.made_to_order %}<span class="badge badge-pre">Cần đặt trước</span>{% endif %}
       {% if p.new and ok %}<span class="badge">Mới</span>{% endif %}
@@ -75,13 +76,12 @@
   <div class="pcard-body">
     <p class="pcard-type">{{ D.TYPE_LABEL[p.type] }}{% if p.type == 'tra' and p.line %}<span aria-hidden="true"> · </span>{{ p.line }}{% endif %}</p>
     <h3 class="pcard-name"><a href="{{ product_url(p) }}">{{ p.name }}</a></h3>
-    {% if p.type == 'tra' %}<p class="pcard-spec"><span class="chip-spec">{{ p.variants | map(attribute='label') | join(' · ') }}</span></p>{% endif %}
     <div class="pcard-foot">
       <span class="price">{% if multi %}<small>từ</small> {% endif %}{{ min_price(p) | vnd }}</span>
       {% if not ok %}
         <button class="btn btn-sm btn-secondary" disabled title="Sản phẩm tạm hết">Tạm hết</button>
       {% elif multi %}
-        <a class="btn btn-sm btn-secondary" href="{{ product_url(p) }}">Chọn quy cách</a>
+        <a class="btn btn-sm btn-secondary" href="{{ product_url(p) }}">{{ 'Chọn vị bánh' if p.flavors else 'Chọn quy cách' }}</a>
       {% else %}
         <button class="btn btn-sm" data-add="{{ v0.sku }}" data-name="{{ p.name }}">Thêm vào giỏ</button>
       {% endif %}

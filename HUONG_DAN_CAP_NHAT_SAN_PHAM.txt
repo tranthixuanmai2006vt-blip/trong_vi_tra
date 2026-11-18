@@ -1,0 +1,59 @@
+CẬP NHẬT TRANG SẢN PHẨM – 18/11/2026
+
+Gói nhỏ chỉ chứa file mới/sửa, không chứa database, môi trường Python hay ảnh trang chủ.
+Sao lưu dự án hiện tại trước khi chép đè. Giữ nguyên file .db, .env, uploads và .venv.
+
+CÁCH CÀI
+1. Mở terminal trong thư mục dự án (nơi có app.py).
+2. Giải nén cap_nhat_san_pham.zip ngay tại đây; đồng ý ghi đè file trùng tên.
+   Có thể chạy: unzip -o ~/Downloads/cap_nhat_san_pham.zip -d .
+   Đường dẫn Downloads cần đổi nếu lưu file ở chỗ khác.
+3. Khởi động lại Flask/gunicorn bằng lệnh đang dùng. Tải lại trang với Cmd+Shift+R.
+4. Nếu muốn cập nhật Render, commit/push các file đã sửa theo quy trình hiện tại.
+
+ẢNH BANNER
+- Tất cả sản phẩm: static/img/cover-gift-set.png
+  Đã dùng lại ảnh cover-hopqua.png hiện tại, không cần tìm ảnh mới.
+- Trà: giữ static/img/cover-tra.png
+- Bánh: giữ static/img/cover-banh.jpg
+- Hộp quà: giữ static/img/cover-hopqua.png
+- Có thể thêm bản di động: cover-gift-set-mobile.png (cùng thư mục).
+- Hệ thống hỗ trợ webp/jpg/jpeg/png. Chỉ giữ một file cùng tên gốc;
+  thứ tự ưu tiên webp > jpg > jpeg > png. Đổi ảnh thì xóa bản khác cùng tên gốc.
+- Ảnh ngang gợi ý 1920×600, chủ thể nằm bên phải để chừa chữ bên trái.
+
+ẢNH 3 VỊ COOKIES – GIỮ TÊN CŨ
+static/img/products/cracker-meringue-cookies-truyen-thong.png
+static/img/products/cracker-meringue-cookies-matcha.png
+static/img/products/cracker-meringue-cookies-oolong.png
+Ảnh mặc định dùng vị truyền thống. Đổi vị trong trang chi tiết sẽ đổi ảnh theo vị.
+
+THAY ĐỔI
+- Tất cả sản phẩm có cover riêng; câu hỏi xuống dòng.
+- Ba trang danh mục dùng heading/description đã chốt.
+- Trọng lượng trà nằm trong nhãn góc trên trái ảnh; bỏ dòng trọng lượng dưới tên.
+- Gọn phần chữ và khoảng trống trên thẻ sản phẩm.
+- Cookies gộp một thẻ: chọn vị, sau đó chọn pack/combo. Giữ toàn bộ 6 SKU và giá.
+  Pack 2 cái 2.500đ; combo 2 pack (4 cái) 4.000đ cho từng vị.
+  Mochi 7.500đ/cái, Paparoti 10.000đ/cái không đổi.
+- Bấm chữ Sản phẩm mở /san-pham; nút mũi tên mở 3 danh mục.
+  Thanh tab trên trang sản phẩm vẫn giữ Tất cả để quay về danh sách đầy đủ.
+- Khối khoảnh khắc dùng 4 tên đã chốt.
+- Nội dung và ảnh riêng của trang chủ giữ nguyên.
+
+KIỂM TRA
+9 kiểm tra tích hợp đã qua: danh mục/giá, SKU, giỏ hàng, tạo hộp quà,
+ảnh, link cũ và nội dung trang. JavaScript đã kiểm tra cú pháp.
+Chưa kiểm tra trực quan trong trình duyệt do môi trường chạy Chromium không hỗ trợ.
+
+FILE ĐƯỢC SỬA/THÊM
+- data.py
+- static/css/style.css
+- static/img/cover-gift-set.png
+- static/js/main.js
+- templates/_buybox.html
+- templates/base.html
+- templates/catalog.html
+- templates/macros.html
+- templates/product_cake.html
+- test_tea_catalog.py

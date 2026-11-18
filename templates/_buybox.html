@@ -1,13 +1,20 @@
 {# Khối mua hàng dùng chung cho trà / bánh / gift set. Biến: p, extra_note (tùy chọn) #}
 {% set first_ok = (p.variants | selectattr('stock', 'gt', 0) | list | first) or p.variants[0] %}
 <form class="buybox" data-buybox>
+  {% if p.flavors %}
+  <div class="field"><label for="cookieFlavor">Chọn vị bánh</label>
+    <select id="cookieFlavor" data-flavor-select>
+      {% for flavor in p.flavors %}<option value="{{ flavor }}" {{ 'selected' if flavor == first_ok.flavor }}>{{ flavor }}</option>{% endfor %}
+    </select>
+  </div>
+  {% endif %}
   <fieldset class="variants">
-    <legend>Quy cách</legend>
+    <legend>{{ 'Chọn pack / combo' if p.flavors else 'Quy cách' }}</legend>
     {% for v in p.variants %}
-    <label class="variant {{ 'is-out' if v.stock <= 0 }}">
-      <input type="radio" name="sku" value="{{ v.sku }}" data-price="{{ v.price }}" data-stock="{{ v.stock }}"
+    <label class="variant {{ 'is-out' if v.stock <= 0 }}" {% if p.flavors %}data-flavor-option="{{ v.flavor }}" {{ 'hidden' if v.flavor != first_ok.flavor }}{% endif %}>
+      <input type="radio" name="sku" value="{{ v.sku }}" data-price="{{ v.price }}" data-stock="{{ v.stock }}" {% if p.flavors %}data-size="{{ v.size }}" data-photo="{{ photo_url_for_stem(v.image_stem) or '' }}"{% endif %}
              {{ 'checked' if v.sku == first_ok.sku }} {{ 'disabled' if v.stock <= 0 }}>
-      <span><b>{{ v.label }}</b><small>{{ v.price | vnd }}{% if v.stock <= 0 %} · Tạm hết{% elif v.stock < 5 %} · Còn {{ v.stock }}{% endif %}</small></span>
+      <span><b>{{ v.size if p.flavors else v.label }}</b><small>{{ v.price | vnd }}{% if v.stock <= 0 %} · Tạm hết{% elif v.stock < 5 %} · Còn {{ v.stock }}{% endif %}</small></span>
     </label>
     {% endfor %}
   </fieldset>

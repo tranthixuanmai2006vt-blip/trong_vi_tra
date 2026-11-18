@@ -59,6 +59,28 @@ document.querySelectorAll('[data-buybox]').forEach(form => {
       form.querySelector('[data-preview]').textContent = ta.value || '(Thiệp để trống)';
     }
   }
+  const flavorSelect = form.querySelector('[data-flavor-select]');
+  if (flavorSelect) {
+    flavorSelect.addEventListener('change', () => {
+      const size = sel()?.dataset.size;
+      const options = [...form.querySelectorAll('[data-flavor-option]')];
+      options.forEach(option => { option.hidden = option.dataset.flavorOption !== flavorSelect.value; });
+      const radios = options.filter(o => !o.hidden).map(o => o.querySelector('[name=sku]'));
+      const next = radios.find(input => input.dataset.size === size && !input.disabled)
+        || radios.find(input => !input.disabled) || radios[0];
+      if (next) next.checked = true;
+    });
+    form.addEventListener('change', () => {
+      const selected = sel();
+      const gallery = document.querySelector('.pdp-gallery');
+      if (selected?.dataset.photo && gallery) {
+        let image = gallery.querySelector('img');
+        if (!image) { gallery.replaceChildren(); image = document.createElement('img'); gallery.append(image); }
+        image.src = selected.dataset.photo;
+        image.alt = 'Cracker Meringue Cookies · ' + flavorSelect.value;
+      }
+    });
+  }
   form.addEventListener('change', refresh); qty.addEventListener('input', refresh); if (ta) ta.addEventListener('input', refresh);
   form.querySelectorAll('[data-step]').forEach(b => b.onclick = () => { qty.value = Math.max(1, Math.min(+qty.max || 99, (+qty.value || 1) + +b.dataset.step)); refresh(); });
   let action = 'add';
@@ -87,10 +109,10 @@ document.querySelectorAll('[data-buybox]').forEach(form => {
   burger.onclick = open; document.getElementById('navClose').onclick = close; ov.onclick = close;
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (nav.classList.contains('open')) close(); document.querySelectorAll('.dd.open').forEach(d => { d.classList.remove('open'); d.querySelector('.dd-btn').setAttribute('aria-expanded', 'false'); }); } });
   document.querySelectorAll('.dd-btn').forEach(b => b.onclick = e => {
-    e.stopPropagation(); const dd = b.parentElement, isOpen = dd.classList.toggle('open'); b.setAttribute('aria-expanded', isOpen);
+    e.stopPropagation(); const dd = b.closest('.dd'), isOpen = dd.classList.toggle('open'); b.setAttribute('aria-expanded', isOpen);
     document.querySelectorAll('.dd').forEach(o => { if (o !== dd) { o.classList.remove('open'); o.querySelector('.dd-btn').setAttribute('aria-expanded', 'false'); } });
   });
-  document.addEventListener('click', e => { if (!e.target.closest('.dd')) document.querySelectorAll('.dd.open').forEach(d => d.classList.remove('open')); });
+  document.addEventListener('click', e => { if (!e.target.closest('.dd')) document.querySelectorAll('.dd.open').forEach(d => { d.classList.remove('open'); d.querySelector('.dd-btn').setAttribute('aria-expanded', 'false'); }); });
   const sb = document.getElementById('searchBtn'), sp = document.getElementById('searchPanel');
   sb.onclick = () => { sp.hidden = !sp.hidden; sb.setAttribute('aria-expanded', !sp.hidden); if (!sp.hidden) document.getElementById('q').focus(); };
   const h = document.getElementById('header'); addEventListener('scroll', () => h.classList.toggle('scrolled', scrollY > 8), { passive: true });

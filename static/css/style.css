@@ -859,3 +859,29 @@ h1, h2, h3 { text-transform: none; }
   .pcard-foot { flex-wrap: wrap; } .pcard-foot .btn { width: 100%; }
 }
 .pcard-img .product-photo { background: transparent; }
+
+/* Product catalog update: compact cards, package badge, split menu control. */
+.dd-product-heading{display:flex;align-items:center}
+.dd-product-link{padding:10px 0 10px 12px;font:500 15px var(--sans);text-decoration:none;color:var(--text)}
+.dd-product-link:hover,.dd.active .dd-product-link{color:var(--action)}
+.dd-product-toggle{padding-left:7px;padding-right:12px}
+.dd.active .dd-product-heading{border-bottom:2px solid var(--action)}
+.dd.active .dd-product-toggle{border-bottom-color:transparent}
+.cover-question{display:block;margin-top:.45em}
+.cat-cover-all.has-photo::after{background:linear-gradient(90deg,rgba(246,236,215,.82),rgba(246,236,215,.62) 30%,rgba(246,236,215,.12) 55%,transparent 72%)}
+.cat-cover-all.has-photo .cat-cover-text{width:58%}
+.badge-pack{background:var(--cream,#FAF7F0);color:var(--action);border:1px solid rgba(80,48,33,.12)}
+.shop-main .pcard-body{padding:14px;gap:0}
+.shop-main .pcard-name{min-height:0;margin-bottom:10px}
+.shop-main .pcard-foot{margin-top:auto;padding-top:10px}
+.shop-main .pcard-gift{margin-top:8px}
+[data-flavor-option][hidden]{display:none!important}
+.pdp-gallery > img{width:100%;height:auto;aspect-ratio:1;object-fit:contain}
+@media(max-width:767px){
+ .cat-cover-all.has-photo .cat-cover-text{width:100%}
+ .dd-product-heading{width:100%}
+ .dd-product-link{flex:1;font-size:16px;padding:14px 8px}
+ .dd-product-toggle{width:44px;flex:none;text-align:center}
+ .dd.active .dd-product-heading{border-bottom:1px solid var(--line);border-left:3px solid var(--action)}
+ .dd.active .dd-product-toggle{border-left:0}
+}

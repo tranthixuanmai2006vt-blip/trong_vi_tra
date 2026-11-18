@@ -1021,6 +1021,22 @@ PAYMENT_STATUS = {"cod_pending": "Chờ thanh toán khi nhận", "bank_pending":
                   "refund_requested": "Yêu cầu hoàn", "refunded": "Đã hoàn"}
 
 
+# Cracker Meringue Cookies: một sản phẩm, ba vị, hai cách đóng gói.
+_cookie_parts = [p for p in PRODUCTS if p['id'] in ('BC01', 'BC02', 'BC03')]
+_cookie = _cookie_parts[0]
+_cookie['name'] = 'Cracker Meringue Cookies'
+_cookie['slug'] = 'cracker-meringue-cookies'
+_cookie['flavors'] = ['Truyền thống', 'Matcha', 'Oolong']
+_cookie['desc'] = 'Chọn vị Truyền thống, Matcha hoặc Oolong. Pack 2 cái: 2.500đ; combo 2 pack (4 cái): 4.000đ.'
+_cookie['taste_note'] = _cookie['tea_note'] = 'Truyền thống · Matcha · Oolong'
+_cookie_variants = []
+for _part, _flavor in zip(_cookie_parts, _cookie['flavors']):
+    for _variant in _part['variants']:
+        _cookie_variants.append(dict(_variant, flavor=_flavor, size=_variant['label'],
+            label=_flavor + ' · ' + _variant['label'], image_stem=_part['image_stem']))
+_cookie['variants'] = _cookie_variants
+PRODUCTS = [p for p in PRODUCTS if p['id'] not in ('BC02', 'BC03')]
+
 # Đồng bộ liên kết khi bỏ các dòng trà mẫu khỏi danh mục bán.
 # Không tự thay nguyên liệu bánh hoặc thành phần quà bằng một loại trà khác.
 _ACTIVE_IDS = {p['id'] for p in PRODUCTS if p['type'] != 'gift'}

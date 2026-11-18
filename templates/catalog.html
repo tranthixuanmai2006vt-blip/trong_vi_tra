@@ -6,14 +6,14 @@
   <div class="container">
     {{ m.crumbs([('Sản phẩm', url_for('catalog') if loai else None)] + ([(D.TYPE_LABEL[loai], None)] if loai in D.TYPE_LABEL else [])) }}
     {% set covers = {
-      'tra': ('Trà', 'Một ấm trà, một khoảng thảnh thơi.', 'cover-tra.jpg', [('pouch','#7C8F3A'),('tin','#B4762E'),('pouch','#5E7D2A')]),
-      'banh': ('Bánh từ trà', 'Thêm chút ngọt cho buổi ngồi cùng nhau.', 'cover-banh.jpg', [('cake','#C08A3E'),('cookie','#7C9A3F'),('madeleine','#D2A24C')]),
-      'gift': ('Hộp quà', 'Chọn một món quà, gửi một lời thương.', 'cover-hopqua.jpg', [('giftbox','#3B630D'),('card','#503021'),('giftbox','#8C9A4B')]) } %}
-    {% if loai in covers %}
-    {% set cv = covers[loai] %}
+      'tra': ('Vị trà thân quen', 'Trồng nên hương trà, lưu giữ vị nhà', 'cover-tra.jpg', [('pouch','#7C8F3A'),('tin','#B4762E'),('pouch','#5E7D2A')]),
+      'banh': ('Vị bánh ấm lòng', 'Ủ hương trà trong bánh, vun chút ngọt cho nhà', 'cover-banh.jpg', [('cake','#C08A3E'),('cookie','#7C9A3F'),('madeleine','#D2A24C')]),
+      'gift': ('Gói vị nhà trao nhau', 'Gói hương trà, gom vị bánh, gửi chút tình nhà', 'cover-hopqua.jpg', [('giftbox','#3B630D'),('card','#503021'),('giftbox','#8C9A4B')]) } %}
+    {% if loai in covers or not loai %}
+    {% set cv = covers[loai] if loai in covers else ('Gói vị thân quen', 'Vị trà thanh, vị bánh ngọt, vị thương gói ghém trong từng món quà.', 'cover-gift-set.jpg') %}
     {% set cover_src = site_image_url(cv[2]) %}
     {% set mobile_src = site_image_url(cv[2].replace('.jpg', '-mobile.jpg')) %}
-    <div class="cat-cover cat-cover-{{ loai }} {{ 'has-photo' if cover_src }}">
+    <div class="cat-cover cat-cover-{{ loai or "all" }} {{ 'has-photo' if cover_src }}">
       {% if cover_src %}
       <picture class="cat-cover-photo">
         {% if mobile_src %}<source media="(max-width: 767px)" srcset="{{ mobile_src }}">{% endif %}
@@ -22,7 +22,7 @@
       {% endif %}
       <div class="cat-cover-text">
         <h1>{{ cv[0] }}</h1>
-        <p class="lead">{{ cv[1] }}</p>
+        <p class="lead">{{ cv[1] }}{% if not loai %}<br><span class="cover-question">Hôm nay, bạn thích vị nào?</span>{% endif %}</p>
       </div>
       {% if not cover_src %}<div class="category-photo-pending">Ảnh {{ cv[0] | lower }} đang cập nhật</div>{% endif %}
     </div>
@@ -104,12 +104,12 @@
 
 <section class="section section-tint">
   <div class="container">
-    <div class="sec-head"><h2>Chọn theo khoảnh khắc</h2></div>
+    <div class="sec-head"><h2>Mỗi khoảnh khắc - mỗi vị riêng</h2></div>
     <div class="moment-grid">
-      <a class="moment" href="{{ url_for('catalog', cat='tra', dip='moi-ngay') }}"><b>Thưởng trà mỗi ngày</b><span>Xem trà mỗi ngày →</span></a>
-      <a class="moment" href="{{ url_for('catalog', **{'goi-y':'pairing'}) }}"><b>Ăn bánh cùng trà</b><span>Chọn cặp trà – bánh →</span></a>
-      <a class="moment" href="{{ url_for('catalog', cat='gift-set') }}"><b>Biếu tặng tinh tế</b><span>Xem gift set →</span></a>
-      <a class="moment" href="{{ url_for('custom_design') }}"><b>Quà doanh nghiệp</b><span>Tư vấn quà doanh nghiệp →</span></a>
+      <a class="moment" href="{{ url_for('catalog', cat='tra', dip='moi-ngay') }}"><b>Ươm chút thảnh thơi</b><span>Xem trà mỗi ngày →</span></a>
+      <a class="moment" href="{{ url_for('catalog', **{'goi-y':'pairing'}) }}"><b>Ấm vị sum vầy</b><span>Chọn cặp trà – bánh →</span></a>
+      <a class="moment" href="{{ url_for('catalog', cat='gift-set') }}"><b>Gói ghém yêu thương</b><span>Xem gift set →</span></a>
+      <a class="moment" href="{{ url_for('custom_design') }}"><b>Trao vị tri ân</b><span>Tư vấn quà doanh nghiệp →</span></a>
     </div>
     <p class="center muted">Chưa rõ gu của mình? <a class="link" href="{{ url_for('tea_dna') }}">Tìm gu trà với Tea DNA</a></p>
   </div>
