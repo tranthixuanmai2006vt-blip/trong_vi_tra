@@ -76,24 +76,22 @@
   }
 
   function renderItems() {
-    const q = ($('bxSearch').value || '').toLowerCase(), pr = $('bxPrice').value, onlyStock = $('bxStock').checked;
-    const [lo, hi] = pr ? pr.split('-').map(Number) : [0, 1e12];
+    const q = ($('bxSearch').value || '').toLowerCase(), onlyStock = $('bxStock').checked;
     const list = BX.products.filter(p => p.type === st.type && p.name.toLowerCase().includes(q)
-      && p.variants.some(v => v.price >= lo && v.price < hi) && (!onlyStock || p.variants.some(v => v.stock > 0)));
+      && (!onlyStock || p.variants.some(v => v.stock > 0)));
     if (!list.length) { $('bxItems').innerHTML = `<div class="empty"><p>Không tìm thấy món phù hợp.</p><button class="btn btn-sm btn-secondary" id="clrF">Xóa bộ lọc</button></div>`;
-      $('clrF').onclick = () => { $('bxSearch').value = ''; $('bxPrice').value = ''; $('bxStock').checked = false; renderItems(); }; return; }
+      $('clrF').onclick = () => { $('bxSearch').value = ''; $('bxStock').checked = false; renderItems(); }; return; }
     $('bxItems').innerHTML = list.map(p => {
-      const opts = p.variants.map(v => `<option value="${v.sku}" ${v.stock <= 0 ? 'disabled' : ''}>${esc(v.label)} – ${vnd(v.price)}${v.stock <= 0 ? ' (tạm hết)' : ''}</option>`).join('');
+      const opts = p.variants.map(v => `<option value="${v.sku}" ${v.stock <= 0 ? 'disabled' : ''}>${esc(v.label)}${v.stock <= 0 ? ' (tạm hết)' : ''}</option>`).join('');
       const chosen = p.variants.filter(v => st.items[v.sku] > 0);
       const allOut = p.variants.every(v => v.stock <= 0);
       const teaPacks = p.type === 'tra'
-        ? `<div class="bx-tea-packs">${p.variants.map(v => `<div class="bx-tea-pack"><span class="bx-pack-tag">${esc(v.label.replace(/^Gói\s*/i, ''))}</span><button class="btn btn-sm" data-addtea="${v.sku}" ${v.stock <= 0 ? 'disabled' : ''}>Thêm vào hộp</button></div>`).join('')}</div>`
+        ? `<div class="bx-tea-packs">${p.variants.filter(v => !st.items[v.sku]).map(v => `<div class="bx-tea-pack"><span class="bx-pack-tag">${esc(v.label.replace(/^Gói\s*/i, ''))}</span><button class="btn btn-sm" data-addtea="${v.sku}" ${v.stock <= 0 ? 'disabled' : ''}>Thêm vào hộp</button></div>`).join('')}</div>`
         : `<div class="bx-add"><select data-var="${p.id}" aria-label="Quy cách ${esc(p.name)}">${opts}</select><button class="btn btn-sm" data-addbox="${p.id}">Thêm vào hộp</button></div>`;
       return `<article class="bx-card ${chosen.length ? 'selected' : ''} ${allOut ? 'is-out' : ''}">
         <div class="bx-art ${p.image_url ? 'has-photo' : ''}" style="--c:${p.color}">${p.image_url ? `<img src="${esc(p.image_url)}" alt="${esc(p.name)}" loading="lazy">` : ''}</div>
         <div class="bx-body"><h4>${esc(p.name)}</h4><p class="small muted">${esc(p.taste_note)}</p>
-          ${p.type === 'banh' ? `<p class="small"><span class="pill-warn">Dị ứng: ${esc(p.allergens.join(', '))}</span> · Chuẩn bị ${p.prep_days} ngày</p>` : ''}
-          <button class="link-sm" data-detail="${p.id}">Xem chi tiết</button>
+          <button class="link-sm" data-detail="${p.id}">Chi tiết →</button>
           ${allOut ? '<p class="err small">Tạm hết hàng</p>' : teaPacks}
           ${chosen.map(v => `<div class="bx-chosen"><span>${esc(v.label)}</span><div class="stepper stepper-sm"><button data-dec="${v.sku}" aria-label="Giảm">−</button><b>${st.items[v.sku]}</b><button data-inc="${v.sku}" aria-label="Tăng">+</button></div></div>`).join('')}
         </div></article>`;
@@ -276,7 +274,7 @@
   function openDetail(pid, opener) {
     const p = BX.products.find(x => x.id === pid);
     $('ddBody').innerHTML = `<h3 id="ddTitle">${esc(p.name)}</h3><p>${esc(p.desc)}</p>
-      <ul class="meta-list">${p.variants.map(v => `<li><span>${esc(v.label)}</span>${vnd(v.price)} · ${v.stock > 0 ? 'còn ' + v.stock : 'tạm hết'}</li>`).join('')}</ul>
+      <ul class="meta-list">${p.variants.map(v => `<li><span>${esc(v.label)}</span>${v.stock > 0 ? 'Còn hàng' : 'Tạm hết'}</li>`).join('')}</ul>
       ${p.allergens.length ? `<p><b>Dị ứng:</b> ${esc(p.allergens.join(', '))}</p>` : ''}
       <p><b>Bảo quản:</b> ${esc(p.storage)}</p><p><b>Hạn dùng:</b> ${esc(p.hsd)}</p>
       <p><b>Chuẩn bị:</b> ${p.prep_days} ngày</p><a class="link" href="${p.url}" target="_blank" rel="noopener">Mở trang sản phẩm ↗</a>`;
@@ -295,7 +293,7 @@
     document.querySelectorAll('.step[data-step="1"] .tab').forEach(x => { x.classList.toggle('active', x === t); x.setAttribute('aria-selected', x === t); });
     st.type = t.dataset.type; renderItems();
   });
-  ['bxSearch', 'bxPrice', 'bxStock'].forEach(id => $(id).addEventListener('input', renderItems));
+  ['bxSearch', 'bxStock'].forEach(id => $(id).addEventListener('input', renderItems));
   $('wTo').oninput = e => { st.wish.to = e.target.value; renderWish(); update(); };
   $('wFrom').oninput = e => { st.wish.from = e.target.value; renderWish(); update(); };
   $('wMsg').oninput = e => { st.wish.message = e.target.value; st.emptyOk = false; renderWish(); renderStepbar(); $('nextReason').textContent = stepError(5) || ''; save(); };

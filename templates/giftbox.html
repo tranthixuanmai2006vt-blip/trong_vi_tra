@@ -7,9 +7,9 @@
       {{ m.crumbs([('Dịch vụ', None), ('Tạo hộp quà', None)]) }}
       <p class="eyebrow">Dịch vụ · Tạo hộp quà</p>
       <h1>Gói một chút hương trà, gửi trọn lời thương.</h1>
-      <p class="lead">Tự chọn trà, bánh, hộp và thiệp. Mỗi bước sẽ hiện riêng để bạn dễ xem lựa chọn và giá trước khi tiếp tục.</p>
+      <p class="lead">Chọn trà, bánh, hộp và thiệp theo cách bạn thích.</p>
       <div class="giftbox-hero-actions"><a href="#builder" class="btn btn-lg" id="startBtn">Bắt đầu chọn quà <span aria-hidden="true">↓</span></a><a class="link" href="{{ url_for('custom_design') }}" id="toCustom">Cần thiết kế riêng? →</a></div>
-      <p class="muted small">Giá tạm tính cập nhật theo lựa chọn. Phí vận chuyển tính ở bước thanh toán.</p>
+      <p class="muted small">Giá hộp quà sẽ được tổng kết ở bước cuối.</p>
     </div>
     <div class="giftbox-hero-visual"><div class="giftbox-photo-placeholder"><span aria-hidden="true">✳</span><b>Ảnh hộp quà</b><small>Chừa chỗ để thêm ảnh sau</small></div><span class="giftbox-hero-stamp">Chọn từng món<br>theo gu của bạn</span></div>
   </div>
@@ -38,7 +38,6 @@
               <button class="tab" data-type="banh" role="tab" aria-selected="false">Bánh từ trà</button>
             </div>
             <input type="search" id="bxSearch" placeholder="Tìm theo tên…" aria-label="Tìm món">
-            <select id="bxPrice" aria-label="Lọc giá"><option value="">Mọi mức giá</option><option value="0-150000">Dưới 150.000đ</option><option value="150000-300000">150.000 – 300.000đ</option><option value="300000-99999999">Trên 300.000đ</option></select>
             <label class="check"><input type="checkbox" id="bxStock"> Còn hàng</label>
           </div>
           <div class="bx-grid" id="bxItems"></div>

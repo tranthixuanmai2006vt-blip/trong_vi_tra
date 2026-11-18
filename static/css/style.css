@@ -932,6 +932,8 @@ h1, h2, h3 { text-transform: none; }
 .bx-card h4{font-family:var(--serif);font-size:18px;line-height:1.28}
 .bx-body{gap:8px}
 .bx-body>.small.muted{font-size:14px;line-height:1.55}
+.bx-body>.small.muted{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:0}
+.bx-tools .tabs{flex:none}.bx-tools input[type=search]{flex:1;min-width:180px}
 .bx-tea-packs{display:grid;gap:8px;margin-top:3px}
 .bx-tea-pack{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .bx-pack-tag{display:inline-flex;align-items:center;min-height:30px;padding:4px 11px;border-radius:999px;background:var(--selected-bg);color:var(--action);font-size:13px;font-weight:700;white-space:nowrap}
