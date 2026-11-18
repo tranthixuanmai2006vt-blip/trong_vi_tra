@@ -7,8 +7,8 @@
     {{ m.crumbs([('Sản phẩm', url_for('catalog') if loai else None)] + ([(D.TYPE_LABEL[loai], None)] if loai in D.TYPE_LABEL else [])) }}
     {% set covers = {
       'tra': ('Vị trà thân quen', 'Trồng nên hương trà, lưu giữ vị nhà', 'cover-tra.jpg', [('pouch','#7C8F3A'),('tin','#B4762E'),('pouch','#5E7D2A')]),
-      'banh': ('Vị bánh ấm lòng', 'Ủ hương trà trong bánh, vun chút ngọt cho nhà', 'cover-banh.jpg', [('cake','#C08A3E'),('cookie','#7C9A3F'),('madeleine','#D2A24C')]),
-      'gift': ('Gói vị nhà trao nhau', 'Gói hương trà, gom vị bánh, gửi chút tình nhà', 'cover-hopqua.jpg', [('giftbox','#3B630D'),('card','#503021'),('giftbox','#8C9A4B')]) } %}
+      'banh': ('Vị bánh ấm lòng', 'Ủ hương trà cho bánh, vun chút ngọt cho nhà', 'cover-banh.jpg', [('cake','#C08A3E'),('cookie','#7C9A3F'),('madeleine','#D2A24C')]),
+      'gift': ('Vị nhà trao nhau', 'Gói hương trà, gom vị bánh, gửi tình nhà', 'cover-hopqua.jpg', [('giftbox','#3B630D'),('card','#503021'),('giftbox','#8C9A4B')]) } %}
     {% if loai in covers or not loai %}
     {% set cv = covers[loai] if loai in covers else ('Gói vị thân quen', 'Vị trà thanh, vị bánh ngọt, vị thương gói ghém trong từng món quà.', 'cover-gift-set.jpg') %}
     {% set cover_src = site_image_url(cv[2]) %}
@@ -52,15 +52,9 @@
       <fieldset><legend>Tình trạng</legend>
         <label class="check"><input type="checkbox" name="con-hang" value="1" {{ 'checked' if sel.get('con-hang') }}> Chỉ hiện còn hàng</label>
       </fieldset>
-      <fieldset><legend>Dịp tặng / dùng</legend>
-        {% for k, v in D.OCCASIONS.items() %}<label class="check"><input type="checkbox" name="dip" value="{{ k }}" {{ 'checked' if k in sel.getlist('dip') }}> {{ v }}</label>{% endfor %}
-      </fieldset>
       {% if loai in [None, 'tra'] %}
       <fieldset><legend>Nhóm trà</legend>
         {% for k, v in D.TEA_GROUPS.items() %}<label class="check"><input type="checkbox" name="nhom" value="{{ k }}" {{ 'checked' if k in sel.getlist('nhom') }}> {{ v }}</label>{% endfor %}
-      </fieldset>
-      <fieldset><legend>Gu vị</legend>
-        {% for k, v in D.FLAVORS.items() %}<label class="check"><input type="checkbox" name="vi" value="{{ k }}" {{ 'checked' if k in sel.getlist('vi') }}> {{ v }}</label>{% endfor %}
       </fieldset>
       {% endif %}
       {% if loai == 'banh' %}
@@ -106,7 +100,7 @@
   <div class="container">
     <div class="sec-head"><h2>Mỗi khoảnh khắc - mỗi vị riêng</h2></div>
     <div class="moment-grid">
-      <a class="moment" href="{{ url_for('catalog', cat='tra', dip='moi-ngay') }}"><b>Ươm chút thảnh thơi</b><span>Xem trà mỗi ngày →</span></a>
+      <a class="moment" href="{{ url_for('catalog', cat='tra', dip='moi-ngay') }}"><b>Nhâm nhi vị trà</b><span>Xem các loại trà →</span></a>
       <a class="moment" href="{{ url_for('catalog', **{'goi-y':'pairing'}) }}"><b>Ấm vị sum vầy</b><span>Chọn cặp trà – bánh →</span></a>
       <a class="moment" href="{{ url_for('catalog', cat='gift-set') }}"><b>Gói ghém yêu thương</b><span>Xem gift set →</span></a>
       <a class="moment" href="{{ url_for('custom_design') }}"><b>Trao vị tri ân</b><span>Tư vấn quà doanh nghiệp →</span></a>
