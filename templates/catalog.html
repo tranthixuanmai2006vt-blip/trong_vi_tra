@@ -27,8 +27,8 @@
       {% if not cover_src %}<div class="category-photo-pending">Ảnh {{ cv[0] | lower }} đang cập nhật</div>{% endif %}
     </div>
     {% else %}
-    <h1>Khám phá Trà • Bánh từ trà • Hộp quà</h1>
-    <p class="lead">Một nơi để chọn vị trà mình thích, chiếc bánh đi cùng và món quà gửi người thương.</p>
+    <h1>Gói vị thân quen</h1>
+    <p class="lead">Vị trà thanh, vị bánh ngọt, vị thương gói ghém trong từng món quà. Hôm nay, bạn thích vị nào?</p>
     {% endif %}
     <nav class="tabs tabs-link" aria-label="Danh mục">
       <a class="tab {{ 'active' if not loai }}" href="{{ url_for('catalog') }}">Tất cả <small>{{ D.PRODUCTS|length }}</small></a>

@@ -61,10 +61,11 @@
 
 {# ====== Thẻ sản phẩm ====== #}
 {% macro product_card(p, show_gift_cta=False) -%}
-{% set ok = in_stock(p) %}{% set v0 = p.variants[0] %}
-<article class="pcard {{ 'is-out' if not ok }}">
+{% set ok = in_stock(p) %}{% set v0 = p.variants[0] %}{% set multi = p.variants|length > 1 %}
+{# Lưới chỉ giữ thông tin gọn: loại · tên · (quy cách gói với trà) · giá · nút. Chi tiết xem ở trang sản phẩm. #}
+<article class="pcard pcard-{{ p.type }} {{ 'is-out' if not ok }}">
   <a href="{{ product_url(p) }}" class="pcard-img" aria-label="Xem chi tiết {{ p.name }}">
-    {{ product_image(p) }}
+    {{ product_image(p, '5/4') }}
     <span class="badges">
       {% if not ok %}<span class="badge badge-out">Tạm hết</span>{% endif %}
       {% if p.made_to_order %}<span class="badge badge-pre">Cần đặt trước</span>{% endif %}
@@ -72,22 +73,21 @@
     </span>
   </a>
   <div class="pcard-body">
-    <p class="pcard-type">{{ D.TYPE_LABEL[p.type] }}{% if p.line %} · {{ p.line }}{% endif %}</p>
+    <p class="pcard-type">{{ D.TYPE_LABEL[p.type] }}{% if p.type == 'tra' and p.line %}<span aria-hidden="true"> · </span>{{ p.line }}{% endif %}</p>
     <h3 class="pcard-name"><a href="{{ product_url(p) }}">{{ p.name }}</a></h3>
-    <p class="pcard-taste">{{ p.taste_note }}</p>
-    <p class="pcard-spec">{{ p.variants | map(attribute='label') | join(' · ') }}</p>
+    {% if p.type == 'tra' %}<p class="pcard-spec"><span class="chip-spec">{{ p.variants | map(attribute='label') | join(' · ') }}</span></p>{% endif %}
     <div class="pcard-foot">
-      <span class="price">{% if p.variants|length > 1 %}<small>từ</small> {% endif %}{{ min_price(p) | vnd }}</span>
+      <span class="price">{% if multi %}<small>từ</small> {% endif %}{{ min_price(p) | vnd }}</span>
       {% if not ok %}
         <button class="btn btn-sm btn-secondary" disabled title="Sản phẩm tạm hết">Tạm hết</button>
-      {% elif p.variants|length > 1 %}
+      {% elif multi %}
         <a class="btn btn-sm btn-secondary" href="{{ product_url(p) }}">Chọn quy cách</a>
       {% else %}
         <button class="btn btn-sm" data-add="{{ v0.sku }}" data-name="{{ p.name }}">Thêm vào giỏ</button>
       {% endif %}
     </div>
     {% if show_gift_cta and p.type in ['tra','banh'] and ok %}
-      <a class="link-sm" href="{{ url_for('giftbox_page', sku=v0.sku) }}">Tạo quà từ món này →</a>
+      <a class="pcard-gift" href="{{ url_for('giftbox_page', sku=v0.sku) }}">Tạo quà từ món này <span aria-hidden="true">→</span></a>
     {% endif %}
   </div>
 </article>
