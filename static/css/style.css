@@ -1296,3 +1296,59 @@ body:has(.dna-reveal:not([hidden])) .msg-bubble, body:has(.drawer:not([hidden]))
 .catalog-gift-card:nth-child(3) .pcard-img .product-photo img {
   transform: scale(1.02);
 }
+
+
+/* Dịch vụ: thẻ chọn món gọn, quy cách nằm dưới ảnh và giá các hộp cùng hàng. */
+.bx-card{grid-template-columns:86px minmax(0,1fr);min-height:126px;align-items:start}
+.bx-media{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0}
+.bx-card .bx-art{width:86px;height:86px;flex:none}
+.bx-tea-packs{display:flex;flex-wrap:wrap;gap:5px;max-width:100%;margin:0}
+.bx-pack-tag{border:0;cursor:pointer;font:700 12px var(--sans);min-height:25px;padding:3px 8px}
+.bx-pack-tag.active{background:var(--action);color:#fff}
+.bx-pack-tag:disabled{opacity:.45;cursor:not-allowed}
+.bx-tea-qty{width:100%;padding:4px 5px!important;font-size:11px!important}
+.bx-tea-qty .stepper{gap:6px}
+.bx-card-tea .bx-body{min-height:96px}
+.bx-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:3px}
+.bx-actions .link-sm{padding:0;white-space:nowrap}
+.bx-actions .btn{white-space:nowrap}
+.bx-added{font-size:13px;color:var(--action);font-weight:700}
+.bx-chosen{margin-top:4px}
+.bx-flavors{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.bx-flavor{border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--text);padding:6px 10px;font:600 12px var(--sans);cursor:pointer}
+.bx-flavor:hover,.bx-flavor.selected{border-color:var(--action);background:var(--selected-bg);color:var(--action)}
+.bx-flavor:disabled{opacity:.45;cursor:not-allowed}
+.box-opt-grid .opt{height:100%;min-height:338px}
+.box-opt-grid .opt-body{display:flex;flex-direction:column;gap:5px;min-height:168px}
+.box-opt-grid .opt-body>b{min-height:2.4em;display:flex;align-items:flex-start}
+.box-opt-grid .opt-body small{min-height:1.35em}
+.box-opt-grid .opt-price{margin-top:auto;padding-top:8px}
+.box-opt-grid .opt-photo{height:144px;flex:none}
+
+/* Thiết kế riêng: hero ảnh biên tập và quy trình theo nhịp kể chuyện. */
+.custom-hero{position:relative;overflow:hidden;padding:24px 0 72px;background:radial-gradient(80% 110% at 90% 0%,#e8e2c7 0%,#f5ead6 48%,#faf7f0 100%)}
+.custom-hero::after{content:"";position:absolute;right:-130px;bottom:-260px;width:430px;height:430px;border:1px solid rgba(140,154,75,.25);border-radius:50%;box-shadow:0 0 0 36px rgba(140,154,75,.05),0 0 0 76px rgba(140,154,75,.04);pointer-events:none}
+.custom-hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(36px,7vw,96px);align-items:center}
+.custom-hero-copy .crumbs{margin-bottom:34px}.custom-hero-copy .eyebrow{color:var(--action);font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
+.custom-hero h1{font-size:clamp(46px,6vw,74px);line-height:1.02;letter-spacing:-.035em;margin:8px 0 18px}.custom-hero h1 em{font-weight:500;color:var(--action)}
+.custom-hero .lead{font-size:20px;max-width:470px;margin-bottom:20px}
+.custom-points{display:grid;gap:9px;list-style:none;padding:0;margin:0 0 24px;color:var(--text-2)}
+.custom-points li{display:flex;align-items:center;gap:10px}.custom-points li::before{content:"✳";color:var(--accent);font-size:15px}
+.custom-hero-photo{position:relative;margin:0;min-height:390px;overflow:hidden;border:8px solid #fff;border-radius:24px;background:#ebe2ce;box-shadow:0 26px 54px -38px rgba(47,59,42,.55)}
+.custom-hero-photo img{display:block;width:100%;height:100%;min-height:390px;object-fit:cover}
+.custom-hero-photo figcaption{position:absolute;left:22px;right:22px;bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;background:rgba(250,247,240,.92);color:var(--text)}
+.custom-hero-photo figcaption span{color:var(--action);font-size:12px;letter-spacing:.13em;font-weight:700}.custom-hero-photo figcaption b{font:600 17px var(--serif)}
+.custom-process-section{background:var(--bg-tint);padding-top:76px;padding-bottom:84px}
+.custom-section-head{display:flex;justify-content:space-between;align-items:end;gap:28px;margin-bottom:32px}.custom-section-head .eyebrow{color:var(--action);font-size:12px;letter-spacing:.15em;text-transform:uppercase;font-weight:700;margin-bottom:8px}.custom-section-head h2{margin:0}.custom-section-head>p{max-width:330px;color:var(--text-2);margin:0 0 4px}
+.custom-process{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;counter-reset:none}
+.custom-process-card{position:relative;min-height:232px;padding:22px 18px;border:1px solid var(--line);border-radius:18px;background:rgba(255,255,255,.86);box-shadow:0 18px 40px -38px rgba(80,48,33,.5);transition:transform .25s,border-color .25s}
+.custom-process-card:hover{transform:translateY(-5px);border-color:var(--accent)}
+.custom-process-no{display:block;color:var(--accent);font-size:12px;letter-spacing:.16em;font-weight:700}
+.custom-process-mark{position:absolute;right:18px;top:16px;color:var(--action);font-size:21px}
+.custom-process-card h3{font:600 21px/1.2 var(--serif);margin:40px 0 10px}.custom-process-card p{font-size:14px;color:var(--text-2);line-height:1.65;margin:0}
+.custom-process-connector{position:absolute;top:31px;right:-24px;z-index:2;color:var(--accent);letter-spacing:.06em}
+.custom-terms-section .terms-grid{align-self:center}.custom-terms-section .term{height:100%}
+.custom-form-section[hidden]{display:none!important}
+@media(max-width:980px){.custom-process{grid-template-columns:repeat(3,minmax(0,1fr))}.custom-process-card{min-height:205px}.custom-process-connector{display:none}}
+@media(max-width:767px){.bx-card{grid-template-columns:76px minmax(0,1fr);min-height:0}.bx-card .bx-art{width:76px;height:76px}.bx-actions{flex-wrap:wrap;justify-content:flex-start}.box-opt-grid .opt{min-height:0}.box-opt-grid .opt-body{min-height:0}.box-opt-grid .opt-body>b,.box-opt-grid .opt-body small{min-height:0}.box-opt-grid .opt-price{margin-top:6px}.custom-hero-grid{grid-template-columns:1fr;gap:25px}.custom-hero-photo,.custom-hero-photo img{min-height:260px}.custom-hero-photo img{max-height:360px}.custom-section-head{display:block}.custom-section-head>p{margin-top:12px}.custom-process{grid-template-columns:1fr 1fr}.custom-process-card{min-height:200px}}
+@media(max-width:520px){.custom-process{grid-template-columns:1fr}.custom-process-card{min-height:0}.custom-process-card h3{margin-top:25px}.custom-hero-photo figcaption{left:12px;right:12px;bottom:12px;padding:10px 12px}.custom-hero-photo figcaption b{font-size:15px}}

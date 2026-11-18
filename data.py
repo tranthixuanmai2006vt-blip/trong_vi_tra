@@ -711,14 +711,12 @@ GIFTBOX_PACKING_DAYS = 1
 # THIẾT KẾ RIÊNG
 # -----------------------------------------------------------------
 CUSTOM_SCOPES = [
-    {"icon": "logo", "title": "In tên, logo lên hộp & thiệp",
-     "desc": "In logo doanh nghiệp, tên người nhận hoặc thông điệp riêng lên nắp hộp, tag và thiệp."},
-    {"icon": "leaf", "title": "Chọn món theo ngân sách",
-     "desc": "Phối trà, bánh từ trà và phụ kiện theo ngân sách, khẩu vị và số lượng quà."},
-    {"icon": "paper", "title": "Bao bì & giấy trà thủ công",
-     "desc": "Chọn chất liệu hộp, màu giấy, giấy trà thủ công và cách sắp xếp lòng hộp."},
-    {"icon": "card", "title": "Thiệp & lời nhắn riêng",
-     "desc": "Thiết kế thiệp theo nhận diện, lời nhắn khác nhau cho từng người nhận (theo danh sách)."},
+    {"icon": "logo", "title": "In tên, logo lên hộp và thiệp",
+     "desc": "Thêm nhận diện hoặc lời nhắn riêng lên món quà."},
+    {"icon": "paper", "title": "Đặt theo dịp, số lượng lớn",
+     "desc": "Tư vấn phối hộp quà cho doanh nghiệp, sự kiện và dịp đặc biệt."},
+    {"icon": "card", "title": "Duyệt mẫu trước khi làm",
+     "desc": "Thống nhất thiết kế và báo giá trước khi bắt đầu sản xuất."},
 ]
 CUSTOM_IDEAS = [
     {"title": "Quà Tết doanh nghiệp", "tag": "doanh-nghiep", "desc": "Hộp gỗ, in logo nắp, 2 dòng trà + bánh hạnh nhân.", "color": "#503021"},

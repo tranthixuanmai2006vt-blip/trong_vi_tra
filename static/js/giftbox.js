@@ -11,7 +11,7 @@
 
   const fresh = () => ({ step: 1, maxStep: 1, items: {}, box: null, paper: null, card: null, acc: {},
     wish: { to: '', message: '', from: '' }, boxes: 1, reqId: null, emptyOk: false, type: 'tra' });
-  let st = fresh(), notice = {};
+  let st = fresh(), notice = {}, teaSelection = {}, openCookie = {};
 
   /* ---------- tính toán ---------- */
   const lines = () => Object.entries(st.items).filter(([, q]) => q > 0).map(([sku, q]) => ({ sku, q, ...SKU[sku] })).filter(l => l.p);
@@ -84,26 +84,33 @@
     $('bxItems').innerHTML = list.map(p => {
       const chosen = p.variants.filter(v => st.items[v.sku] > 0);
       const allOut = p.variants.every(v => v.stock <= 0);
-      const addable = p.variants.filter(v => !st.items[v.sku]);
-      const opts = addable.map(v => `<option value="${v.sku}" ${v.stock <= 0 ? 'disabled' : ''}>${esc(v.label)}${v.stock <= 0 ? ' (tạm hết)' : ''}</option>`).join('');
-      const teaPacks = p.type === 'tra'
-        ? `<div class="bx-tea-packs">${p.variants.filter(v => !st.items[v.sku]).map(v => `<div class="bx-tea-pack"><span class="bx-pack-tag">${esc(v.label.replace(/^Gói\s*/i, ''))}</span><button class="btn btn-sm" data-addtea="${v.sku}" ${v.stock <= 0 ? 'disabled' : ''}>Thêm vào hộp</button></div>`).join('')}</div>`
-        : p.variants.length === 1
-          ? (chosen.length ? '' : `<div class="bx-tea-pack"><span class="bx-pack-tag">${esc(p.variants[0].label)}</span><button class="btn btn-sm" data-addbox="${p.id}" data-sku="${p.variants[0].sku}">Thêm vào hộp</button></div>`)
-          : (addable.length ? `<div class="bx-add"><select data-var="${p.id}" aria-label="Chọn vị và quy cách ${esc(p.name)}">${opts}</select><button class="btn btn-sm" data-addbox="${p.id}">Thêm vào hộp</button></div>` : '');
-      return `<article class="bx-card ${chosen.length ? 'selected' : ''} ${allOut ? 'is-out' : ''}">
-        <div class="bx-art ${p.image_url ? 'has-photo' : ''}" style="--c:${p.color}">${p.image_url ? `<img src="${esc(p.image_url)}" alt="${esc(p.name)}" loading="lazy">` : ''}</div>
-        <div class="bx-body"><h4>${esc(p.name)}</h4><p class="small muted">${esc(p.taste_note)}</p>
-          <button class="link-sm" data-detail="${p.id}">Chi tiết →</button>
-          ${allOut ? '<p class="err small">Tạm hết hàng</p>' : teaPacks}
-          ${chosen.map(v => `<div class="bx-chosen"><span>${esc(v.label)}</span><div class="stepper stepper-sm"><button data-dec="${v.sku}" aria-label="Giảm">−</button><b>${st.items[v.sku]}</b><button data-inc="${v.sku}" aria-label="Tăng">+</button></div></div>`).join('')}
-        </div></article>`;
+      const isTea = p.type === 'tra';
+      const isCookie = p.id === 'BC01' && p.variants.some(v => v.flavor);
+      if (isTea && !teaSelection[p.id]) teaSelection[p.id] = p.variants.find(v => v.stock > 0)?.sku || p.variants[0]?.sku;
+      const selectedTea = p.variants.find(v => v.sku === teaSelection[p.id]) || p.variants[0];
+      const art = `<div class="bx-art ${p.image_url ? 'has-photo' : ''}" style="--c:${p.color}">${p.image_url ? `<img src="${esc(p.image_url)}" alt="${esc(p.name)}" loading="lazy">` : ''}</div>`;
+      const tags = isTea ? `<div class="bx-tea-packs" aria-label="Chọn quy cách">${p.variants.map(v => `<button type="button" class="bx-pack-tag ${selectedTea?.sku === v.sku ? 'active' : ''}" data-selecttea="${p.id}" data-sku="${v.sku}" ${v.stock <= 0 ? 'disabled' : ''}>${esc(v.label.replace(/^Gói\s*/i, ''))}</button>${st.items[v.sku] ? `<div class="bx-chosen bx-tea-qty"><span>${st.items[v.sku]} trong hộp</span><div class="stepper stepper-sm"><button data-dec="${v.sku}" aria-label="Giảm">−</button><b>${st.items[v.sku]}</b><button data-inc="${v.sku}" aria-label="Tăng">+</button></div></div>` : ''}`).join('')}</div>` : '';
+      let actions = '';
+      if (allOut) actions = '<span class="err small">Tạm hết hàng</span>';
+      else if (isTea) actions = `<div class="bx-actions"><button class="link-sm" data-detail="${p.id}">Chi tiết →</button><button class="btn btn-sm" data-addtea="${p.id}" ${selectedTea?.stock <= 0 ? 'disabled' : ''}>Thêm vào hộp</button></div>`;
+      else if (isCookie) {
+        const flavors = [...new Set(p.variants.map(v => v.flavor).filter(Boolean))];
+        actions = `<div class="bx-actions"><button class="link-sm" data-detail="${p.id}">Chi tiết →</button><button class="btn btn-sm" data-cookie-toggle="${p.id}">${openCookie[p.id] || chosen.length ? 'Chọn vị' : 'Thêm vào hộp'}</button></div>` +
+          (openCookie[p.id] || chosen.length ? `<div class="bx-flavors" aria-label="Chọn vị">${flavors.map(f => { const options = p.variants.filter(x => x.flavor === f); const v = options.find(x => /Pack 2 cái/i.test(x.size || x.label) && x.stock > 0) || options.find(x => x.stock > 0) || options[0]; const exists = chosen.some(x => x.flavor === f); return `<button class="bx-flavor ${exists ? 'selected' : ''}" data-addflavor="${v.sku}" ${v.stock <= 0 ? 'disabled' : ''}>${esc(f)}${exists ? ' · Đã chọn' : ''}</button>`; }).join('')}</div>` : '');
+      } else {
+        const v = p.variants[0], exists = chosen.length > 0;
+        actions = `<div class="bx-actions"><button class="link-sm" data-detail="${p.id}">Chi tiết →</button>${exists ? '<span class="bx-added">Đã thêm</span>' : `<button class="btn btn-sm" data-addsingle="${v.sku}" ${v.stock <= 0 ? 'disabled' : ''}>Thêm vào hộp</button>`}</div>`;
+      }
+      const chosenRows = chosen.filter(v => !isTea).map(v => `<div class="bx-chosen"><span>${esc(isCookie ? v.flavor : v.label.replace(/^Gói\s*/i, ''))}</span><div class="stepper stepper-sm"><button data-dec="${v.sku}" aria-label="Giảm">−</button><b>${st.items[v.sku]}</b><button data-inc="${v.sku}" aria-label="Tăng">+</button></div></div>`).join('');
+      return `<article class="bx-card ${chosen.length ? 'selected' : ''} ${allOut ? 'is-out' : ''} ${isTea ? 'bx-card-tea' : ''}">
+        <div class="bx-media">${art}${tags}</div>
+        <div class="bx-body"><h4>${esc(p.name)}</h4><p class="small muted">${esc(p.taste_note)}</p>${actions}${chosenRows}</div></article>`;
     }).join('');
-    $('bxItems').querySelectorAll('[data-addtea]').forEach(b => b.onclick = () => changeQty(b.dataset.addtea, 1));
-    $('bxItems').querySelectorAll('[data-addbox]').forEach(b => b.onclick = () => {
-      const select = $('bxItems').querySelector(`[data-var="${b.dataset.addbox}"]`);
-      changeQty(select ? select.value : b.dataset.sku, 1);
-    });
+    $('bxItems').querySelectorAll('[data-selecttea]').forEach(b => b.onclick = () => { teaSelection[b.dataset.selecttea] = b.dataset.sku; renderItems(); });
+    $('bxItems').querySelectorAll('[data-addtea]').forEach(b => b.onclick = () => changeQty(teaSelection[b.dataset.addtea], 1));
+    $('bxItems').querySelectorAll('[data-addsingle]').forEach(b => b.onclick = () => changeQty(b.dataset.addsingle, 1));
+    $('bxItems').querySelectorAll('[data-cookie-toggle]').forEach(b => b.onclick = () => { openCookie[b.dataset.cookieToggle] = !openCookie[b.dataset.cookieToggle]; renderItems(); });
+    $('bxItems').querySelectorAll('[data-addflavor]').forEach(b => b.onclick = () => changeQty(b.dataset.addflavor, 1));
     $('bxItems').querySelectorAll('[data-inc]').forEach(b => b.onclick = () => changeQty(b.dataset.inc, 1));
     $('bxItems').querySelectorAll('[data-dec]').forEach(b => b.onclick = () => changeQty(b.dataset.dec, -1));
     $('bxItems').querySelectorAll('[data-detail]').forEach(b => b.onclick = () => openDetail(b.dataset.detail, b));
@@ -185,7 +192,7 @@
     const n = st.boxes;
     $('review').innerHTML = `
       <div class="rv-group"><div class="rv-head"><h3>Trà & bánh (${lines().reduce((s, l) => s + l.q, 0)} món)</h3><button class="link-sm" data-go="1">Chỉnh sửa</button></div>
-        <ul>${lines().map(l => `<li>${esc(l.p.name)} – ${esc(l.v.label)} × ${l.q}<span>${vnd(l.v.price * l.q)}</span>${l.p.type === 'banh' ? `<small class="muted">HSD: ${esc(l.p.hsd)} · ${esc(l.p.storage)}</small>` : ''}</li>`).join('')}</ul></div>
+        <ul>${lines().map(l => `<li>${esc(l.p.name)} – ${esc(l.v.flavor || l.v.label.replace(/^Gói\s*/i, ''))} × ${l.q}<span>${vnd(l.v.price * l.q)}</span>${l.p.type === 'banh' ? `<small class="muted">HSD: ${esc(l.p.hsd)} · ${esc(l.p.storage)}</small>` : ''}</li>`).join('')}</ul></div>
       <div class="rv-group"><div class="rv-head"><h3>Hộp</h3><button class="link-sm" data-go="2">Chỉnh sửa</button></div><ul><li>${esc(b.name)}<span>${vnd(b.price)}</span></li></ul></div>
       <div class="rv-group"><div class="rv-head"><h3>Giấy gói</h3><button class="link-sm" data-go="3">Chỉnh sửa</button></div><ul><li>${esc(pa.name)}<span>${vnd(pa.price)}</span></li></ul></div>
       <div class="rv-group"><div class="rv-head"><h3>Thiệp & phụ kiện</h3><button class="link-sm" data-go="4">Chỉnh sửa</button></div>
@@ -279,7 +286,7 @@
   function openDetail(pid, opener) {
     const p = BX.products.find(x => x.id === pid);
     $('ddBody').innerHTML = `<h3 id="ddTitle">${esc(p.name)}</h3><p>${esc(p.taste_note || '')}</p>
-      <ul class="meta-list">${p.variants.map(v => `<li><span>${esc(v.label)}</span>${v.stock > 0 ? 'Còn hàng' : 'Tạm hết'}</li>`).join('')}</ul>
+      <ul class="meta-list">${(p.id === 'BC01' ? [...new Map(p.variants.map(v => [v.flavor, v])).values()] : p.variants).map(v => `<li><span>${esc(v.flavor || v.label)}</span>${v.stock > 0 ? 'Còn hàng' : 'Tạm hết'}</li>`).join('')}</ul>
       ${p.allergens.length ? `<p><b>Dị ứng:</b> ${esc(p.allergens.join(', '))}</p>` : ''}
       <p><b>Bảo quản:</b> ${esc(p.storage)}</p><p><b>Hạn dùng:</b> ${esc(p.hsd)}</p>
       <p><b>Chuẩn bị:</b> ${p.prep_days} ngày</p><a class="link" href="${p.url}" target="_blank" rel="noopener">Mở trang sản phẩm ↗</a>`;

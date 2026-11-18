@@ -746,7 +746,7 @@ def custom_design():
                     "contact": form.get("email") if form.get("channel") == "email" else form.get("phone"),
                     "created": now_str()}
     ref = request.args.get("tham-chieu")
-    return render_template("custom_design.html", done=done, errors=errors, form=form, ref=ref)
+    return render_template("custom_design.html", done=done, errors=errors, form=form, ref=ref, form_open=(request.args.get("form") == "1"))
 
 
 # ------------------------------------------------------------------

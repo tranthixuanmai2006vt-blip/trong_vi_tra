@@ -1,64 +1,42 @@
 {% extends 'base.html' %}{% import 'macros.html' as m with context %}
 {% block title %}Thiết kế hộp quà theo yêu cầu{% endblock %}
 {% block content %}
-<section class="page-hero section-cream">
-  <div class="container hero-grid hero-grid-sm">
-    <div>
+<section class="custom-hero">
+  <div class="container custom-hero-grid">
+    <div class="custom-hero-copy">
       {{ m.crumbs([('Dịch vụ', None), ('Thiết kế riêng', None)]) }}
-      <h1>Món quà mang dấu ấn của riêng bạn</h1>
-      <p class="lead">In tên, logo; chọn món theo ngân sách; thiết kế bao bì và thiệp cho doanh nghiệp, sự kiện hay dịp đặc biệt. Bạn gửi yêu cầu – chúng tôi tư vấn và báo giá trước khi bắt đầu.</p>
-      <div class="cta-row"><a href="#gui-yeu-cau" class="btn btn-lg">Gửi yêu cầu thiết kế</a><a href="{{ url_for('giftbox_page') }}" class="btn btn-lg btn-secondary">Chỉ cần vài hộp? Tự tạo hộp quà</a></div>
-      <p class="small muted">Đây là luồng tư vấn, không đặt mua ngay. Bạn chỉ thanh toán khi đã có báo giá và phạm vi được chấp thuận.</p>
+      <p class="eyebrow">Dịch vụ · Thiết kế riêng</p>
+      <h1>Thiết kế hộp quà<br><em>theo yêu cầu</em></h1>
+      <p class="lead">Gửi nhu cầu, nhận tư vấn và báo giá.</p>
+      <ul class="custom-points">
+        <li>In tên, logo lên hộp và thiệp</li>
+        <li>Đặt theo dịp, số lượng lớn</li>
+        <li>Duyệt mẫu trước khi làm</li>
+      </ul>
+      <div class="cta-row"><a href="{{ url_for('custom_design', form='1') }}#gui-yeu-cau" class="btn btn-lg">Gửi yêu cầu thiết kế <span aria-hidden="true">→</span></a><a href="{{ url_for('giftbox_page') }}" class="link">Tự tạo hộp quà →</a></div>
+      <p class="small muted">Gửi yêu cầu miễn phí · Chưa phát sinh đơn hay khoản thanh toán.</p>
     </div>
-    <div>{{ m.art('giftbox', '#503021', 'hộp quà in logo', '4/3') }}</div>
+    <figure class="custom-hero-photo"><img src="{{ url_for('static', filename='img/about/story-hopqua.jpg') }}" alt="Hộp quà trà và bánh được sắp xếp chỉn chu" loading="eager"><figcaption><span>01 / 03</span><b>Một món quà, nhiều dấu ấn riêng</b></figcaption></figure>
   </div>
 </section>
 
-<section class="section">
+
+<section class="section custom-process-section">
   <div class="container">
-    <div class="sec-head"><h2>Bạn có thể cá nhân hóa những gì?</h2></div>
-    <div class="scope-grid">
-      {% for s in D.CUSTOM_SCOPES %}
-      <article class="scope reveal"><span class="v-ic">{{ m.icon({'logo':'pen','leaf':'leaf','paper':'gift','card':'pen'}[s.icon]) }}</span><h3>{{ s.title }}</h3><p>{{ s.desc }}</p></article>
-      {% endfor %}
-    </div>
+    <div class="custom-section-head"><div><p class="eyebrow">Từ lời nhắn đến món quà</p><h2>Quy trình thiết kế riêng</h2></div><p>Từng bước rõ ràng, bạn duyệt mẫu xong mới bắt đầu sản xuất.</p></div>
+    <ol class="custom-process">{% for t, d in D.CUSTOM_STEPS %}<li class="custom-process-card"><span class="custom-process-no">{{ '%02d'|format(loop.index) }}</span><span class="custom-process-mark" aria-hidden="true">{% if loop.last %}✳{% else %}↗{% endif %}</span><h3>{{ t }}</h3><p>{{ d }}</p>{% if not loop.last %}<span class="custom-process-connector" aria-hidden="true">——</span>{% endif %}</li>{% endfor %}</ol>
   </div>
 </section>
-
-<section class="section section-tint">
-  <div class="container">
-    <div class="sec-head"><h2>Bộ sưu tập ý tưởng</h2><p class="muted">Mẫu tham khảo để bạn hình dung – không phải sản phẩm bấm mua ngay.</p></div>
-    <div class="tabs" role="tablist" id="ideaTabs">
-      <button class="tab active" data-f="" role="tab">Tất cả</button>
-      {% for k, v in D.CUSTOM_IDEA_TAGS.items() %}<button class="tab" data-f="{{ k }}" role="tab">{{ v }}</button>{% endfor %}
-    </div>
-    <div class="idea-grid">
-      {% for i in D.CUSTOM_IDEAS %}
-      <article class="idea" data-tag="{{ i.tag }}">
-        {{ m.art('giftbox', i.color, i.title, '4/3') }}
-        <div class="idea-body"><span class="tag">{{ D.CUSTOM_IDEA_TAGS[i.tag] }}</span><h3>{{ i.title }}</h3><p>{{ i.desc }}</p>
-          <button class="link-sm" data-ref="{{ i.title }}">Dùng làm cảm hứng →</button></div>
-      </article>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-
-<section class="section">
+<section class="section custom-terms-section">
   <div class="container two-col">
-    <div>
-      <h2>Quy trình từ ý tưởng đến món quà</h2>
-      <ol class="vsteps">{% for t, d in D.CUSTOM_STEPS %}<li><b>{{ t }}</b><p>{{ d }}</p></li>{% endfor %}</ol>
-    </div>
-    <div>
-      <h2>Chi phí, thời gian và điều kiện</h2>
-      <div class="terms-grid">{% for t, d in D.CUSTOM_TERMS %}<div class="term"><b>{{ t }}</b><p>{{ d }}</p></div>{% endfor %}</div>
-      <p class="small"><a class="link" href="{{ url_for('policy', slug='qua-ca-nhan-hoa') }}">Xem Quy định quà cá nhân hóa →</a></p>
-    </div>
+    <div><p class="eyebrow">Trước khi bắt đầu</p><h2>Thông tin cần biết</h2><p class="muted">Mọi chi phí và mốc thời gian sẽ được xác nhận trong báo giá.</p></div>
+    <div class="terms-grid">{% for t, d in D.CUSTOM_TERMS %}<div class="term"><b>{{ t }}</b><p>{{ d }}</p></div>{% endfor %}</div>
   </div>
+  <div class="container"><p class="small"><a class="link" href="{{ url_for('policy', slug='qua-ca-nhan-hoa') }}">Xem Quy định quà cá nhân hóa →</a></p></div>
 </section>
 
-<section class="section section-cream" id="gui-yeu-cau">
+
+<section class="section section-cream custom-form-section" id="gui-yeu-cau" {% if not form_open and not done and not errors %}hidden{% endif %}>
   <div class="container form-layout">
     {% if done %}
     <div class="success-panel success-big" role="status" tabindex="-1" id="donePanel">
@@ -68,7 +46,7 @@
       <p>Gửi lúc {{ done.created }}. Bộ phận tư vấn sẽ liên hệ qua <b>{{ {'phone':'điện thoại','email':'email','zalo':'Zalo'}[done.channel] or done.channel }}</b> ({{ done.contact | mask_phone if done.channel != 'email' else done.contact | mask_email }}).</p>
       <ol class="vsteps vsteps-sm"><li><b>Tư vấn & báo giá</b></li><li><b>Chốt phạm vi & đặt cọc</b></li><li><b>Thiết kế & duyệt mẫu</b></li><li><b>Sản xuất & giao</b></li></ol>
       <p class="small muted">Lưu ý: mã yêu cầu (YC-…) khác mã đơn hàng. Chưa có khoản thanh toán nào được tạo.</p>
-      <div class="cta-row"><a class="btn" href="{{ url_for('custom_design') }}#gui-yeu-cau">Gửi yêu cầu khác</a><a class="btn btn-secondary" href="{{ url_for('catalog') }}">Xem sản phẩm</a></div>
+      <div class="cta-row"><a class="btn" href="{{ url_for('custom_design', form='1') }}#gui-yeu-cau">Gửi yêu cầu khác</a><a class="btn btn-secondary" href="{{ url_for('catalog') }}">Xem sản phẩm</a></div>
     </div>
     {% else %}
     <form class="card-form" method="post" enctype="multipart/form-data" novalidate id="designForm">
@@ -129,24 +107,17 @@
   <div class="container narrow">
     <h2>Câu hỏi thường gặp</h2>
     {% for q, a in D.CUSTOM_FAQ %}<details class="acc"><summary>{{ q }}</summary><p>{{ a }}</p></details>{% endfor %}
-    <div class="cta-row"><a href="#gui-yeu-cau" class="btn">Gửi yêu cầu</a></div>
+    <div class="cta-row"><a href="{{ url_for('custom_design', form='1') }}#gui-yeu-cau" class="btn">Gửi yêu cầu thiết kế</a></div>
   </div>
 </section>
 {% endblock %}
 {% block scripts %}
 <script>
-document.querySelectorAll('#ideaTabs .tab').forEach(t => t.onclick = () => {
-  document.querySelectorAll('#ideaTabs .tab').forEach(x => x.classList.toggle('active', x === t));
-  document.querySelectorAll('.idea').forEach(i => i.hidden = t.dataset.f && i.dataset.tag !== t.dataset.f);
-});
-document.querySelectorAll('[data-ref]').forEach(b => b.onclick = () => {
-  const f = document.getElementById('f-reference'); if (!f) return;
-  f.value = b.dataset.ref; document.getElementById('gui-yeu-cau').scrollIntoView({behavior:'smooth'}); f.focus();
-});
 const ff = document.getElementById('f-files');
 if (ff) ff.onchange = () => { const bad = [...ff.files].filter(f => f.size > 10*1024*1024 || !/\.(jpe?g|png|pdf)$/i.test(f.name));
   if (ff.files.length > 3 || bad.length) { toast(ff.files.length > 3 ? 'Tối đa 3 tệp.' : 'Tệp "' + bad[0].name + '" không hợp lệ (JPG/PNG/PDF, ≤10 MB).', 'error'); ff.value = ''; } };
-{% if done %}document.getElementById('gui-yeu-cau').scrollIntoView(); document.getElementById('donePanel').focus();{% endif %}
+{% if form_open or done %}document.getElementById('gui-yeu-cau').scrollIntoView();{% endif %}
+{% if done %}document.getElementById('donePanel').focus();{% endif %}
 {% if errors %}document.getElementById('gui-yeu-cau').scrollIntoView(); (document.querySelector('.has-error input, .has-error select, .has-error textarea')||{}).focus?.();{% endif %}
 </script>
 {% endblock %}
