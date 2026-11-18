@@ -2,6 +2,33 @@
 {% block title %}{{ D.TYPE_LABEL[loai] if loai in D.TYPE_LABEL else 'Sản phẩm' }}{% endblock %}
 {% block content %}
 {% set base_url = url_for('catalog', cat=cat) %}
+{% macro giftset_cards() %}
+{% set giftsets = [
+  ('khoi-huong', 'Khơi Hương', '#6A8543', 'Mở đầu bằng hương trà thanh dịu.'),
+  ('tron-vi', 'Trọn Vị', '#B18C58', 'Một hộp quà đủ đầy trà và bánh.'),
+  ('giao-hoa', 'Giao Hòa', '#8C5B4B', 'Nơi hương trà gặp vị bánh thân quen.')
+] %}
+<div class="pgrid pgrid-3 catalog-product-grid catalog-gift-grid">
+  {% for stem, name, color, note in giftsets %}
+  {% set photo = photo_url_for_stem(stem) %}
+  <article class="pcard pcard-gift catalog-gift-card">
+    <a href="{{ url_for('custom_design') }}" class="pcard-img" aria-label="Tìm hiểu gift set {{ name }}">
+      {% if photo %}<div class="product-photo"><img src="{{ photo }}" alt="Gift set {{ name }}" loading="lazy" decoding="async"></div>
+      {% else %}{{ m.art('giftbox', color, 'Gift set ' + name, '5/4') }}{% endif %}
+    </a>
+    <div class="pcard-body">
+      <p class="pcard-type">Gift set · Trồng Vị Nhà</p>
+      <h3 class="pcard-name">{{ name }}</h3>
+      <p class="catalog-gift-note">{{ note }}</p>
+      <div class="pcard-foot">
+        <span class="catalog-gift-price">Báo giá theo thành phần</span>
+        <a class="btn btn-sm btn-secondary" href="{{ url_for('custom_design') }}">Tùy chỉnh</a>
+      </div>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% endmacro %}
 <section class="page-hero section-cream">
   <div class="container">
     {{ m.crumbs([('Sản phẩm', url_for('catalog') if loai else None)] + ([(D.TYPE_LABEL[loai], None)] if loai in D.TYPE_LABEL else [])) }}
@@ -18,7 +45,7 @@
       <div class="collection-cover-copy">
         <span class="collection-kicker">TRỒNG VỊ NHÀ · {{ counts[loai] }} SẢN PHẨM</span>
         <h1>{{ 'Vị trà thân quen' if loai == 'tra' else 'Vị bánh ấm lòng' }}</h1>
-        <p>{{ 'Từ những dòng trà được tuyển chọn, tìm một hương vị hợp với nhịp riêng của bạn.' if loai == 'tra' else 'Hương trà đi vào từng lớp bánh nhỏ — chọn món theo vị và dòng bánh bạn yêu thích.' }}</p>
+        <p>{{ 'Trồng nên hương trà, lưu giữ vị nhà' if loai == 'tra' else 'Ủ hương trà cho bánh, vun chút ngọt cho nhà' }}</p>
         <a class="collection-cta" href="#danh-sach-san-pham">Khám phá {{ category_title | lower }} <span aria-hidden="true">↓</span></a>
       </div>
       <span class="collection-mark" aria-hidden="true">{{ 'TRÀ' if loai == 'tra' else 'BÁNH' }}</span>
@@ -27,20 +54,73 @@
     {% set cover_src = site_image_url('cover-hopqua.jpg') %}
     <div class="cat-cover cat-cover-gift {{ 'has-photo' if cover_src }}">
       {% if cover_src %}<picture class="cat-cover-photo"><img src="{{ cover_src }}" alt="Gift set Trồng Vị Nhà" fetchpriority="high"></picture>{% endif %}
-      <div class="cat-cover-text"><h1>Vị nhà trao nhau</h1><p class="lead">Gói hương trà, gom vị bánh, gửi tình nhà.</p></div>
+      <div class="cat-cover-text"><h1>Vị nhà trao nhau</h1><p class="lead">Gói hương trà, gom vị bánh, gửi tình nhà</p></div>
     </div>
     {% else %}
     <div class="cat-cover cat-cover-all"><div class="cat-cover-text"><h1>Gói vị thân quen</h1><p class="lead">Vị trà thanh, vị bánh ngọt, vị thương gói ghém trong từng món quà. Hôm nay, bạn thích vị nào?</p></div></div>
     {% endif %}
-    <nav class="tabs tabs-link" aria-label="Danh mục">
+  </div>
+</section>
+
+<section class="catalog-tabbar">
+  <div class="container">
+    <nav class="tabs tabs-link {{ 'catalog-jump-tabs' if landing }}" aria-label="Danh mục">
+      {% if landing %}
+      <a class="tab active" href="#catalog-tra">Trà <small>{{ counts.tra }}</small></a>
+      <a class="tab" href="#catalog-banh">Bánh từ trà <small>{{ counts.banh }}</small></a>
+      <a class="tab" href="#catalog-gift">Gift set <small>3</small></a>
+      {% else %}
       <a class="tab {{ 'active' if not loai }}" href="{{ url_for('catalog') }}">Tất cả <small>{{ D.PRODUCTS|length }}</small></a>
       <a class="tab {{ 'active' if loai=='tra' }}" href="{{ url_for('catalog', cat='tra') }}">Trà <small>{{ counts.tra }}</small></a>
       <a class="tab {{ 'active' if loai=='banh' }}" href="{{ url_for('catalog', cat='banh') }}">Bánh từ trà <small>{{ counts.banh }}</small></a>
-      <a class="tab {{ 'active' if loai=='gift' }}" href="{{ url_for('catalog', cat='gift-set') }}">Gift set <small>{{ counts.gift }}</small></a>
+      <a class="tab {{ 'active' if loai=='gift' }}" href="{{ url_for('catalog', cat='gift-set') }}">Gift set <small>3</small></a>
+      {% endif %}
     </nav>
   </div>
 </section>
 
+{% if landing %}
+{% for key, heading, eyebrow, description in [
+  ('tra', 'Trà', '01 · HƯƠNG TRÀ HẰNG SƠN ĐIỀN', 'Trồng nên hương trà, lưu giữ vị nhà'),
+  ('banh', 'Bánh từ trà', '02 · VỊ NGỌT TỪ HƯƠNG TRÀ', 'Ủ hương trà cho bánh, vun chút ngọt cho nhà'),
+  ('gift', 'Gift set', '03 · VỊ NHÀ TRAO NHAU', 'Gói hương trà, gom vị bánh, gửi tình nhà')
+] %}
+{% set section_items = items|selectattr('type', 'equalto', key)|list %}
+<section class="catalog-story-section catalog-story-{{ key }}" id="catalog-{{ key }}">
+  <div class="container">
+    <header class="catalog-story-head">
+      <div class="catalog-story-title">
+        <p class="eyebrow">{{ eyebrow }}</p>
+        <h2>{{ heading }}</h2>
+      </div>
+      <div class="catalog-story-copy">
+        <p>{{ description }}</p>
+        {% if key == 'tra' %}<a href="{{ url_for('catalog', cat='tra') }}">Khám phá các dòng trà <span aria-hidden="true">→</span></a>
+        {% elif key == 'banh' %}<a href="{{ url_for('catalog', cat='banh') }}">Xem các loại bánh <span aria-hidden="true">→</span></a>
+        {% else %}<a href="{{ url_for('custom_design') }}">Tùy chỉnh hộp quà <span aria-hidden="true">→</span></a>{% endif %}
+      </div>
+    </header>
+    {% if key in ['tra', 'banh'] %}
+      <div class="pgrid pgrid-3 catalog-product-grid">
+        {% for p in section_items %}{{ m.product_card(p, show_gift_cta=(key != 'gift')) }}{% endfor %}
+      </div>
+    {% else %}
+      {{ giftset_cards() }}
+    {% endif %}
+  </div>
+</section>
+{% endfor %}
+{% elif loai == 'gift' %}
+<section class="catalog-story-section catalog-story-gift" id="danh-sach-san-pham">
+  <div class="container">
+    <header class="catalog-story-head">
+      <div class="catalog-story-title"><p class="eyebrow">03 · VỊ NHÀ TRAO NHAU</p><h2>Gift set</h2></div>
+      <div class="catalog-story-copy"><p>Gói hương trà, gom vị bánh, gửi tình nhà</p><a href="{{ url_for('custom_design') }}">Tùy chỉnh hộp quà <span aria-hidden="true">→</span></a></div>
+    </header>
+    {{ giftset_cards() }}
+  </div>
+</section>
+{% else %}
 <section class="section section-tight" id="danh-sach-san-pham">
   <div class="container shop">
     {% if loai in ['tra', 'banh'] %}
@@ -113,6 +193,7 @@
     </div>
   </div>
 </section>
+{% endif %}
 
 <section class="section section-tint">
   <div class="container">
@@ -139,12 +220,15 @@
 {% endblock %}
 {% block scripts %}
 <script>
-document.getElementById('sortSel').onchange = e => {
+const sortSel = document.getElementById('sortSel');
+if (sortSel) sortSel.onchange = e => {
   const u = new URL(location.href); u.searchParams.set('sap-xep', e.target.value); location.href = u;
 };
 const fl = document.getElementById('filters');
-document.getElementById('filterToggle').onclick = () => { fl.classList.add('open'); fl.querySelector('input,button').focus(); };
-document.getElementById('filterClose').onclick = () => fl.classList.remove('open');
-fl.addEventListener('change', () => { if (innerWidth > 960) fl.submit(); });
+if (fl) {
+  document.getElementById('filterToggle').onclick = () => { fl.classList.add('open'); fl.querySelector('input,button').focus(); };
+  document.getElementById('filterClose').onclick = () => fl.classList.remove('open');
+  fl.addEventListener('change', () => { if (innerWidth > 960) fl.submit(); });
+}
 </script>
 {% endblock %}

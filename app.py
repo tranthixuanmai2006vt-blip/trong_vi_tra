@@ -469,6 +469,7 @@ def catalog(cat=None):
     else:
         items.sort(key=lambda p: (p["type"] != "tra", p["rank"]) if not loai else p["rank"])
     counts = {k: sum(1 for p in D.PRODUCTS if p["type"] == k) for k in D.TYPE_LABEL}
+    landing = not any((loai, q, gia, dip, nhom, dong, vi, tranh, con_hang, goi_y))
     chips = []
     for key, label_map in (("gia", {k: v[0] for k, v in D.PRICE_RANGES.items()}), ("dip", D.OCCASIONS),
                            ("nhom", D.TEA_GROUPS), ("vi", D.FLAVORS),
@@ -490,7 +491,7 @@ def catalog(cat=None):
     cake_lines = list(dict.fromkeys(p["line"] for p in D.PRODUCTS if p["type"] == "banh"))
     return render_template("catalog.html", items=items, cat=cat, loai=loai, q=q, sel=a, counts=counts,
                            chips=chips, sort=sort, goi_y=goi_y, cover_items=cover_items,
-                           cake_lines=cake_lines, selected_line=dong)
+                           cake_lines=cake_lines, selected_line=dong, landing=landing)
 
 
 def strip_accents(s):
