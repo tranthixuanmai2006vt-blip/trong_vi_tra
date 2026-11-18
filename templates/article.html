@@ -1,7 +1,19 @@
 {% extends 'base.html' %}{% import 'macros.html' as m with context %}
 {% block title %}{{ a.title }}{% endblock %}
 {% block desc %}{{ a.summary }}{% endblock %}
-{% from 'stories.html' import story_image with context %}
+{% macro story_image(file, alt, ratio='4/3') -%}
+  <div class="story-image" style="--story-ratio: {{ ratio }}">
+    {% if has_img(file) %}
+      <img src="{{ url_for('static', filename='img/' + file) }}" alt="{{ alt }}" loading="lazy" decoding="async">
+    {% else %}
+      <div class="story-image-empty" aria-label="Vị trí ảnh sẽ được bổ sung">
+        <span class="story-image-mark" aria-hidden="true">✳</span>
+        <span>Ảnh bài viết</span>
+        <small>{{ file }}</small>
+      </div>
+    {% endif %}
+  </div>
+{%- endmacro %}
 {% block head %}
 <style>
   .article-cover .story-image { margin-top: 24px; border-radius: 12px; }
