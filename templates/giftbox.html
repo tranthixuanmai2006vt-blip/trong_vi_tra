@@ -1,17 +1,20 @@
 {% extends 'base.html' %}{% import 'macros.html' as m with context %}
 {% block title %}Tạo hộp quà{% endblock %}
 {% block content %}
-<section class="page-hero section-cream">
-  <div class="container hero-grid hero-grid-sm">
-    <div>
-      {{ m.crumbs([('Dịch vụ', None), ('Tạo hộp quà', None)]) }}
-      <p class="eyebrow">Dịch vụ · Tạo hộp quà</p>
-      <h1>Gói ghém sắc hương, gửi trọn lời thương.</h1>
-      <p class="lead">Chọn trà, bánh, hộp và thiệp theo cách bạn thích.</p>
-      <div class="giftbox-hero-actions"><a href="#builder" class="btn btn-lg" id="startBtn">Bắt đầu chọn quà <span aria-hidden="true">↓</span></a><a class="link" href="{{ url_for('custom_design') }}" id="toCustom">Cần thiết kế riêng? →</a></div>
-      <p class="muted small">Giá hộp quà sẽ được tổng kết ở bước cuối.</p>
+<section class="giftbox-hero-section">
+  <div class="container">
+    <div class="giftbox-hero-banner">
+      <img class="giftbox-hero-image" src="{{ url_for('static', filename='img/tao-hop-qua-banner.png') }}" alt="Các hộp quà trà và bánh Trồng Vị Nhà" fetchpriority="high">
+      <div class="giftbox-hero-copy">
+        {{ m.crumbs([('Dịch vụ', None), ('Tạo hộp quà', None)]) }}
+        <p class="eyebrow">Dịch vụ · Tạo hộp quà</p>
+        <h1>Gói ghém sắc <span class="giftbox-green-word">hương</span>,<br>gửi trọn lời <span class="giftbox-green-word">thương</span>.</h1>
+        <p class="lead">Chọn trà, bánh, hộp và thiệp theo cách bạn thích.</p>
+        <div class="giftbox-hero-actions"><a href="#builder" class="btn btn-lg" id="startBtn">Bắt đầu chọn quà</a><a class="link" href="{{ url_for('custom_design') }}" id="toCustom">Cần thiết kế riêng? →</a></div>
+        <p class="muted small">Giá hộp quà sẽ được tổng kết ở bước cuối.</p>
+      </div>
+      <span class="giftbox-hero-stamp">Chọn từng món<br>theo gu của bạn</span>
     </div>
-    <div class="giftbox-hero-visual"><div class="giftbox-photo-placeholder"><span aria-hidden="true">✳</span><b>Ảnh hộp quà</b><small>Chừa chỗ để thêm ảnh sau</small></div><span class="giftbox-hero-stamp">Chọn từng món<br>theo gu của bạn</span></div>
   </div>
 </section>
 

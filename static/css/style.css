@@ -1352,3 +1352,58 @@ body:has(.dna-reveal:not([hidden])) .msg-bubble, body:has(.drawer:not([hidden]))
 @media(max-width:980px){.custom-process{grid-template-columns:repeat(3,minmax(0,1fr))}.custom-process-card{min-height:205px}.custom-process-connector{display:none}}
 @media(max-width:767px){.bx-card{grid-template-columns:76px minmax(0,1fr);min-height:0}.bx-card .bx-art{width:76px;height:76px}.bx-actions{flex-wrap:wrap;justify-content:flex-start}.box-opt-grid .opt{min-height:0}.box-opt-grid .opt-body{min-height:0}.box-opt-grid .opt-body>b,.box-opt-grid .opt-body small{min-height:0}.box-opt-grid .opt-price{margin-top:6px}.custom-hero-grid{grid-template-columns:1fr;gap:25px}.custom-hero-photo,.custom-hero-photo img{min-height:260px}.custom-hero-photo img{max-height:360px}.custom-section-head{display:block}.custom-section-head>p{margin-top:12px}.custom-process{grid-template-columns:1fr 1fr}.custom-process-card{min-height:200px}}
 @media(max-width:520px){.custom-process{grid-template-columns:1fr}.custom-process-card{min-height:0}.custom-process-card h3{margin-top:25px}.custom-hero-photo figcaption{left:12px;right:12px;bottom:12px;padding:10px 12px}.custom-hero-photo figcaption b{font-size:15px}}
+
+/* Ảnh quà tặng cho hai trang dịch vụ. */
+.custom-hero-photo img{object-position:center 52%}
+.giftbox-hero-section{padding:26px 0 64px;background:var(--bg-cream)}
+.giftbox-hero-banner{position:relative;isolation:isolate;min-height:clamp(380px,42vw,520px);overflow:hidden;border-radius:24px;background:#263324;box-shadow:0 22px 55px -42px rgba(47,59,42,.55)}
+.giftbox-hero-image{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:center}
+.giftbox-hero-banner::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(28,43,29,.54) 0%,rgba(28,43,29,.26) 42%,rgba(28,43,29,0) 74%)}
+.giftbox-hero-copy{position:relative;z-index:1;width:min(58%,620px);padding:42px clamp(24px,4vw,58px);color:#fbf0dc}
+.giftbox-hero-copy .crumbs,.giftbox-hero-copy .crumbs a{color:rgba(255,245,226,.84)}
+.giftbox-hero-copy .eyebrow{margin:28px 0 10px;color:#d9d68f;font-size:12px;letter-spacing:.15em;text-transform:uppercase;font-weight:700}
+.giftbox-hero-copy h1{font-size:clamp(38px,5vw,62px);line-height:1.06;color:#fff0d7;margin:0 0 15px;max-width:600px}
+.giftbox-hero-copy .lead{max-width:480px;color:rgba(255,245,226,.92);font-size:18px}
+.giftbox-hero-copy .giftbox-hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin:22px 0 12px}
+.giftbox-hero-copy .link{font-weight:600;color:#f0daa9}.giftbox-hero-copy .small{color:rgba(255,245,226,.74)}
+.giftbox-hero-stamp{right:22px;bottom:22px}
+@media(max-width:767px){.giftbox-hero-section{padding:14px 0 42px}.giftbox-hero-banner{min-height:520px;border-radius:18px}.giftbox-hero-image{object-position:63% center}.giftbox-hero-banner::after{background:linear-gradient(90deg,rgba(28,43,29,.68),rgba(28,43,29,.3) 68%,rgba(28,43,29,.1))}.giftbox-hero-copy{width:100%;padding:24px 22px}.giftbox-hero-copy .crumbs{margin-bottom:24px}.giftbox-hero-copy .eyebrow{margin-top:22px}.giftbox-hero-stamp{width:82px;height:82px;right:14px;bottom:14px;font-size:12px}}
+
+/* Quy trình riêng: sợi dây xanh nối các chặng; thông tin dàn kín khung. */
+.custom-process-wrap{position:relative;isolation:isolate}.custom-process{position:relative;z-index:1}
+.custom-process-thread{position:absolute;z-index:0;top:0;left:0;width:100%;height:48px;overflow:visible;pointer-events:none}
+.custom-process-thread path{fill:none;stroke:#8C9A4B;stroke-width:2.5;stroke-dasharray:5 5;stroke-linecap:round;opacity:.9}
+.custom-process-card{z-index:1}
+.custom-process-connector{display:none}
+.custom-terms-section .custom-section-head{margin-bottom:28px}
+.custom-terms-section .terms-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.custom-terms-section .term{height:100%;min-height:152px}
+.custom-policy-link{margin:22px 0 0}
+.design-request-heading{padding:30px 0 46px;background:radial-gradient(90% 120% at 100% 0%,#e8e2c7 0%,#f5ead6 45%,#faf7f0 100%)}
+.design-request-heading .crumbs{margin-bottom:36px}
+.design-request-heading .eyebrow{color:var(--action);font-size:12px;letter-spacing:.16em;font-weight:700}
+.design-request-heading h1{font-size:clamp(42px,5.5vw,68px);line-height:1.04;margin:8px 0 14px}
+.design-request-heading h1 em{font-weight:500;color:var(--action)}
+.design-request-heading .lead{max-width:720px;color:var(--text-2);font-size:18px;margin-bottom:18px}
+.custom-form-standalone{padding-top:30px}
+.custom-form-standalone .form-layout{max-width:1020px;margin-inline:auto}
+.custom-form-standalone .card-form{box-shadow:0 18px 55px -44px rgba(80,48,33,.45)}
+.giftbox-green-word{color:var(--action);font-style:italic}
+
+/* Bring every product action to the lower edge; align it with the tea size tag. */
+.bx-card{align-items:stretch;min-height:148px}
+.bx-body{display:flex;flex-direction:column;min-height:118px}
+.bx-card-tea .bx-body{min-height:118px}
+.bx-actions{margin-top:auto;padding-top:8px}
+.bx-card .bx-art{object-fit:cover}
+.bx-media{min-height:118px}
+.bx-pack-tag{align-self:flex-start}
+
+/* Keep tall food and gift photos centered inside the catalog frames. */
+.catalog-portfolio-grid .portfolio-card-link>.product-photo img{object-fit:contain;padding:10%;transform:none}
+.catalog-portfolio-grid .portfolio-card-link[href*="paparoti-matcha"]>.product-photo img{padding:9%;transform:translateY(-6%) scale(.88)}
+.catalog-gift-card .pcard-img .product-photo img{object-fit:contain!important;padding:8%!important;transform:none!important;object-position:center!important}
+@media(max-width:980px){.custom-terms-section .terms-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.custom-process-thread{top:20px}}
+@media(max-width:767px){.custom-process-thread{display:none}.custom-terms-section .terms-grid{grid-template-columns:1fr}.design-request-heading{padding:18px 0 34px}.design-request-heading .crumbs{margin-bottom:24px}.design-request-heading h1{font-size:42px}.custom-terms-section .term{min-height:0}.bx-card{min-height:140px}.bx-body,.bx-card-tea .bx-body{min-height:110px}}
+.catalog-portfolio-grid .portfolio-card-link[href*="paparoti-matcha"]>.product-photo img,
+.pcard-banh .pcard-img[href*="paparoti-matcha"] .product-photo img{object-fit:contain;padding:9%;transform:translateY(-6%) scale(.88)}

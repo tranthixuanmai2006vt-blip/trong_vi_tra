@@ -1,0 +1,25 @@
+{% extends 'base.html' %}{% import 'macros.html' as m with context %}
+{% block title %}Gửi yêu cầu thiết kế hộp quà{% endblock %}
+{% block content %}
+<section class="design-request-heading">
+  <div class="container">
+    {{ m.crumbs([('Dịch vụ', None), ('Thiết kế riêng', url_for('custom_design')), ('Gửi yêu cầu', None)]) }}
+    <p class="eyebrow">THIẾT KẾ RIÊNG · BƯỚC 01</p>
+    <h1>Gửi nhu cầu,<br><em>nhận tư vấn & báo giá.</em></h1>
+    <p class="lead">Chia sẻ dịp tặng, số lượng và ý tưởng của bạn. Trồng Vị Nhà sẽ liên hệ để tư vấn trước khi lên báo giá.</p>
+    <a class="link" href="{{ url_for('custom_design') }}">← Quay lại Thiết kế riêng</a>
+  </div>
+</section>
+<section class="section custom-form-standalone">
+  {% include '_design_request_form.html' %}
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+const ff = document.getElementById('f-files');
+if (ff) ff.onchange = () => { const bad = [...ff.files].filter(f => f.size > 10*1024*1024 || !/\.(jpe?g|png|pdf)$/i.test(f.name));
+  if (ff.files.length > 3 || bad.length) { toast(ff.files.length > 3 ? 'Tối đa 3 tệp.' : 'Tệp "' + bad[0].name + '" không hợp lệ (JPG/PNG/PDF, ≤10 MB).', 'error'); ff.value = ''; } };
+{% if done %}document.getElementById('donePanel')?.focus();{% endif %}
+{% if errors %}(document.querySelector('.has-error input, .has-error select, .has-error textarea')||{}).focus?.();{% endif %}
+</script>
+{% endblock %}

@@ -704,7 +704,10 @@ def giftbox_page():
 
 
 @app.route("/dich-vu/thiet-ke-rieng", methods=["GET", "POST"])
+@app.route("/dich-vu/gui-yeu-cau-thiet-ke", methods=["GET", "POST"], endpoint="design_request")
 def custom_design():
+    if request.method == "GET" and request.endpoint == "custom_design" and request.args.get("form") == "1":
+        return redirect(url_for("design_request"))
     done, errors, form = None, {}, {}
     if request.method == "POST":
         form = request.form.to_dict()
@@ -746,7 +749,8 @@ def custom_design():
                     "contact": form.get("email") if form.get("channel") == "email" else form.get("phone"),
                     "created": now_str()}
     ref = request.args.get("tham-chieu")
-    return render_template("custom_design.html", done=done, errors=errors, form=form, ref=ref, form_open=(request.args.get("form") == "1"))
+    template = "design_request.html" if request.endpoint == "design_request" else "custom_design.html"
+    return render_template(template, done=done, errors=errors, form=form, ref=ref)
 
 
 # ------------------------------------------------------------------
