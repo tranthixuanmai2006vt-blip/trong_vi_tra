@@ -768,7 +768,10 @@ def dna_payload():
     for r in D.DNA_RECIPES:
         r["tea_url"] = product_url(BY_ID[r["tea"]]) if r.get("tea") else None
         r["tea_name"] = BY_ID[r["tea"]]["name"] if r.get("tea") else None
-    return {"questions": D.DNA_QUESTIONS, "axes": D.DNA_AXES, "groups": D.DNA_GROUPS,
+    groups = [dict(g, img=url_for("static", filename=f"img/teadna/{g['id']}.webp"),
+                   thumb=url_for("static", filename=f"img/teadna/{g['id']}-sm.webp"),
+                   tint=D.DNA_GROUP_ART[g["id"]][0], bg=D.DNA_GROUP_ART[g["id"]][1]) for g in D.DNA_GROUPS]
+    return {"questions": D.DNA_QUESTIONS, "axes": D.DNA_AXES, "groups": groups,
             "recipes": D.DNA_RECIPES, "products": prods, "version": 2}
 
 

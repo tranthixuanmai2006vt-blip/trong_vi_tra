@@ -1,6 +1,7 @@
 {% extends 'base.html' %}{% import 'macros.html' as m with context %}
 {% block title %}Kết quả Tea DNA{% endblock %}
-{% block bodyclass %}page-dna{% endblock %}
+{% block bodyclass %}page-dna page-dna-result{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='css/teadna.css') }}">{% endblock %}
 {% block content %}
 <section class="section section-tight">
   <div class="container">
@@ -12,27 +13,31 @@
     </div>
 
     <div id="result" hidden>
-      <p class="eyebrow">YOUR TEA DNA / HỒ SƠ GU TRÀ</p>
-      <div class="dna-top">
-        <div>
-          <div class="dna-card" id="dnaCard">
-            <p class="dc-eyebrow">MY TEA DNA</p>
-            <h1 id="gName"></h1>
-            <p class="dc-tag" id="gTagline"></p>
-            <p class="dc-desc" id="gDesc"></p>
-            <p id="gSecond" class="dc-second"></p>
-            <div class="dc-chips" id="gChips"></div>
-            <div class="dc-conf"><span>Độ hoàn thiện hồ sơ</span><i><b id="gConfBar"></b></i><span id="gConf"></span></div>
-            <p class="dc-foot">{{ SITE.name }} × {{ SITE.partner }} · Explore Tea. Create Your Way.</p>
-          </div>
-          <div class="dna-actions">
-            <button class="btn btn-sm btn-secondary" id="shareBtn">{{ m.icon('share') }} Chia sẻ kết quả</button>
+      <div class="dres" id="dnaCard">
+        <div class="dres-art">
+          <div class="dres-halo" aria-hidden="true"><i></i><i></i><i></i></div>
+          <img id="gImg" alt="" width="720" height="720">
+          <span class="dres-spark s1" aria-hidden="true">✦</span><span class="dres-spark s2" aria-hidden="true">✦</span><span class="dres-spark s3" aria-hidden="true">✧</span>
+        </div>
+        <div class="dres-txt">
+          <p class="eyebrow dres-in" style="--d:0">YOUR TEA DNA · HỒ SƠ GU TRÀ</p>
+          <h1 id="gName" class="dres-name"></h1>
+          <p class="dc-tag dres-in" id="gTagline" style="--d:3"></p>
+          <p class="dc-desc dres-in" id="gDesc" style="--d:4"></p>
+          <p id="gSecond" class="dc-second dres-in" style="--d:5"></p>
+          <div class="dc-chips dres-in" id="gChips" style="--d:5"></div>
+          <div class="dc-conf dres-in" style="--d:6"><span>Độ hoàn thiện hồ sơ</span><i><b id="gConfBar"></b></i><span id="gConf"></span></div>
+          <div class="dna-actions dres-in" style="--d:7">
+            <button class="btn btn-sm btn-dark" id="shareBtn">{{ m.icon('share') }} Chia sẻ kết quả</button>
             <button class="btn btn-sm btn-secondary" id="redoBtn">↻ Làm lại bài test</button>
             <button class="btn btn-sm btn-ghost" id="delBtn">Xóa hồ sơ</button>
           </div>
-          <p class="small muted" id="gUpdated"></p>
+          <p class="small muted dres-in" id="gUpdated" style="--d:8"></p>
+          <p class="dc-foot dres-in" style="--d:8">{{ SITE.name }} × {{ SITE.partner }} · Explore Tea. Create Your Way.</p>
         </div>
+      </div>
 
+      <div class="dres-grid rv">
         <div class="axes-box">
           <h2 class="h3">Điểm từng trục</h2>
           <div id="axes"></div>
@@ -44,12 +49,16 @@
             <div class="cta-row"><button class="btn btn-sm" id="manSave">Lưu điều chỉnh</button><button class="btn btn-sm btn-secondary" id="manCancel">Hủy</button><button class="btn btn-sm btn-ghost" id="manReset" hidden>Khôi phục kết quả bài test</button></div>
           </details>
         </div>
+        <figure class="radar-box">
+          <svg id="radar" viewBox="-130 -125 260 250" role="img" aria-label="Biểu đồ 5 trục vị"></svg>
+          <figcaption class="small muted">Vùng màu là gu của bạn, đường nét đứt là hồ sơ chuẩn của nhân vật.</figcaption>
+        </figure>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section section-cream" id="recSec" hidden>
+<section class="section section-cream rv" id="recSec" hidden>
   <div class="container">
     <p class="eyebrow">Gợi ý dành cho bạn</p>
     <h2 id="recTitle"></h2>
@@ -58,7 +67,7 @@
   </div>
 </section>
 
-<section class="section" id="prodSec" hidden>
+<section class="section rv" id="prodSec" hidden>
   <div class="container">
     <h2 id="prodTitle"></h2>
     <p class="muted small" id="prodNote"></p>
@@ -67,7 +76,7 @@
   </div>
 </section>
 
-<section class="section section-tint" id="groupsSec" hidden>
+<section class="section section-tint rv" id="groupsSec" hidden>
   <div class="container">
     <p class="eyebrow">Bộ sưu tập Tea DNA</p>
     <h2>13 hồ sơ khẩu vị</h2>
@@ -78,6 +87,15 @@
 
 <div class="drawer" id="recipeDrawer" hidden role="dialog" aria-modal="true" aria-labelledby="rdTitle"><div class="drawer-panel"><button class="nav-close" id="rdClose" aria-label="Đóng">✕</button><div id="rdBody"></div></div></div>
 <div class="drawer" id="dlg" hidden role="dialog" aria-modal="true" aria-labelledby="dlgTitle"><div class="drawer-panel dialog"><div id="dlgBody"></div></div></div>
+<div class="dna-reveal" id="dnaReveal" hidden>
+  <div class="dr-inner">
+    <p class="dr-pre">Tea DNA của bạn là…</p>
+    <img id="drImg" alt="">
+    <p class="dr-name" id="drName"></p>
+    <p class="dr-tag" id="drTag"></p>
+    <button class="btn btn-dark" id="drGo" type="button">Xem hồ sơ của tôi ↓</button>
+  </div>
+</div>
 {% endblock %}
 {% block scripts %}
 <script>window.DNA = {{ dna | tojson }}; window.DNA_PAGE = 'result';</script>

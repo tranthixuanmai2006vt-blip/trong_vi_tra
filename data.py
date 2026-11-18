@@ -884,6 +884,18 @@ DNA_GROUPS = [
     {"id": "tropical-soul", "name": "Tropical Soul", "tagline": "Hồn nhiệt đới", "desc": "Thích trái cây nhiệt đới, hương rõ.", "proto": [75, 65, 20, 45, 95], "tag": "fruity", "color": "#EDA43A", "level": "Rực rỡ"},
     {"id": "amber-classic", "name": "Amber Classic", "tagline": "Hổ phách cổ điển", "desc": "Thích trà đen, ô long, vị truyền thống.", "proto": [20, 15, 70, 85, 30], "tag": None, "color": "#A0522D", "level": "Truyền thống"},
 ]
+
+# Ảnh nhân vật Tea DNA (static/img/teadna/<id>.webp, bản nhỏ <id>-sm.webp)
+# tint = màu sóng dưới chân ảnh, bg = màu nền ảnh – dùng cho hiệu ứng nền.
+DNA_GROUP_ART = {
+    "honey-bloom": ("#FEDFA2", "#FDF4EB"), "citrus-spark": ("#DEE19A", "#FCF3E7"),
+    "roasted-soul": ("#C5865F", "#FBEEE5"), "petal-whisper": ("#F6C3CB", "#FDF0EB"),
+    "velvet-matcha": ("#C2C97E", "#F8F0E8"), "sugar-muse": ("#D4B7E1", "#FBF1EE"),
+    "berry-rebel": ("#DA6888", "#FCECEC"), "lemon-theory": ("#FDD562", "#FCF1E6"),
+    "tea-minimalist": ("#B4BA99", "#FBF1E9"), "creamy-cloud": ("#F2D0AE", "#FDF1E9"),
+    "garden-muse": ("#F6B4C2", "#FDEFF0"), "tropical-soul": ("#FDC446", "#FCF0E9"),
+    "amber-classic": ("#F3B76C", "#FCEEE2"),
+}
 DNA_RECIPES = [
     {"id": "r1", "name": "Trà vải lài", "en": "Lychee Jasmine Tea", "kind": "Trà trái cây", "temp": "cold",
      "vec": [70, 40, 20, 30, 80], "tags": ["Sweet", "Fruity"], "time": "10 phút", "level": "Dễ", "cost": "≈ 19.000đ",

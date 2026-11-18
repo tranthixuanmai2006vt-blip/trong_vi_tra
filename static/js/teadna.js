@@ -60,11 +60,40 @@
       ranked: ranked.slice(0, 13).map(r => ({ id: r.g.id, score: Math.round(r.score) })), updated: new Date().toISOString() };
   }
 
-  /* =============== TRANG CÂU HỎI =============== */
+  /* =============== TRANG CÂU HỎI (flow từng câu) =============== */
   if (window.DNA_PAGE !== 'result') {
-    let ans = {};
-    const form = $('dnaForm');
-    /* ----- thanh trượt (thay nhóm nút 1–5) ----- */
+    let ans = {}, idx = 0, busy = false;
+    const form = $('dnaForm'), root = $('tdx');
+    const slides = [...form.querySelectorAll('.dq')];
+    const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const qs = new URLSearchParams(location.search);
+    const has = q => q.type === 'multi' ? (ans[q.id] || []).length > 0 : !!ans[q.id];
+
+    /* ----- chuyển màn (intro → quiz → brew) ----- */
+    function screen(name) {
+      root.querySelectorAll('.tdx-screen').forEach(s => {
+        const on = s.dataset.screen === name;
+        if (on) { s.hidden = false; requestAnimationFrame(() => s.classList.add('is-on')); }
+        else { s.classList.remove('is-on'); s.hidden = true; }
+      });
+      root.dataset.screen = name;
+      window.scrollTo({ top: 0, behavior: RM ? 'auto' : 'smooth' });
+    }
+    function tint(el) { if (el && el.dataset.tint) { root.style.setProperty('--tint', el.dataset.tint); root.style.setProperty('--bgc', el.dataset.bg); } }
+
+    /* ----- intro: nhân vật đổi lần lượt ----- */
+    const heroImgs = [...root.querySelectorAll('#tdxHero img')];
+    let hi = 0, heroTimer = null;
+    function heroStep() {
+      if (root.dataset.screen !== 'intro') return;
+      heroImgs[hi].classList.remove('on'); hi = (hi + 1) % heroImgs.length;
+      const im = heroImgs[hi]; if (im.src !== im.dataset.full && !im.dataset.up) { im.dataset.up = 1; im.src = im.dataset.full; }
+      im.classList.add('on'); $('tdxHeroName').textContent = im.dataset.name; tint(im);
+      $('tdxHeroName').classList.remove('pop'); void $('tdxHeroName').offsetWidth; $('tdxHeroName').classList.add('pop');
+    }
+    if (!RM && heroImgs.length) heroTimer = setInterval(heroStep, 2400);
+
+    /* ----- thanh trượt ----- */
     const LEVELS = { q1: ['Ít ngọt', 'Hơi ngọt', 'Ngọt vừa', 'Khá ngọt', 'Rất ngọt'] };
     function levelText(r, v) {
       const i = Math.max(0, Math.min(4, Math.round(v) - 1)), L = r.dataset.left, R = r.dataset.right;
@@ -72,25 +101,25 @@
     }
     function paintRange(r) {
       const box = r.closest('.slider'), on = r.dataset.touched === '1', v = +r.value;
-      r.style.setProperty('--p', ((v - 1) / 4 * 100) + '%');
+      r.style.setProperty('--p', ((v - 1) / 4 * 100) + '%'); box.style.setProperty('--p', ((v - 1) / 4 * 100) + '%');
       box.classList.toggle('is-set', on);
-      box.querySelector('[data-now]').textContent = on ? levelText(r, v) : 'Kéo hoặc chạm vào thanh để chọn';
+      const now = box.querySelector('[data-now]'), txt = on ? levelText(r, v) : 'Kéo thanh hoặc chạm một mức';
+      if (now.textContent !== txt) { now.textContent = txt; now.classList.remove('bump'); void now.offsetWidth; now.classList.add('bump'); }
       r.setAttribute('aria-valuetext', on ? levelText(r, v) : 'Chưa chọn');
-      box.querySelector('[data-keep]').hidden = on;
+      box.querySelectorAll('[data-tick]').forEach(t => t.classList.toggle('on', on && Math.round(v) >= +t.dataset.tick));
+      const host = r.closest('.dq').querySelector('.dq-host img');
+      if (host) host.style.setProperty('--lv', on ? (v - 3) / 2 : 0);
     }
-    function setRange(r, v) {
-      if (v === null) { r.value = 3; r.dataset.touched = '0'; } else { r.value = v; r.dataset.touched = '1'; }
-      paintRange(r);
-    }
+    function setRange(r, v) { if (v === null) { r.value = 3; r.dataset.touched = '0'; } else { r.value = v; r.dataset.touched = '1'; } paintRange(r); }
     form.querySelectorAll('input[type="range"]').forEach(r => { r.dataset.touched = '0'; paintRange(r); });
     form.addEventListener('input', e => {
       if (e.target.type !== 'range') return;
-      e.target.dataset.touched = '1'; paintRange(e.target); readForm(); paint(); persist();
+      e.target.dataset.touched = '1'; paintRange(e.target); sync();
     });
-    form.querySelectorAll('[data-keep]').forEach(b => b.onclick = () => {
-      const r = form.querySelector(`input[type="range"][name="${b.dataset.keep}"]`);
-      r.dataset.touched = '1'; paintRange(r); readForm(); paint(); persist();
+    form.querySelectorAll('[data-tick]').forEach(t => t.onclick = () => {
+      const r = t.closest('.slider').querySelector('input[type="range"]'); setRange(r, +t.dataset.tick); sync();
     });
+
     function readForm() {
       ans = {};
       DNA.questions.forEach(q => {
@@ -106,55 +135,125 @@
       });
     }
     function paint() {
-      const n = DNA.questions.filter(q => q.type === 'multi' ? (ans[q.id] || []).length : ans[q.id]).length;
-      $('dpCount').textContent = n; $('dpFill').style.width = (n / 12 * 100) + '%'; $('dpBar').setAttribute('aria-valuenow', n);
-      DNA.questions.forEach(q => {
-        const has = q.type === 'multi' ? (ans[q.id] || []).length : !!ans[q.id];
-        form.querySelector(`[data-clear="${q.id}"]`).hidden = !has;
-        $(q.id).classList.toggle('answered', has);
+      const n = DNA.questions.filter(has).length;
+      $('dpCount').textContent = n; $('dpBar').setAttribute('aria-valuenow', n);
+      DNA.questions.forEach((q, i) => {
+        const h = has(q), seg = root.querySelector(`[data-go="${i}"]`);
+        seg.classList.toggle('done', h); seg.classList.toggle('cur', i === idx);
+        form.querySelector(`[data-clear="${q.id}"]`).hidden = !h;
+        $(q.id).classList.toggle('answered', h);
+        const nx = $(q.id).querySelector('.dq-next'); if (nx) nx.classList.toggle('ready', h);
       });
     }
     function persist() { if (!ls.set(KD, { version: VER, answers: ans, at: Date.now() })) $('dnaStorageWarn').hidden = false; }
+    function sync() { readForm(); paint(); persist(); }
+
+    /* ----- điều hướng câu hỏi ----- */
+    function show(i, dir) {
+      i = Math.max(0, Math.min(slides.length - 1, i));
+      const from = slides[idx], to = slides[i];
+      const img = to.querySelector('.dq-host img'); if (img && img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; }
+      const nimg = slides[i + 1] && slides[i + 1].querySelector('.dq-host img'); if (nimg && nimg.dataset.src) { const p = new Image(); p.src = nimg.dataset.src; }
+      tint(to);
+      const done = () => {
+        idx = i; slides.forEach(s => { s.hidden = s !== to; s.classList.remove('enter'); });
+        to.classList.add('enter'); to.style.setProperty('--dir', dir || 1);
+        paint(); busy = false;
+        const f = to.querySelector('input:checked') || to.querySelector('input'); if (f && !matchMedia('(hover:none)').matches) f.focus({ preventScroll: true });
+      };
+      if (from === to || from.hidden || RM) return done();
+      busy = true; from.classList.add('leave'); from.style.setProperty('--dir', dir || 1);
+      setTimeout(() => { from.classList.remove('leave'); done(); }, 260);
+    }
+    const next = () => { if (busy) return; if (idx < slides.length - 1) show(idx + 1, 1); };
+    const prev = () => { if (busy) return; if (idx === 0) return screen('intro'); show(idx - 1, -1); };
+    form.querySelectorAll('[data-next]').forEach(b => b.onclick = next);
+    $('tdxBack').onclick = prev;
+    root.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { const i = +b.dataset.go; if (i !== idx) show(i, i > idx ? 1 : -1); });
+
     form.addEventListener('change', e => {
-      if (e.target.name === 'q12') {                      // "Không có" loại trừ lựa chọn khác
+      const t = e.target;
+      if (t.name === 'q12') {                      // "Không có" loại trừ lựa chọn khác
         const boxes = form.querySelectorAll('[name="q12"]');
-        if (e.target.value === 'none' && e.target.checked) boxes.forEach(b => { if (b.value !== 'none') b.checked = false; });
-        else if (e.target.checked) form.querySelector('[name="q12"][value="none"]').checked = false;
+        if (t.value === 'none' && t.checked) boxes.forEach(b => { if (b.value !== 'none') b.checked = false; });
+        else if (t.checked) form.querySelector('[name="q12"][value="none"]').checked = false;
       }
-      readForm(); paint(); persist();
+      const card = t.closest('.ocard'); if (card && t.checked) { card.classList.remove('pop'); void card.offsetWidth; card.classList.add('pop'); burst(card); }
+      sync();
+      if (t.type === 'radio' && idx < slides.length - 1) setTimeout(() => { if (slides[idx] === t.closest('.dq')) next(); }, RM ? 120 : 520);
     });
+    function burst(card) {
+      if (RM) return;
+      const c = getComputedStyle(root).getPropertyValue('--tint');
+      for (let k = 0; k < 8; k++) {
+        const s = document.createElement('i'); s.className = 'spark';
+        const a = k / 8 * Math.PI * 2 + Math.random() * .4, d = 40 + Math.random() * 30;
+        s.style.cssText = `--x:${Math.cos(a) * d}px;--y:${Math.sin(a) * d}px;background:${c}`;
+        card.appendChild(s); setTimeout(() => s.remove(), 700);
+      }
+    }
     form.querySelectorAll('[data-clear]').forEach(b => b.onclick = () => {
-      form.querySelectorAll(`[name="${b.dataset.clear}"]`).forEach(i => { if (i.type === 'range') setRange(i, null); else i.checked = false; }); readForm(); paint(); persist();
+      form.querySelectorAll(`[name="${b.dataset.clear}"]`).forEach(i => { if (i.type === 'range') setRange(i, null); else i.checked = false; }); sync();
     });
     $('clearAll').onclick = () => {
       if (!confirm('Xóa tất cả câu trả lời? Kết quả Tea DNA cũ trên thiết bị này cũng sẽ bị xóa.')) return;
-      ans = {}; writeForm(); paint(); ls.del(KD); ls.del(KP);
+      ans = {}; writeForm(); paint(); ls.del(KD); ls.del(KP); show(0, -1);
     };
+    document.addEventListener('keydown', e => {
+      if (root.dataset.screen !== 'quiz' || e.altKey || e.ctrlKey || e.metaKey) return;
+      const s = slides[idx];
+      if (/^[1-5]$/.test(e.key) && e.target.type !== 'number') {
+        const n = +e.key, opts = s.querySelectorAll('.ocard input');
+        if (opts.length) { const o = opts[n - 1]; if (o) { o.click(); e.preventDefault(); } }
+        else { const t = s.querySelector(`[data-tick="${n}"]`); if (t) { t.click(); e.preventDefault(); } }
+      } else if (e.key === 'Enter' && !e.target.closest('[data-next],[type=submit],a,.tdx-back,[data-go],[data-clear],#clearAll')) {
+        e.preventDefault(); if (idx === slides.length - 1) form.requestSubmit(); else next();
+      }
+    });
+
+    /* ----- bắt đầu / khôi phục ----- */
+    function firstOpen() { const i = DNA.questions.findIndex(q => !has(q)); return i < 0 ? slides.length - 1 : i; }
+    function start(at) {
+      clearInterval(heroTimer); screen('quiz'); slides.forEach(s => s.hidden = true); idx = at; slides[at].hidden = true; show(at, 1);
+    }
+    $('tdxStart').onclick = () => start(Object.keys(ans).length ? firstOpen() : 0);
+
     form.onsubmit = e => {
       e.preventDefault(); readForm();
       const c = compute(ans), hasTaste = AX.some(k => c.axes[k] !== null);
       if (!hasTaste) {
         $('dnaErr').hidden = false;
-        $('dnaErr').innerHTML = (ans.q12 ? 'Đã lưu phần bạn muốn tránh, nhưng chưa đủ để tính hồ sơ vị. ' : '') + 'Hãy trả lời ít nhất một câu về vị (câu 1, 3, 5, 7 hoặc 9). <button type="button" class="link-sm" id="toQ1">Đi đến câu đầu</button>';
-        $('toQ1').onclick = () => { $('q1').scrollIntoView({ behavior: 'smooth' }); $('q1').querySelector('input').focus(); };
+        $('dnaErr').innerHTML = (ans.q12 ? 'Đã lưu phần bạn muốn tránh, nhưng chưa đủ để tính hồ sơ vị. ' : '') + 'Hãy trả lời ít nhất một câu về vị (câu 1, 3, 5, 7 hoặc 9). <button type="button" class="link-sm" id="toQ1">Về câu 1</button>';
+        $('toQ1').onclick = () => show(0, -1);
         persist(); return;
       }
-      const prev = ls.get(KP);
-      const prof = buildProfile(ans, prev && prev.version === VER && prev.override ? null : null);
+      const prof = buildProfile(ans, null);
       persist();
       if (!ls.set(KP, prof)) sessionStorage.setItem(KP, JSON.stringify(prof));
-      location.href = '/tea-dna/ket-qua';
+      try { sessionStorage.setItem('tvt_dna_fresh', '1'); } catch (er) { }
+      brew();
     };
+    function brew() {
+      screen('brew');
+      const lines = ['Đang cân độ ngọt…', 'Đo độ chua và vị đắng…', 'Ủ hương trà…', 'Ghép với 13 nhân vật…'];
+      let k = 0; const tx = $('brewTxt');
+      const tick = setInterval(() => { k++; if (k < lines.length) { tx.classList.remove('bump'); void tx.offsetWidth; tx.textContent = lines[k]; tx.classList.add('bump'); } }, 650);
+      setTimeout(() => { clearInterval(tick); location.href = '/tea-dna/ket-qua'; }, RM ? 300 : 2700);
+    }
+
     // khôi phục nháp
     const d = ls.get(KD);
+    const jump = location.hash && DNA.questions.findIndex(q => '#' + q.id === location.hash);
     if (d && d.version === VER && Date.now() - d.at < TTL && Object.keys(d.answers || {}).length) {
-      if (new URLSearchParams(location.search).get('giu') === '1') { ans = d.answers; writeForm(); paint(); }
+      if (qs.get('giu') === '1') { ans = d.answers; writeForm(); paint(); start(jump > -1 ? jump : 0); }
       else {
         $('dnaRestore').hidden = false; $('drCount').textContent = Object.keys(d.answers).length;
-        $('drYes').onclick = () => { ans = d.answers; writeForm(); paint(); $('dnaRestore').hidden = true; };
-        $('drNo').onclick = () => { ls.del(KD); $('dnaRestore').hidden = true; };
+        $('tdxStart').closest('.cta-row').hidden = true;
+        $('drYes').onclick = () => { ans = d.answers; writeForm(); paint(); start(firstOpen()); };
+        $('drNo').onclick = () => { ls.del(KD); $('dnaRestore').hidden = true; $('tdxStart').closest('.cta-row').hidden = false; start(0); };
       }
-    } else if (d) { ls.del(KD); if (d.version !== VER) { $('dnaErr').hidden = false; $('dnaErr').textContent = 'Bộ câu hỏi đã được cập nhật nên câu trả lời cũ không còn dùng được. Mời bạn làm lại.'; } }
+    } else if (d) { ls.del(KD); if (d.version !== VER) { $('dnaVerMsg').hidden = false; $('dnaVerMsg').textContent = 'Bộ câu hỏi đã được cập nhật nên câu trả lời cũ không còn dùng được. Mời bạn làm lại.'; } }
+    root.dataset.screen = root.dataset.screen || 'intro';
     paint();
     return;
   }
@@ -178,8 +277,10 @@
     const g = G(prof.group);
     const known = AX.filter(k => prof.axes[k] !== null && prof.axes[k] !== undefined);
     $('result').hidden = false; ['recSec', 'prodSec', 'groupsSec'].forEach(id => $(id).hidden = false);
-    $('dnaCard').style.setProperty('--gc', g.color);
-    $('gName').textContent = g.name;
+    [document.body].forEach(el => { el.style.setProperty('--gc', g.color); el.style.setProperty('--tint', g.tint); el.style.setProperty('--bgc', g.bg); });
+    if ($('gImg').getAttribute('src') !== g.img) { $('gImg').src = g.img; $('gImg').alt = 'Nhân vật ' + g.name; replay($('dnaCard')); }
+    $('gName').innerHTML = [...g.name].map((ch, i) => ch === ' ' ? ' ' : `<span style="--i:${i}">${esc(ch)}</span>`).join('');
+    $('gName').setAttribute('aria-label', g.name);
     $('gTagline').textContent = g.tagline;
     $('gDesc').textContent = g.desc + ' Đây là gu uống hiện tại của bạn, không phải nhận định tính cách.';
     $('gSecond').textContent = prof.second ? `Có nét gần ${G(prof.second).name}` : '';
@@ -194,8 +295,8 @@
     $('axes').innerHTML = DNA.axes.map(a => {
       const v = prof.axes[a.key], lv = level(v);
       const word = lv === 'left' ? a.left : lv === 'right' ? a.right : lv === 'mid' ? 'Cân bằng' : '';
-      return `<div class="axis"><div class="ax-top"><b>${a.label}</b><span>${v === null || v === undefined ? 'Chưa có dữ liệu' : v + '/100'}</span></div>
-        <div class="ax-track ${v === null || v === undefined ? 'na' : ''}">${v === null || v === undefined ? '' : `<i style="left:${v}%"></i>`}</div>
+      return `<div class="axis"><div class="ax-top"><b>${a.label}</b><span>${v === null || v === undefined ? 'Chưa có dữ liệu' : `<b class="cu" data-to="${v}">0</b>/100`}</span></div>
+        <div class="ax-track ${v === null || v === undefined ? 'na' : ''}">${v === null || v === undefined ? '' : `<u style="--v:${v}%"></u><i style="--v:${v}%"></i>`}</div>
         <div class="ax-lbl"><span>${a.left}</span><b>${word}</b><span>${a.right}</span></div></div>`;
     }).join('');
     const tagName = { fruity: 'Trái cây', floral: 'Hoa', roasted: 'Rang', herbal: 'Thảo mộc' }, tempName = { cold: 'Thích uống lạnh', hot: 'Thích uống nóng', both: 'Nóng hay lạnh đều được' };
@@ -204,7 +305,32 @@
     $('ctx').innerHTML = [ctx.aroma_tag && `Hương ưa thích: <b>${tagName[ctx.aroma_tag]}</b>`, ctx.temp && tempName[ctx.temp], ctx.mode && modeName[ctx.mode],
       ctx.creamy !== null && `Độ béo: ${ctx.creamy}/100`, ctx.astringency !== null && `Hậu chát: ${ctx.astringency}/100`,
       ctx.avoid.length && `Tránh: <b>${ctx.avoid.map(a => avName[a]).join(', ')}</b>`].filter(Boolean).map(x => `<span class="chip chip-static">${x}</span>`).join('');
-    renderManual(); renderRecipes(g); renderProducts(g); renderGroups(ranked);
+    renderManual(); renderRecipes(g); renderProducts(g); renderGroups(ranked); radar(g);
+    animateAxes();
+  }
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function replay(el) { el.classList.remove('play'); void el.offsetWidth; el.classList.add('play'); }
+  function animateAxes() {
+    const box = $('axes'); box.classList.remove('go');
+    requestAnimationFrame(() => requestAnimationFrame(() => box.classList.add('go')));
+    box.querySelectorAll('.cu').forEach(c => {
+      const to = +c.dataset.to; if (RM) { c.textContent = to; return; }
+      const t0 = performance.now(), D = 1100;
+      const f = t => { const k = Math.min(1, (t - t0) / D), e = 1 - Math.pow(1 - k, 3); c.textContent = Math.round(to * e); if (k < 1) requestAnimationFrame(f); };
+      requestAnimationFrame(f);
+    });
+  }
+  function radar(g) {
+    const R = 100, n = AX.length, pt = (i, v) => { const a = -Math.PI / 2 + i * 2 * Math.PI / n; return [Math.cos(a) * R * v / 100, Math.sin(a) * R * v / 100]; };
+    const poly = vals => vals.map((v, i) => pt(i, v).map(x => x.toFixed(1)).join(',')).join(' ');
+    const mine = AX.map(k => prof.axes[k] ?? 0);
+    let h = [25, 50, 75, 100].map(r => `<polygon class="rg" points="${poly(AX.map(() => r))}"/>`).join('');
+    h += AX.map((k, i) => { const [x, y] = pt(i, 100); return `<line class="rg" x1="0" y1="0" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/>`; }).join('');
+    h += `<polygon class="rp-proto" points="${poly(g.proto)}"/>`;
+    h += `<polygon class="rp-me" points="${poly(mine)}"/>`;
+    h += mine.map((v, i) => { const [x, y] = pt(i, v); return `<circle class="rp-dot" style="--k:${i}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4"/>`; }).join('');
+    h += DNA.axes.map((a, i) => { const [x, y] = pt(i, 118); return `<text x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="middle">${esc(a.label)}</text>`; }).join('');
+    $('radar').innerHTML = h; replay($('radar').closest('.radar-box'));
   }
 
   function renderManual() {
@@ -249,7 +375,7 @@
     $('recTitle').textContent = 'Công thức hợp với ' + g.name;
     if (!list.length) { $('recipes').innerHTML = '<div class="empty"><p>Chưa có công thức phù hợp với các thành phần bạn muốn tránh.</p><a class="btn btn-sm btn-secondary" href="/tea-dna?giu=1#q12">Sửa tiêu chí</a></div>'; return; }
     const tempName = { cold: 'Lạnh', hot: 'Nóng', both: 'Nóng / lạnh' };
-    $('recipes').innerHTML = list.map(({ r, s }) => `<article class="recipe">
+    $('recipes').innerHTML = list.map(({ r, s }, k) => `<article class="recipe" style="--k:${k}">
       <div class="rc-img" style="--rc:${r.color}"><span class="rc-pct">${s}% hợp vị</span><svg viewBox="0 0 120 120" aria-hidden="true"><path d="M38 30h44l-6 70H44z" fill="#fff" opacity=".55" stroke="#2F3B2A" stroke-width="2"/><path d="M41 52h38l-4 46H45z" fill="var(--rc)"/><path d="M70 18 62 98" stroke="#2F3B2A" stroke-width="4" stroke-linecap="round"/></svg></div>
       <div class="rc-body"><p class="eyebrow">${esc(r.kind)} · ${tempName[r.temp]}</p><h3>${esc(r.name)}</h3><p class="small muted">${esc(r.en)}</p>
         <div class="dc-chips light">${r.tags.map(t => `<span>${esc(t)}</span>`).join('')}</div>
@@ -304,15 +430,19 @@
   }
   function renderGroups(ranked) {
     const sc = {}; ranked.forEach(r => sc[r.g.id] = Math.round(r.score));
-    $('groups').innerHTML = DNA.groups.map(g => `<button class="gcard ${g.id === prof.group ? 'current' : ''}" style="--gc:${g.color}" data-g="${g.id}" aria-pressed="${g.id === prof.group}">
-      <b>${esc(g.name)}</b><span>${esc(g.desc)}</span>${g.id === prof.group ? '<em>Gu của bạn</em>' : `<small>${sc[g.id] ?? '—'}% gần</small>`}</button>`).join('');
+    $('groups').innerHTML = DNA.groups.map((g, gi) => `<button class="gcard ${g.id === prof.group ? 'current' : ''}" style="--gc:${g.tint};--k:${gi}" data-g="${g.id}" aria-pressed="${g.id === prof.group}">
+      <span class="gc-img" style="background:${g.bg}"><img src="${g.thumb}" alt="" loading="lazy"></span>
+      <b>${esc(g.name)}</b><span class="gc-desc">${esc(g.desc)}</span>${g.id === prof.group ? '<em>Gu của bạn</em>' : `<small>${sc[g.id] ?? '—'}% gần</small>`}</button>`).join('');
     $('groups').querySelectorAll('[data-g]').forEach(b => b.onclick = () => {
       const g = G(b.dataset.g);
       $('groupDetail').hidden = false;
-      $('groupDetail').innerHTML = `<h3>${esc(g.name)} – ${esc(g.tagline)}</h3><p>${esc(g.desc)}</p>
+      $('groups').querySelectorAll('.gcard').forEach(x => x.classList.toggle('open', x === b));
+      $('groupDetail').style.setProperty('--tint', g.tint); $('groupDetail').style.setProperty('--bgc', g.bg);
+      $('groupDetail').innerHTML = `<img src="${g.img}" alt="Nhân vật ${esc(g.name)}"><div><h3>${esc(g.name)} – ${esc(g.tagline)}</h3><p>${esc(g.desc)}</p>
         <p class="small">Hồ sơ vị tham chiếu: ${DNA.axes.map((a, i) => `${a.label} ${g.proto[i]}`).join(' · ')}</p>
         ${g.id !== prof.group ? `<button class="btn btn-sm btn-secondary" id="useG">Dùng gu này làm gợi ý</button>` : '<p class="small muted">Đây là gu hiện tại của bạn.</p>'}
-        ${prof.manualGroup ? `<button class="btn btn-sm btn-ghost" id="autoG">Quay về gu theo bài test</button>` : ''}`;
+        ${prof.manualGroup ? `<button class="btn btn-sm btn-ghost" id="autoG">Quay về gu theo bài test</button>` : ''}</div>`;
+      replay($('groupDetail')); $('groupDetail').scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'nearest' });
       const u = $('useG'); if (u) u.onclick = () => { prof.manualGroup = g.id; prof.group = g.id; prof.second = null; ls.set(KP, prof); render(); scrollTo({ top: 0, behavior: 'smooth' }); };
       const a = $('autoG'); if (a) a.onclick = () => { prof.manualGroup = null; ls.set(KP, prof); render(); };
     });
@@ -332,24 +462,29 @@
     const close = modal($('dlg'), $('shClose'), $('shareBtn'));
     if ($('shNative')) $('shNative').onclick = () => navigator.share({ title: 'Tea DNA', text, url }).catch(() => { });
     $('shCopy').onclick = () => copyText(text + ' ' + url);
-    $('shImg').onclick = () => downloadCard(g, $('shScore').checked);
+    $('shImg').onclick = () => { const im = new Image(); im.onload = () => downloadCard(g, $('shScore').checked, im); im.onerror = () => downloadCard(g, $('shScore').checked, null); im.src = g.img; };
   };
-  function downloadCard(g, withScore) {
+  function downloadCard(g, withScore, im) {
     try {
       const c = document.createElement('canvas'); c.width = 1080; c.height = 1350; const x = c.getContext('2d');
-      x.fillStyle = '#2F3B2A'; x.fillRect(0, 0, 1080, 1350);
-      x.fillStyle = g.color; x.globalAlpha = .5; x.beginPath(); x.arc(980, 120, 300, 0, 7); x.fill(); x.globalAlpha = 1;
-      x.fillStyle = '#EDD4AB'; x.font = '600 34px "Be Vietnam Pro", Arial'; x.fillText('MY TEA DNA', 90, 200);
-      x.fillStyle = '#FAF7F0'; x.font = '600 120px Lora, Georgia, serif'; x.fillText(g.name, 90, 360);
-      x.font = 'italic 500 48px Lora, Georgia, serif'; x.fillText(g.tagline, 90, 440);
-      x.font = '400 40px "Be Vietnam Pro", Arial'; wrap(x, g.desc, 90, 540, 900, 56);
-      if (withScore) DNA.axes.forEach((a, i) => { const v = prof.axes[a.key]; const y = 720 + i * 90;
-        x.fillStyle = '#EDD4AB'; x.font = '500 34px "Be Vietnam Pro", Arial'; x.fillText(a.label + (v === null ? ': —' : `: ${v}/100`), 90, y);
-        x.fillStyle = 'rgba(255,255,255,.2)'; x.fillRect(90, y + 18, 900, 12); if (v !== null) { x.fillStyle = '#8C9A4B'; x.fillRect(90, y + 18, 9 * v, 12); } });
-      x.fillStyle = '#EDD4AB'; x.font = '500 34px "Be Vietnam Pro", Arial'; x.fillText('Trồng Vị Nhà × Hằng Sơn Điền · Explore Tea. Create Your Way.', 90, 1260);
+      x.fillStyle = g.bg; x.fillRect(0, 0, 1080, 1350);
+      x.fillStyle = g.tint; x.globalAlpha = .35; x.beginPath(); x.arc(540, 380, 420, 0, 7); x.fill(); x.globalAlpha = 1;
+      if (im) { x.save(); x.beginPath(); x.arc(540, 380, 300, 0, 7); x.clip(); x.drawImage(im, 240, 80, 600, 600); x.restore(); }
+      x.textAlign = 'center';
+      x.fillStyle = '#6A5548'; x.font = '600 30px "Be Vietnam Pro", Arial'; x.fillText('MY TEA DNA', 540, 760);
+      x.fillStyle = '#503021'; x.font = '600 104px Lora, Georgia, serif'; x.fillText(g.name, 540, 870);
+      x.font = 'italic 500 44px Lora, Georgia, serif'; x.fillText(g.tagline, 540, 935);
+      x.fillStyle = '#6A5548'; x.font = '400 34px "Be Vietnam Pro", Arial'; x.textAlign = 'left';
+      if (!withScore) { x.textAlign = 'center'; wrapC(x, g.desc, 540, 1010, 860, 48); }
+      else DNA.axes.forEach((a, i) => { const v = prof.axes[a.key]; const y = 1000 + i * 52; x.textAlign = 'left';
+        x.fillStyle = '#503021'; x.font = '500 28px "Be Vietnam Pro", Arial'; x.fillText(a.label, 150, y + 10);
+        x.fillStyle = 'rgba(80,48,33,.12)'; x.fillRect(400, y - 4, 440, 14); if (v !== null && v !== undefined) { x.fillStyle = '#3B630D'; x.fillRect(400, y - 4, 4.4 * v, 14); }
+        x.textAlign = 'right'; x.fillText(v === null || v === undefined ? '—' : String(v), 930, y + 10); });
+      x.textAlign = 'center'; x.fillStyle = '#503021'; x.font = '500 28px "Be Vietnam Pro", Arial'; x.fillText('Trồng Vị Nhà × Hằng Sơn Điền · Explore Tea. Create Your Way.', 540, 1300);
       const a = document.createElement('a'); a.download = 'tea-dna-' + g.id + '.png'; a.href = c.toDataURL('image/png'); a.click();
     } catch (e) { toast('Không tạo được ảnh. Bạn có thể sao chép nội dung thay thế.', 'error'); }
   }
+  function wrapC(x, t, X, Y, W, L) { let line = ''; t.split(' ').forEach(w => { if (x.measureText(line + w).width > W) { x.fillText(line.trim(), X, Y); Y += L; line = ''; } line += w + ' '; }); x.fillText(line.trim(), X, Y); }
   function wrap(x, t, X, Y, W, L) { let line = ''; t.split(' ').forEach(w => { if (x.measureText(line + w).width > W) { x.fillText(line, X, Y); Y += L; line = ''; } line += w + ' '; }); x.fillText(line, X, Y); }
 
   /* ----- làm lại / xóa ----- */
@@ -366,5 +501,24 @@
     $('dlYes').onclick = () => { ls.del(KP); ls.del(KD); try { sessionStorage.removeItem(KP); } catch (e) { } location.reload(); };
   };
   window.addEventListener('storage', e => { if (e.key === KP && !e.newValue) location.reload(); });
+  let fresh = false; try { fresh = sessionStorage.getItem('tvt_dna_fresh') === '1'; sessionStorage.removeItem('tvt_dna_fresh'); } catch (e) { }
   render();
+  // các khối hiện dần khi cuộn tới
+  const rvs = document.querySelectorAll('.page-dna-result .rv');
+  if ('IntersectionObserver' in window && !RM) {
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .12 });
+    rvs.forEach(el => io.observe(el));
+  } else rvs.forEach(el => el.classList.add('in'));
+  // màn mở quà: nhân vật xuất hiện (chỉ ngay sau khi làm bài)
+  if (fresh && !RM) {
+    const g = G(prof.group), ov = $('dnaReveal');
+    $('drImg').src = g.img; $('drName').textContent = g.name; $('drTag').textContent = g.tagline;
+    ov.style.setProperty('--tint', g.tint); ov.style.setProperty('--bgc', g.bg);
+    ov.hidden = false; document.body.classList.add('dr-lock'); $('dnaCard').classList.add('wait');
+    const close = () => { if (ov.classList.contains('out')) return; ov.classList.add('out'); document.body.classList.remove('dr-lock');
+      $('dnaCard').classList.remove('wait'); replay($('dnaCard')); animateAxes(); setTimeout(() => ov.hidden = true, 700); };
+    $('drGo').onclick = close; ov.onclick = e => { if (e.target === ov) close(); };
+    document.addEventListener('keydown', function k(e) { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', k); } });
+    setTimeout(() => $('drGo').focus(), 50);
+  } else replay($('dnaCard'));
 })();
