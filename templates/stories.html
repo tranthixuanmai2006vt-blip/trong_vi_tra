@@ -1,7 +1,6 @@
 {% extends 'base.html' %}{% import 'macros.html' as m with context %}
 {% block title %}Chuyện trà{% endblock %}
 {% block bodyclass %}page-stories{% endblock %}
-{% block content %}
 {% macro story_image(file, alt, ratio='4/3') -%}
   <div class="story-image" style="--story-ratio: {{ ratio }}">
     {% if has_img(file) %}
@@ -15,6 +14,7 @@
     {% endif %}
   </div>
 {%- endmacro %}
+{% block content %}
 
 {# 01 — Mở đầu theo tinh thần trang chủ / Về chúng tôi #}
 <section class="story-hero">
