@@ -329,7 +329,8 @@ def cart_count():
 
 
 def has_img(name):
-    return bool(site_image_url(name))
+    """Existing exact-file lookup used by the homepage and other unchanged sections."""
+    return os.path.isfile(os.path.join(app.static_folder, "img", name))
 
 
 def site_image_url(name):

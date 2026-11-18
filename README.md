@@ -2,7 +2,7 @@
 
 **Cập nhật danh mục trà 18/11/2026:** xem `HUONG_DAN_CAP_NHAT_TRA.md` để biết 11 giá/quy cách đã sửa và tên file ảnh trong `static/img/products/`. Giá trà đã theo ảnh nhóm gửi; các dữ liệu khác vẫn là demo.
 
-**Ảnh banner và danh mục trang chủ:** xem `HUONG_DAN_ANH_BANNER.md`. Ảnh banner đặt trực tiếp trong `static/img/`; ảnh từng sản phẩm vẫn ở `static/img/products/`.
+**Ảnh Sản phẩm / Tạo hộp quà:** xem `HUONG_DAN_ANH_BANNER.md`. Banner Sản phẩm đặt trực tiếp trong `static/img/`; ảnh từng món dùng ở Sản phẩm và Tạo hộp quà đặt ở `static/img/products/`. Trang chủ giữ nguyên ảnh riêng, không tự lấy ảnh banner Sản phẩm.
 
 Website bán trà, bánh từ trà, gift set + dịch vụ **Tạo hộp quà**, **Thiết kế riêng**, **Tea DNA**.
 Viết bằng Python (Flask), dựng theo file *[THDAKD] BRIEF WEB* và *[THDAKD] CHI TIẾT WEB*.

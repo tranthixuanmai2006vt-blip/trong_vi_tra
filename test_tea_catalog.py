@@ -117,9 +117,10 @@ class TeaCatalogTests(unittest.TestCase):
         self.assertEqual(200, self.client.post('/api/cart/remove', json={'key': 'old'}).status_code)
         self.assertIn('Giỏ hàng đang trống', self.client.get('/gio-hang').get_data(as_text=True))
 
-    def test_cover_photos_and_home_fallback(self):
+    def test_product_covers_do_not_change_home(self):
         image_root = Path(web.app.static_folder) / 'img'
         created = []
+        home_before = self.client.get('/').get_data(as_text=True)
         png = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1sAAAAASUVORK5CYII=')
         try:
             for category, stem in [('tra', 'tra'), ('banh', 'banh'), ('gift-set', 'hopqua')]:
@@ -129,22 +130,17 @@ class TeaCatalogTests(unittest.TestCase):
                 html = self.client.get('/san-pham/' + category).get_data(as_text=True)
                 self.assertIn('class="cat-cover-photo"', html)
                 self.assertIn(target.name, html)
-                self.assertIn(target.name, self.client.get('/').get_data(as_text=True))
-            # Dedicated homepage category photo overrides the shared cover fallback.
-            dedicated = image_root / 'cat-hopqua.png'
-            dedicated.write_bytes(png); created.append(dedicated)
-            self.assertIn('cat-hopqua.png', self.client.get('/').get_data(as_text=True))
-            # The hero accepts PNG as well; mobile picture source is optional.
-            for name in ['cover-desktop.png', 'cover-mobile.png', 'cover-hopqua-mobile.png']:
-                file = image_root / name; file.write_bytes(png); created.append(file)
-            html = self.client.get('/').get_data(as_text=True)
-            self.assertIn('cover-desktop.png', html)
-            self.assertIn('cover-mobile.png', html)
-            html = self.client.get('/san-pham/gift-set').get_data(as_text=True)
-            self.assertIn('cover-hopqua-mobile.png', html)
-            response = self.client.get('/static/img/cover-hopqua.png')
-            self.assertEqual(200, response.status_code)
-            response.close()
+                self.assertEqual(home_before, self.client.get('/').get_data(as_text=True))
+            mobile = image_root / 'cover-hopqua-mobile.png'
+            mobile.write_bytes(png); created.append(mobile)
+            self.assertIn(mobile.name, self.client.get('/san-pham/gift-set').get_data(as_text=True))
+            self.assertEqual(home_before, self.client.get('/').get_data(as_text=True))
+            # Homepage retains its own image file and never substitutes the product cover.
+            own = image_root / 'cat-hopqua.jpg'
+            own.write_bytes(png); created.append(own)
+            homepage = self.client.get('/').get_data(as_text=True)
+            self.assertIn('img/cat-hopqua.jpg', homepage)
+            self.assertNotIn('img/cover-hopqua', homepage)
         finally:
             for file in created:
                 file.unlink(missing_ok=True)

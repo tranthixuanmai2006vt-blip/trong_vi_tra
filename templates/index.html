@@ -8,8 +8,8 @@
   <div class="cover-media">
     {% if has_img('cover-desktop.jpg') %}
     <picture>
-      {% if has_img('cover-mobile.jpg') %}<source media="(max-width: 767px)" srcset="{{ site_image_url('cover-mobile.jpg') }}">{% endif %}
-      <img src="{{ site_image_url('cover-desktop.jpg') }}" alt="Gói trà, đĩa bánh và hộp quà mở của Trồng Vị Nhà trên bàn gỗ sáng" fetchpriority="high">
+      {% if has_img('cover-mobile.jpg') %}<source media="(max-width: 767px)" srcset="{{ url_for('static', filename='img/cover-mobile.jpg') }}">{% endif %}
+      <img src="{{ url_for('static', filename='img/cover-desktop.jpg') }}" alt="Gói trà, đĩa bánh và hộp quà mở của Trồng Vị Nhà trên bàn gỗ sáng" fetchpriority="high">
     </picture>
     {% else %}
     <div class="hero-scene">
@@ -43,13 +43,7 @@
         ('banh','Bánh từ trà','Vị bánh ấm lòng','Thêm chút ngọt cho buổi ngồi cùng nhau','cake','#C08A3E','cat-banh.jpg'),
         ('gift-set','Hộp quà','Gói vị nhà trao nhau','Chọn một món quà, gửi một lời thương','giftbox','#503021','cat-hopqua.jpg')] %}
       <a class="cat-card reveal" href="{{ url_for('catalog', cat=key) }}" aria-label="{{ tag }} – {{ title }}">
-        {% set fallback = {'tra':'cover-tra.jpg', 'banh':'cover-banh.jpg', 'gift-set':'cover-hopqua.jpg'}[key] %}
-        {% set photo_src = site_image_url(file) or site_image_url(fallback) %}
-        <div class="cat-img">
-          {% if photo_src %}<div class="home-category-photo"><img src="{{ photo_src }}" alt="{{ title }}" loading="lazy" decoding="async"></div>
-          {% else %}<div class="home-category-photo category-photo-pending">Ảnh {{ tag | lower }} đang cập nhật</div>{% endif %}
-          <span class="cat-tag">{{ tag }}</span>
-        </div>
+        <div class="cat-img">{{ m.pic(file, title, '4/5', kind, color) }}<span class="cat-tag">{{ tag }}</span></div>
         <div class="cat-body"><h3>{{ title }}</h3><p>{{ sub }}</p><span class="link">Xem {{ tag | lower }} →</span></div>
       </a>
       {% endfor %}

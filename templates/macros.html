@@ -127,7 +127,7 @@
 {% macro pic(file, alt, ratio='4/3', kind='leaf', color='#8C9A4B', cap='') -%}
 {% if file and has_img(file) %}
 <figure class="pic" style="aspect-ratio: {{ ratio }}">
-  <img src="{{ site_image_url(file) }}" alt="{{ alt }}" loading="lazy" decoding="async">
+  <img src="{{ url_for('static', filename='img/' + file) }}" alt="{{ alt }}" loading="lazy" decoding="async">
   {% if cap %}<figcaption>{{ cap }}</figcaption>{% endif %}
 </figure>
 {% else %}
