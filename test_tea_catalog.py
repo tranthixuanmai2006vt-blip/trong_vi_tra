@@ -145,6 +145,44 @@ class TeaCatalogTests(unittest.TestCase):
             for file in created:
                 file.unlink(missing_ok=True)
 
+    def test_cookie_and_mochi_prices_in_cart_and_gift(self):
+        cookies = [web.BY_ID[pid] for pid in ['BC01', 'BC02', 'BC03']]
+        mochi = web.BY_ID['BC04']
+        self.assertEqual(5, sum(p['type'] == 'banh' for p in web.D.PRODUCTS))
+        for product in cookies:
+            self.assertEqual([('Pack 2 cái', 2500), ('Combo 2 pack (4 cái)', 4000)],
+                             [(v['label'], v['price']) for v in product['variants']])
+        self.assertEqual(('1 cái', 7500), (mochi['variants'][0]['label'], mochi['variants'][0]['price']))
+        paparoti = web.BY_ID['BC05']
+        self.assertEqual(('1 cái', 10000), (paparoti['variants'][0]['label'], paparoti['variants'][0]['price']))
+        for product in cookies + [mochi, paparoti]:
+            for variant in product['variants']:
+                client = web.app.test_client()
+                result = client.post('/api/cart/add', json={'sku': variant['sku'], 'qty': 2, 'price': 1})
+                self.assertEqual(200, result.status_code)
+                self.assertEqual(variant['price'] * 2, result.json['cart']['subtotal'])
+                self.assertIn(variant['label'], client.get('/gio-hang').get_data(as_text=True))
+                with web.app.test_request_context():
+                    quote, _ = web.giftbox_quote({'items': [{'sku': variant['sku'], 'qty': 1}]})
+                    self.assertEqual(variant['price'], quote['items'][0]['price'])
+        self.assertEqual(400, self.client.post('/api/cart/add', json={'sku': 'TVT-BQM-6'}).status_code)
+
+    def test_bakery_photo_is_shared_and_home_unchanged(self):
+        product = web.BY_ID['BC02']
+        photo = Path(web.app.static_folder) / 'img/products' / (product['slug'] + '.png')
+        self.assertFalse(photo.exists())
+        before = self.client.get('/').get_data(as_text=True)
+        try:
+            photo.write_bytes(base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1sAAAAASUVORK5CYII='))
+            for url in ['/san-pham/banh', '/san-pham/banh/' + product['slug'], '/dich-vu/tao-hop-qua']:
+                self.assertIn(photo.name, self.client.get(url).get_data(as_text=True))
+            self.client.post('/api/cart/add', json={'sku': product['variants'][1]['sku'], 'qty': 1})
+            self.assertIn(photo.name, self.client.get('/gio-hang').get_data(as_text=True))
+            # Use a fresh empty-cart client to compare the homepage body without badge changes.
+            self.assertEqual(before, web.app.test_client().get('/').get_data(as_text=True))
+        finally:
+            photo.unlink(missing_ok=True)
+
 
 if __name__ == '__main__':
     unittest.main()

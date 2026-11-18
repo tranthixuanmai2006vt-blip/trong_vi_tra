@@ -438,6 +438,8 @@ def catalog(cat=None):
         items = [p for p in items if set(vi) & set(p.get("flavor", []))]
     if tranh:
         def has_allergen(p, key):
+            if p.get("allergens_verified") is False:
+                return True  # Không gắn nhãn an toàn dị ứng khi chưa có dữ liệu.
             al = " ".join(p.get("allergens", [])).lower()
             return {"gluten": "gluten", "sua": "sữa", "trung": "trứng", "hat": "hạt"}[key] in al
         items = [p for p in items if not any(has_allergen(p, k) for k in tranh)]

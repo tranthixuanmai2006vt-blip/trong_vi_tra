@@ -4,13 +4,15 @@
 
 **Ảnh Sản phẩm / Tạo hộp quà:** xem `HUONG_DAN_ANH_BANNER.md`. Banner Sản phẩm đặt trực tiếp trong `static/img/`; ảnh từng món dùng ở Sản phẩm và Tạo hộp quà đặt ở `static/img/products/`. Trang chủ giữ nguyên ảnh riêng, không tự lấy ảnh banner Sản phẩm.
 
+**Bánh và giá mới:** xem `HUONG_DAN_CAP_NHAT_BANH.md`. Đã thêm 3 vị Cracker Meringue Cookies (pack 2 cái 2.500đ / combo 4 cái 4.000đ) và Mochi Matcha Milk Cheese 7.500đ/cái. Đã thêm Paparoti Matcha 10.000đ/cái, đủ 5 loại bánh. Ảnh đặt tên paparoti-matcha.png trong static/img/products/. Lớp phủ sáng bên trái chỉ giảm ở banner Bánh.
+
 Website bán trà, bánh từ trà, gift set + dịch vụ **Tạo hộp quà**, **Thiết kế riêng**, **Tea DNA**.
 Viết bằng Python (Flask), dựng theo file *[THDAKD] BRIEF WEB* và *[THDAKD] CHI TIẾT WEB*.
 
 ## Chạy trong PyCharm (macOS)
 ```bash
 cd ~/Downloads/trong_vi_tra
-python3 -m venv .venv
+python3 -m venv .venv            # chỉ cần lần đầu
 source .venv/bin/activate
 pip install -r requirements.txt
 python app.py

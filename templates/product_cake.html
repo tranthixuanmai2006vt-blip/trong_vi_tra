@@ -33,7 +33,7 @@
   <div class="container">
     <h2>Chuyện vị bánh</h2>
     <div class="trio">
-      <div><span class="eyebrow">Vị trà</span><p>{% if tea_used %}<a class="link" href="{{ product_url(tea_used) }}">{{ tea_used.name }}</a>{% else %}—{% endif %}</p></div>
+      <div><span class="eyebrow">Vị trà</span><p>{% if tea_used %}<a class="link" href="{{ product_url(tea_used) }}">{{ tea_used.name }}</a>{% else %}{{ p.tea_note or 'Đang cập nhật' }}{% endif %}</p></div>
       <div><span class="eyebrow">Kết cấu</span><p>{{ p.texture }}</p></div>
       <div><span class="eyebrow">Độ ngọt</span><p>{{ p.sweetness }}</p></div>
     </div>
