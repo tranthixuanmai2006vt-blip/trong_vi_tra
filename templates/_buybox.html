@@ -8,6 +8,11 @@
     </select>
   </div>
   {% endif %}
+  {% if p.type == 'tra' and p.variants|length == 1 %}
+  {# Giữ radio SKU để script giỏ hàng tiếp tục lấy đúng giá và tồn kho. #}
+  <input type="radio" name="sku" value="{{ first_ok.sku }}" data-price="{{ first_ok.price }}"
+         data-stock="{{ first_ok.stock }}" checked hidden>
+  {% else %}
   <fieldset class="variants">
     <legend>{{ 'Chọn pack / combo' if p.flavors else 'Quy cách' }}</legend>
     {% for v in p.variants %}
@@ -18,6 +23,7 @@
     </label>
     {% endfor %}
   </fieldset>
+  {% endif %}
   <div class="price-row">
     <span class="price price-lg" data-price-out>{{ first_ok.price | vnd }}</span>
     <span class="stock-note" data-stock-out>{% if first_ok.stock > 0 %}Còn hàng{% else %}Tạm hết{% endif %}</span>

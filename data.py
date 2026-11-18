@@ -1053,3 +1053,5 @@ for _p in PRODUCTS:
 for _r in DNA_RECIPES:
     if _r.get('tea') not in _ACTIVE_IDS:
         _r['tea'] = None  # Công thức tham khảo vẫn có thể dùng nguyên liệu ngoài danh mục.
+from tea_details import apply_tea_details
+apply_tea_details(PRODUCTS)
