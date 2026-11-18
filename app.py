@@ -424,6 +424,7 @@ def catalog(cat=None):
     gia = a.getlist("gia")
     dip = a.getlist("dip")
     nhom = a.getlist("nhom")
+    dong = a.get("dong", "")
     vi = a.getlist("vi")
     tranh = a.getlist("tranh")          # bánh: tránh chất dị ứng
     con_hang = a.get("con-hang") == "1"
@@ -446,6 +447,8 @@ def catalog(cat=None):
         items = [p for p in items if set(dip) & set(p.get("occasions", []))]
     if nhom:
         items = [p for p in items if p.get("group") in nhom]
+    if dong and loai == "banh":
+        items = [p for p in items if p.get("line") == dong]
     if vi:
         items = [p for p in items if set(vi) & set(p.get("flavor", []))]
     if tranh:
@@ -475,12 +478,19 @@ def catalog(cat=None):
                 args = request.args.to_dict(flat=False)
                 args[key] = [x for x in args[key] if x != v]
                 chips.append((label_map[v], url_for("catalog", cat=cat, **args)))
+    if dong and loai == "banh":
+        args = request.args.to_dict(flat=False)
+        args.pop("dong", None)
+        chips.append((dong, url_for("catalog", cat=cat, **args)))
     if con_hang:
         args = request.args.to_dict(flat=False)
         args.pop("con-hang", None)
         chips.append(("Còn hàng", url_for("catalog", cat=cat, **args)))
+    cover_items = sorted([p for p in D.PRODUCTS if p["type"] == loai], key=lambda p: p["rank"])[:4] if loai in ("tra", "banh") else []
+    cake_lines = list(dict.fromkeys(p["line"] for p in D.PRODUCTS if p["type"] == "banh"))
     return render_template("catalog.html", items=items, cat=cat, loai=loai, q=q, sel=a, counts=counts,
-                           chips=chips, sort=sort, goi_y=goi_y)
+                           chips=chips, sort=sort, goi_y=goi_y, cover_items=cover_items,
+                           cake_lines=cake_lines, selected_line=dong)
 
 
 def strip_accents(s):

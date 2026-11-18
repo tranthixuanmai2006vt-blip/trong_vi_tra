@@ -5,30 +5,32 @@
 <section class="page-hero section-cream">
   <div class="container">
     {{ m.crumbs([('Sản phẩm', url_for('catalog') if loai else None)] + ([(D.TYPE_LABEL[loai], None)] if loai in D.TYPE_LABEL else [])) }}
-    {% set covers = {
-      'tra': ('Vị trà thân quen', 'Trồng nên hương trà, lưu giữ vị nhà', 'cover-tra.jpg', [('pouch','#7C8F3A'),('tin','#B4762E'),('pouch','#5E7D2A')]),
-      'banh': ('Vị bánh ấm lòng', 'Ủ hương trà cho bánh, vun chút ngọt cho nhà', 'cover-banh.jpg', [('cake','#C08A3E'),('cookie','#7C9A3F'),('madeleine','#D2A24C')]),
-      'gift': ('Vị nhà trao nhau', 'Gói hương trà, gom vị bánh, gửi tình nhà', 'cover-hopqua.jpg', [('giftbox','#3B630D'),('card','#503021'),('giftbox','#8C9A4B')]) } %}
-    {% if loai in covers or not loai %}
-    {% set cv = covers[loai] if loai in covers else ('Gói vị thân quen', 'Vị trà thanh, vị bánh ngọt, vị thương gói ghém trong từng món quà.', 'cover-gift-set.jpg') %}
-    {% set cover_src = site_image_url(cv[2]) %}
-    {% set mobile_src = site_image_url(cv[2].replace('.jpg', '-mobile.jpg')) %}
-    <div class="cat-cover cat-cover-{{ loai or "all" }} {{ 'has-photo' if cover_src }}">
-      {% if cover_src %}
-      <picture class="cat-cover-photo">
-        {% if mobile_src %}<source media="(max-width: 767px)" srcset="{{ mobile_src }}">{% endif %}
-        <img src="{{ cover_src }}" alt="{{ cv[0] }} Trồng Vị Nhà" fetchpriority="high">
-      </picture>
-      {% endif %}
-      <div class="cat-cover-text">
-        <h1>{{ cv[0] }}</h1>
-        <p class="lead">{{ cv[1] }}{% if not loai %}<br><span class="cover-question">Hôm nay, bạn thích vị nào?</span>{% endif %}</p>
+    {% if loai in ['tra', 'banh'] %}
+    {% set category_title = 'Trà' if loai == 'tra' else 'Bánh từ trà' %}
+    <div class="collection-cover collection-cover-{{ loai }}">
+      <div class="collection-collage" aria-label="Một số sản phẩm {{ category_title | lower }}">
+        {% for p in cover_items %}
+        <a class="collection-collage-item collection-collage-item-{{ loop.index }}" href="{{ product_url(p) }}" aria-label="Xem {{ p.name }}">
+          {{ m.product_image(p, '1/1') }}
+        </a>
+        {% endfor %}
       </div>
-      {% if not cover_src %}<div class="category-photo-pending">Ảnh {{ cv[0] | lower }} đang cập nhật</div>{% endif %}
+      <div class="collection-cover-copy">
+        <span class="collection-kicker">TRỒNG VỊ NHÀ · {{ counts[loai] }} SẢN PHẨM</span>
+        <h1>{{ 'Vị trà thân quen' if loai == 'tra' else 'Vị bánh ấm lòng' }}</h1>
+        <p>{{ 'Từ những dòng trà được tuyển chọn, tìm một hương vị hợp với nhịp riêng của bạn.' if loai == 'tra' else 'Hương trà đi vào từng lớp bánh nhỏ — chọn món theo vị và dòng bánh bạn yêu thích.' }}</p>
+        <a class="collection-cta" href="#danh-sach-san-pham">Khám phá {{ category_title | lower }} <span aria-hidden="true">↓</span></a>
+      </div>
+      <span class="collection-mark" aria-hidden="true">{{ 'TRÀ' if loai == 'tra' else 'BÁNH' }}</span>
+    </div>
+    {% elif loai == 'gift' %}
+    {% set cover_src = site_image_url('cover-hopqua.jpg') %}
+    <div class="cat-cover cat-cover-gift {{ 'has-photo' if cover_src }}">
+      {% if cover_src %}<picture class="cat-cover-photo"><img src="{{ cover_src }}" alt="Gift set Trồng Vị Nhà" fetchpriority="high"></picture>{% endif %}
+      <div class="cat-cover-text"><h1>Vị nhà trao nhau</h1><p class="lead">Gói hương trà, gom vị bánh, gửi tình nhà.</p></div>
     </div>
     {% else %}
-    <h1>Gói vị thân quen</h1>
-    <p class="lead">Vị trà thanh, vị bánh ngọt, vị thương gói ghém trong từng món quà. Hôm nay, bạn thích vị nào?</p>
+    <div class="cat-cover cat-cover-all"><div class="cat-cover-text"><h1>Gói vị thân quen</h1><p class="lead">Vị trà thanh, vị bánh ngọt, vị thương gói ghém trong từng món quà. Hôm nay, bạn thích vị nào?</p></div></div>
     {% endif %}
     <nav class="tabs tabs-link" aria-label="Danh mục">
       <a class="tab {{ 'active' if not loai }}" href="{{ url_for('catalog') }}">Tất cả <small>{{ D.PRODUCTS|length }}</small></a>
@@ -39,13 +41,29 @@
   </div>
 </section>
 
-<section class="section section-tight">
+<section class="section section-tight" id="danh-sach-san-pham">
   <div class="container shop">
+    {% if loai in ['tra', 'banh'] %}
+    <div class="collection-frame-head">
+      <div><span class="collection-kicker">BỘ SƯU TẬP</span><h2>{{ 'Chọn vị trà của bạn' if loai == 'tra' else 'Chọn dòng bánh yêu thích' }}</h2></div>
+      <span class="collection-count">{{ items|length }} món</span>
+    </div>
+    <nav class="collection-categories" aria-label="Lọc theo dòng {{ 'trà' if loai == 'tra' else 'bánh' }}">
+      {% if loai == 'tra' %}
+      <a class="collection-chip {{ 'active' if not sel.getlist('nhom') }}" href="{{ url_for('catalog', cat='tra') }}">Tất cả trà</a>
+      {% for key, label in D.TEA_GROUPS.items() %}<a class="collection-chip {{ 'active' if key in sel.getlist('nhom') }}" href="{{ url_for('catalog', cat='tra', nhom=key) }}">{{ label }}</a>{% endfor %}
+      {% else %}
+      <a class="collection-chip {{ 'active' if not selected_line }}" href="{{ url_for('catalog', cat='banh') }}">Tất cả bánh</a>
+      {% for line in cake_lines %}<a class="collection-chip {{ 'active' if selected_line == line }}" href="{{ url_for('catalog', cat='banh', dong=line) }}">{{ line }}</a>{% endfor %}
+      {% endif %}
+    </nav>
+    {% endif %}
     <button class="btn btn-secondary filter-toggle" id="filterToggle" aria-controls="filters" aria-expanded="false">Lọc & sắp xếp</button>
     <form class="filters" id="filters" method="get" action="{{ base_url }}">
       <div class="filters-head"><h2 class="h3">Bộ lọc</h2><button type="button" class="nav-close" id="filterClose" aria-label="Đóng bộ lọc">✕</button></div>
       {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
       {% if goi_y %}<input type="hidden" name="goi-y" value="{{ goi_y }}">{% endif %}
+      {% if selected_line %}<input type="hidden" name="dong" value="{{ selected_line }}">{% endif %}
       <fieldset><legend>Khoảng giá</legend>
         {% for k, v in D.PRICE_RANGES.items() %}<label class="check"><input type="checkbox" name="gia" value="{{ k }}" {{ 'checked' if k in sel.getlist('gia') }}> {{ v[0] }}</label>{% endfor %}
       </fieldset>
